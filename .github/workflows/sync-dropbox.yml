@@ -1,0 +1,37 @@
+name: sync-dropbox
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 8 * * *' # 08:00 UTC daily
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: webapp
+    env:
+      DROPBOX_TOKEN: ${{ secrets.DROPBOX_TOKEN }}
+      DROPBOX_LIBRARY_PATH: ${{ secrets.DROPBOX_LIBRARY_PATH }}
+      CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+      CF_KV_NAMESPACE_ID: ${{ secrets.CF_KV_NAMESPACE_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: webapp/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Sync Dropbox snapshot
+        run: npm run sync:dropbox -- --out data/library.generated.json
+
+

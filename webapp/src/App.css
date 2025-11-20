@@ -1,0 +1,334 @@
+.app-shell {
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 6rem;
+  color: #fdf9ef;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.app-header h1 {
+  margin: 0.2rem 0 0;
+  font-size: clamp(2rem, 3vw, 3rem);
+}
+
+.app-header nav {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.app-header nav a {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.app-header nav a:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.app-main {
+  padding: 2rem 0 4rem;
+}
+
+.library-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-bar {
+  flex: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.85rem 1.2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.filters {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0 2rem;
+}
+
+.filter-group {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.filter-title {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.filter-chips {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.chip {
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  cursor: pointer;
+}
+
+.chip-active {
+  background: rgba(235, 64, 52, 0.9);
+  border-color: rgba(235, 64, 52, 0.9);
+}
+
+.reset-button {
+  align-self: flex-end;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+}
+
+.album-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.album-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  min-height: 320px;
+}
+
+.album-cover {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.album-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.album-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+  letter-spacing: 0.2em;
+}
+
+.album-era {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.album-subtitle {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.album-description {
+  color: rgba(255, 255, 255, 0.8);
+  min-height: 3.5rem;
+}
+
+.album-metadata {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.album-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.album-actions .ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  padding: 0.4rem 0.9rem;
+  text-decoration: none;
+  text-align: center;
+}
+
+button {
+  border: none;
+  border-radius: 12px;
+  padding: 0.55rem 1rem;
+  background: rgba(235, 64, 52, 0.9);
+  color: white;
+  cursor: pointer;
+}
+
+.ghost {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 12px;
+  padding: 0.55rem 1rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.player-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(5, 5, 5, 0.9);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 2rem;
+  gap: 1rem;
+}
+
+.player-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.player-controls button {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.player-track {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-meta {
+  display: flex;
+  gap: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.loading-state,
+.error-state,
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.error-state button {
+  margin-top: 1rem;
+}
+
+.album-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.album-page-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.album-page-actions {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.tracklist ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.tracklist li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.track-info {
+  display: flex;
+  gap: 1rem;
+}
+
+.track-actions {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.meta {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.status-banner {
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+input,
+select {
+  padding: 0.55rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.03);
+  color: inherit;
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+  }
+
+  .library-header {
+    flex-direction: column;
+  }
+
+  .player-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
