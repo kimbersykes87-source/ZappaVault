@@ -9,19 +9,26 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "sync:dropbox": "tsx scripts/dropboxSync.ts",
-    "typecheck": "tsc -b"
+    "typecheck": "tsc -b",
+    "debug": "tsx scripts/debug.ts",
+    "test:routes": "tsx scripts/test-routes.ts",
+    "test:screenshot": "tsx scripts/screenshot.ts",
+    "test:network": "tsx scripts/network-monitor.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
+    "dayjs": "^1.11.13",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.0.2",
-    "zustand": "^5.0.3",
     "zod": "^3.23.8",
-    "dayjs": "^1.11.13"
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
     "@cloudflare/workers-types": "^4.20250204.0",
+    "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.56.1",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
@@ -32,6 +39,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "playwright": "^1.56.1",
     "tsx": "^4.19.2",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",

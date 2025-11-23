@@ -1,0 +1,65 @@
+[
+  {
+    "name": "Home page loads",
+    "passed": false,
+    "error": "page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator('h1') to be visible\n",
+    "duration": 6580,
+    "screenshot": "C:\\Users\\kimbe\\Dropbox\\Apps\\ZappaVault\\webapp\\test-screenshots\\home-page-loads-error.png"
+  },
+  {
+    "name": "Library page displays albums",
+    "passed": false,
+    "error": "No albums, loading state, or error state found",
+    "duration": 2917,
+    "screenshot": "C:\\Users\\kimbe\\Dropbox\\Apps\\ZappaVault\\webapp\\test-screenshots\\library-page-displays-albums-error.png"
+  },
+  {
+    "name": "Search bar is functional",
+    "passed": false,
+    "error": "Page Error: Minified React error #185; visit https://react.dev/errors/185 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "duration": 1959,
+    "screenshot": "C:\\Users\\kimbe\\Dropbox\\Apps\\ZappaVault\\webapp\\test-screenshots\\search-bar-is-functional.png"
+  },
+  {
+    "name": "Album page navigation",
+    "passed": false,
+    "error": "Page Error: Minified React error #185; visit https://react.dev/errors/185 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.; Page Error: Minified React error #185; visit https://react.dev/errors/185 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.; Console Error: Failed to load resource: the server responded with a status of 404 ()",
+    "duration": 4858,
+    "screenshot": "C:\\Users\\kimbe\\Dropbox\\Apps\\ZappaVault\\webapp\\test-screenshots\\album-page-navigation.png"
+  },
+  {
+    "name": "Player bar component exists",
+    "passed": false,
+    "error": "Player bar not found",
+    "duration": 1874,
+    "screenshot": "C:\\Users\\kimbe\\Dropbox\\Apps\\ZappaVault\\webapp\\test-screenshots\\player-bar-component-exists-error.png"
+  },
+  {
+    "name": "No broken images",
+    "passed": false,
+    "error": "Page Error: Minified React error #185; visit https://react.dev/errors/185 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "duration": 2820,
+    "screenshot": "C:\\Users\\kimbe\\Dropbox\\Apps\\ZappaVault\\webapp\\test-screenshots\\no-broken-images.png"
+  },
+  {
+    "name": "No console errors on page load",
+    "passed": false,
+    "error": "Found 1 console error(s)",
+    "duration": 5568,
+    "screenshot": "C:\\Users\\kimbe\\Dropbox\\Apps\\ZappaVault\\webapp\\test-screenshots\\no-console-errors-on-page-load-error.png"
+  },
+  {
+    "name": "Mobile viewport renders",
+    "passed": false,
+    "error": "Page Error: Minified React error #185; visit https://react.dev/errors/185 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "duration": 1859,
+    "screenshot": "C:\\Users\\kimbe\\Dropbox\\Apps\\ZappaVault\\webapp\\test-screenshots\\mobile-viewport-renders.png"
+  },
+  {
+    "name": "Desktop viewport renders",
+    "passed": false,
+    "error": "Page Error: Minified React error #185; visit https://react.dev/errors/185 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "duration": 1910,
+    "screenshot": "C:\\Users\\kimbe\\Dropbox\\Apps\\ZappaVault\\webapp\\test-screenshots\\desktop-viewport-renders.png"
+  }
+]
