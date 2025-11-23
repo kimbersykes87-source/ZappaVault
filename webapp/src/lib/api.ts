@@ -1,4 +1,4 @@
-import type { Album, LibraryResult, LibrarySnapshot } from '../../shared/library.ts';
+import type { Album, LibraryResult, LibrarySnapshot } from '../../../shared/library.ts';
 
 const API_BASE =
   import.meta.env.VITE_API_BASE?.replace(/\/$/, '') ?? '';

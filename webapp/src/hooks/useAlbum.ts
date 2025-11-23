@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { Album } from '../../shared/library.ts';
+import type { Album } from '../../../shared/library.ts';
 import { fetchAlbum } from '../lib/api.ts';
 
 export function useAlbum(albumId?: string, includeLinks = false) {

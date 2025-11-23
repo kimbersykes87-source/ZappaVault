@@ -1,4 +1,4 @@
-import type { Album } from '../../shared/library.ts';
+import type { Album } from '../../../shared/library.ts';
 import { AlbumCard } from './AlbumCard.tsx';
 
 interface AlbumGridProps {

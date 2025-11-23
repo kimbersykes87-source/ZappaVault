@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Track } from '../../shared/library.ts';
+import type { Track } from '../../../shared/library.ts';
 
 interface PlayerState {
   queue: Track[];

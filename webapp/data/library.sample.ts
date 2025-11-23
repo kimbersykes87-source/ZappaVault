@@ -1,4 +1,4 @@
-import type { LibrarySnapshot } from '../shared/library.ts';
+import type { LibrarySnapshot } from '../../shared/library.ts';
 
 export const sampleLibrary: LibrarySnapshot = {
   generatedAt: new Date().toISOString(),

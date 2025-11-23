@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { Album } from '../../shared/library.ts';
+import type { Album } from '../../../shared/library.ts';
 import { fetchLibrary } from '../lib/api.ts';
 import type { LibraryRequest, LibraryResponse } from '../lib/api.ts';
 

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import type { Album } from '../../shared/library.ts';
+import type { Album } from '../../../shared/library.ts';
 import { formatFileSize } from '../utils/format.ts';
 
 interface AlbumCardProps {

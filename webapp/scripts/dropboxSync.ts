@@ -6,7 +6,7 @@ import type {
   Album,
   LibrarySnapshot,
   Track,
-} from '../shared/library.ts';
+} from '../../shared/library.ts';
 
 const DROPBOX_API = 'https://api.dropboxapi.com/2';
 const AUDIO_EXTENSIONS = ['.flac', '.mp3', '.wav', '.aiff', '.ogg'];
