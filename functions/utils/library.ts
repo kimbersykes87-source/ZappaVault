@@ -1,5 +1,5 @@
 import type { LibrarySnapshot } from '../shared/library.ts';
-import { sampleLibrary } from '../webapp/data/library.sample.ts';
+import { sampleLibrary } from './library.sample.ts';
 
 const LIBRARY_CACHE_KEY = 'library-snapshot';
 
