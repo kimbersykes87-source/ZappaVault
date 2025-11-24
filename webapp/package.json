@@ -5,12 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b --project tsconfig.app.json && vite build",
+    "build:skip-check": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "sync:dropbox": "tsx scripts/dropboxSync.ts",
+    "upload:library": "tsx scripts/uploadLibrary.ts",
     "typecheck": "tsc -b",
     "debug": "tsx scripts/debug.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
     "test:routes": "tsx scripts/test-routes.ts",
     "test:screenshot": "tsx scripts/screenshot.ts",
     "test:network": "tsx scripts/network-monitor.ts",
@@ -34,6 +39,7 @@
     "@types/react-dom": "^19.2.3",
     "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "@vitest/ui": "^4.0.13",
     "dotenv": "^16.4.7",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
@@ -43,6 +49,7 @@
     "tsx": "^4.19.2",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
-    "vite": "^7.2.4"
+    "vite": "^7.2.4",
+    "vitest": "^4.0.13"
   }
 }

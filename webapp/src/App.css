@@ -245,8 +245,58 @@ button {
   color: rgba(255, 255, 255, 0.7);
 }
 
-.error-state button {
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.error-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.error-message {
+  color: rgba(235, 64, 52, 0.9);
+  font-size: 1.1rem;
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+.error-details {
   margin-top: 1rem;
+  text-align: left;
+  max-width: 800px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.error-details summary {
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.error-details pre {
+  margin: 0.5rem 0 0;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.error-retry {
+  margin-top: 1rem;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
 }
 
 .album-page {

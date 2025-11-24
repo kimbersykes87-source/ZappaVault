@@ -53,28 +53,85 @@ const buildUrl = (
 export async function fetchLibrary(
   params: LibraryRequest,
 ): Promise<LibraryResponse> {
-  const response = await fetch(buildUrl('/api/library', params));
+  const url = buildUrl('/api/library', params);
+  const response = await fetch(url);
+  
+  const contentType = response.headers.get('content-type');
+  
   if (!response.ok) {
-    throw new Error('Unable to load library');
+    if (contentType?.includes('text/html')) {
+      const text = await response.text();
+      throw new Error(
+        `API endpoint not found. The server returned HTML instead of JSON. ` +
+        `Please check that the API is running and accessible at: ${url}. ` +
+        `Response preview: ${text.substring(0, 200)}`
+      );
+    }
+    throw new Error(`Unable to load library: ${response.status} ${response.statusText}`);
   }
 
-  return (await response.json()) as LibraryResponse;
+  if (!contentType?.includes('application/json')) {
+    const text = await response.text();
+    throw new Error(
+      `Expected JSON response but received ${contentType}. ` +
+      `Response preview: ${text.substring(0, 200)}`
+    );
+  }
+
+  try {
+    return (await response.json()) as LibraryResponse;
+  } catch (err) {
+    // If JSON parsing fails, we can't read the response again, so use the error
+    throw new Error(
+      `Failed to parse JSON response. ` +
+      `This usually means the API returned HTML instead of JSON. ` +
+      `Please check that the API endpoint is correct: ${url}. ` +
+      `Original error: ${err instanceof Error ? err.message : String(err)}`
+    );
+  }
 }
 
 export async function fetchAlbum(
   albumId: string,
   includeLinks = false,
 ): Promise<Album> {
-  const response = await fetch(
-    buildUrl(`/api/albums/${albumId}`, includeLinks ? { links: '1' } : undefined),
-  );
+  const url = buildUrl(`/api/albums/${albumId}`, includeLinks ? { links: '1' } : undefined);
+  const response = await fetch(url);
+
+  const contentType = response.headers.get('content-type');
 
   if (!response.ok) {
-    throw new Error('Album not found');
+    if (contentType?.includes('text/html')) {
+      const text = await response.text();
+      throw new Error(
+        `API endpoint not found. The server returned HTML instead of JSON. ` +
+        `Please check that the API is running and accessible at: ${url}. ` +
+        `Response preview: ${text.substring(0, 200)}`
+      );
+    }
+    throw new Error(`Album not found: ${response.status} ${response.statusText}`);
   }
 
-  const payload = (await response.json()) as { album: Album };
-  return payload.album;
+  if (!contentType?.includes('application/json')) {
+    const text = await response.text();
+    throw new Error(
+      `Expected JSON response but received ${contentType}. ` +
+      `Response preview: ${text.substring(0, 200)}`
+    );
+  }
+
+  try {
+    const payload = (await response.json()) as { album: Album };
+    return payload.album;
+  } catch (err) {
+    // If JSON parsing fails, we can't read the response again, so use the error
+    throw new Error(
+      `Failed to parse JSON response. ` +
+      `This usually means the API returned HTML instead of JSON. ` +
+      `Please check that the API endpoint is correct: ${url}. ` +
+      `Original error: ${err instanceof Error ? err.message : String(err)}`
+    );
+  }
 }
 
 export async function refreshLibrary(

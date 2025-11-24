@@ -5,21 +5,12 @@ import { formatDuration } from '../utils/format.ts';
 export function PlayerBar() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentTrack = usePlayerStore(selectCurrentTrack);
-  const {
-    isPlaying,
-    nowPlayingAlbum,
-    play,
-    pause,
-    next,
-    previous,
-  } = usePlayerStore((state) => ({
-    isPlaying: state.isPlaying,
-    nowPlayingAlbum: state.nowPlayingAlbum,
-    play: state.play,
-    pause: state.pause,
-    next: state.next,
-    previous: state.previous,
-  }));
+  const isPlaying = usePlayerStore((state) => state.isPlaying);
+  const nowPlayingAlbum = usePlayerStore((state) => state.nowPlayingAlbum);
+  const play = usePlayerStore((state) => state.play);
+  const pause = usePlayerStore((state) => state.pause);
+  const next = usePlayerStore((state) => state.next);
+  const previous = usePlayerStore((state) => state.previous);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -58,8 +49,8 @@ export function PlayerBar() {
 
   if (!currentTrack) {
     return (
-    <footer className="player-bar">
-      <audio ref={audioRef} hidden />
+      <footer className="player-bar">
+        <audio ref={audioRef} hidden />
         <p>Select an album to start playing.</p>
       </footer>
     );
