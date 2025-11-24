@@ -16,14 +16,6 @@ function App() {
               Stream, search, and download curated recordings sourced from the family archive.
             </p>
           </div>
-          <nav>
-            <a href="https://github.com/" target="_blank" rel="noreferrer">
-              GitHub Repo
-            </a>
-            <a href="https://cloudflare.com/pages" target="_blank" rel="noreferrer">
-              Cloudflare Pages
-            </a>
-          </nav>
         </header>
         <main className="app-main">
           <Routes>
