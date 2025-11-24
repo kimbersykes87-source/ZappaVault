@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "sync:dropbox": "tsx scripts/dropboxSync.ts",
     "upload:library": "tsx scripts/uploadLibrary.ts",
+    "upload:cloudflare": "tsx scripts/uploadToCloudflare.ts",
     "typecheck": "tsc -b",
     "debug": "tsx scripts/debug.ts",
     "test": "vitest run",
