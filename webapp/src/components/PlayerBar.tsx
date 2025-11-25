@@ -7,6 +7,7 @@ export function PlayerBar() {
   const currentTrack = usePlayerStore(selectCurrentTrack);
   const isPlaying = usePlayerStore((state) => state.isPlaying);
   const nowPlayingAlbum = usePlayerStore((state) => state.nowPlayingAlbum);
+  const nowPlayingCoverUrl = usePlayerStore((state) => state.nowPlayingCoverUrl);
   const play = usePlayerStore((state) => state.play);
   const pause = usePlayerStore((state) => state.pause);
   const next = usePlayerStore((state) => state.next);
@@ -67,6 +68,11 @@ export function PlayerBar() {
   return (
     <footer className="player-bar">
       <audio ref={audioRef} hidden />
+      {nowPlayingCoverUrl && (
+        <div className="player-cover">
+          <img src={nowPlayingCoverUrl} alt={nowPlayingAlbum ?? 'Album cover'} />
+        </div>
+      )}
       <div className="player-track">
         <strong>{currentTrack.title}</strong>
         <span>{nowPlayingAlbum ?? 'Unknown album'}</span>

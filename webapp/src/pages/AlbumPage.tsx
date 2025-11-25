@@ -3,7 +3,7 @@ import { useAlbum } from '../hooks/useAlbum.ts';
 import { LoadingState } from '../components/LoadingState.tsx';
 import { ErrorState } from '../components/ErrorState.tsx';
 import { formatDuration, formatFileSize } from '../utils/format.ts';
-import { getAlbumDownloadUrl } from '../lib/api.ts';
+import { getAlbumDownloadUrl, getTrackDownloadUrl } from '../lib/api.ts';
 import { usePlayerStore } from '../store/player.ts';
 
 export function AlbumPage() {
@@ -27,7 +27,7 @@ export function AlbumPage() {
       alert('No streaming links for this album yet.');
       return;
     }
-    setQueue(playableTracks, album.title);
+    setQueue(playableTracks, album.title, album.coverUrl);
   };
 
   const handlePlayTrack = (index: number) => {
@@ -39,7 +39,7 @@ export function AlbumPage() {
     const startIndex = playableTracks.findIndex(
       (track) => track.id === requested.id,
     );
-    setQueue(playableTracks, album.title);
+    setQueue(playableTracks, album.title, album.coverUrl);
     if (startIndex >= 0) {
       playTrackAt(startIndex);
     }
@@ -100,13 +100,9 @@ export function AlbumPage() {
                 ) : (
                   <span className="badge">No stream</span>
                 )}
-                {track.downloadUrl ? (
-                  <a href={track.downloadUrl} target="_blank" rel="noreferrer">
-                    ⬇
-                  </a>
-                ) : (
-                  <span className="badge">No download</span>
-                )}
+                <a href={getTrackDownloadUrl(track.id)} target="_blank" rel="noreferrer">
+                  ⬇
+                </a>
               </div>
             </li>
           ))}

@@ -5,7 +5,6 @@ import type { LibraryRequest, LibraryResponse } from '../lib/api.ts';
 
 const defaultRequest: LibraryRequest = {
   q: '',
-  formats: [],
   sort: 'title',
   page: 1,
   pageSize: 24,

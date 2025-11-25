@@ -6,7 +6,8 @@ interface PlayerState {
   currentIndex: number;
   isPlaying: boolean;
   nowPlayingAlbum?: string;
-  setQueue: (tracks: Track[], albumTitle?: string) => void;
+  nowPlayingCoverUrl?: string;
+  setQueue: (tracks: Track[], albumTitle?: string, coverUrl?: string) => void;
   play: () => void;
   pause: () => void;
   next: () => void;
@@ -20,12 +21,13 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   currentIndex: 0,
   isPlaying: false,
   nowPlayingAlbum: undefined,
-  setQueue: (tracks, albumTitle) =>
+  setQueue: (tracks, albumTitle, coverUrl) =>
     set({
       queue: tracks,
       currentIndex: 0,
       isPlaying: tracks.length > 0,
       nowPlayingAlbum: albumTitle,
+      nowPlayingCoverUrl: coverUrl,
     }),
   play: () => set({ isPlaying: true }),
   pause: () => set({ isPlaying: false }),
@@ -53,6 +55,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       currentIndex: 0,
       isPlaying: false,
       nowPlayingAlbum: undefined,
+      nowPlayingCoverUrl: undefined,
     }),
 }));
 

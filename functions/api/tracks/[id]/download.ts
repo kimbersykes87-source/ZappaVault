@@ -19,20 +19,20 @@ function convertToDropboxPath(localPath: string): string {
   return `/${localPath}`;
 }
 
-function getFolderNameFromPath(path: string): string {
-  // Extract folder name from path
-  // C:/Users/kimbe/Dropbox/Apps/ZappaVault/ZappaLibrary/Buffalo (April 2007) -> Buffalo (April 2007)
+function getFileNameFromPath(path: string): string {
+  // Extract filename from path
+  // C:/Users/kimbe/Dropbox/.../track.mp3 -> track.mp3
   const normalized = path.replace(/\\/g, '/');
   const parts = normalized.split('/');
-  return parts[parts.length - 1] || 'album';
+  return parts[parts.length - 1] || 'track';
 }
 
 export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
   const { env, params } = context;
-  const albumId = params?.id;
+  const trackId = params?.id;
 
-  if (!albumId) {
-    return new Response('Missing album id', { status: 400 });
+  if (!trackId) {
+    return new Response('Missing track id', { status: 400 });
   }
 
   if (!env.DROPBOX_TOKEN) {
@@ -40,17 +40,26 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
   }
 
   const snapshot = await loadLibrarySnapshot(env);
-  const album = snapshot.albums.find((entry) => entry.id === albumId);
+  
+  // Find the track by searching through all albums
+  let track = null;
+  for (const album of snapshot.albums) {
+    const found = album.tracks.find((t) => t.id === trackId);
+    if (found) {
+      track = found;
+      break;
+    }
+  }
 
-  if (!album) {
-    return new Response('Album not found', { status: 404 });
+  if (!track) {
+    return new Response('Track not found', { status: 404 });
   }
 
   // Convert Windows path to Dropbox path
-  const dropboxPath = convertToDropboxPath(album.locationPath);
+  const dropboxPath = convertToDropboxPath(track.filePath);
 
   const response = await fetch(
-    'https://content.dropboxapi.com/2/files/download_zip',
+    'https://content.dropboxapi.com/2/files/download',
     {
       method: 'POST',
       headers: {
@@ -67,10 +76,22 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
     return new Response(errorText, { status: response.status });
   }
 
-  // Use folder name from path for zip filename
-  const folderName = getFolderNameFromPath(album.locationPath);
-  const filename = `${folderName}.zip`.replace(/"/g, '').replace(/[<>:]/g, '_');
+  // Use filename from path for download
+  let filename = getFileNameFromPath(track.filePath);
+  // Sanitize filename - remove invalid characters
+  filename = filename.replace(/[<>:"/\\|?*]/g, '_');
   
+  // Determine content type from file extension
+  const ext = filename.toLowerCase().substring(filename.lastIndexOf('.'));
+  const contentTypeMap: Record<string, string> = {
+    '.mp3': 'audio/mpeg',
+    '.flac': 'audio/flac',
+    '.wav': 'audio/wav',
+    '.m4a': 'audio/mp4',
+    '.ogg': 'audio/ogg',
+  };
+  const contentType = contentTypeMap[ext] || 'application/octet-stream';
+
   // Encode filename for Content-Disposition header (RFC 5987)
   const encodedFilename = encodeURIComponent(filename);
   const contentDisposition = `attachment; filename="${filename}"; filename*=UTF-8''${encodedFilename}`;
@@ -83,7 +104,7 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
 
   return new Response(body, {
     headers: {
-      'content-type': 'application/zip',
+      'content-type': contentType,
       'content-disposition': contentDisposition,
       'cache-control': 'no-cache',
     },

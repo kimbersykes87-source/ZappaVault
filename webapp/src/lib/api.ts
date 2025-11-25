@@ -156,3 +156,7 @@ export function getAlbumDownloadUrl(albumId: string): string {
   return buildUrl(`/api/albums/${albumId}/download`);
 }
 
+export function getTrackDownloadUrl(trackId: string): string {
+  return buildUrl(`/api/tracks/${trackId}/download`);
+}
+

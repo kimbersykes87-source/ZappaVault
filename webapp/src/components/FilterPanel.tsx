@@ -1,4 +1,3 @@
-const formatOptions = ['FLAC', 'MP3', 'WAV', 'AIFF'];
 const sortOptions = [
   { value: 'title', label: 'Alphabetical' },
   { value: 'year', label: 'Release Year' },
@@ -6,11 +5,9 @@ const sortOptions = [
 ] as const;
 
 interface FilterPanelProps {
-  selectedFormats: string[];
   sort: 'title' | 'year' | 'recent';
   year?: number;
   onChange: (filters: {
-    formats?: string[];
     sort?: 'title' | 'year' | 'recent';
     year?: number;
   }) => void;
@@ -18,41 +15,13 @@ interface FilterPanelProps {
 }
 
 export function FilterPanel({
-  selectedFormats,
   sort,
   year,
   onChange,
   onReset,
 }: FilterPanelProps) {
-  const toggleFormat = (format: string) => {
-    if (selectedFormats.includes(format)) {
-      onChange({
-        formats: selectedFormats.filter((value) => value !== format),
-      });
-      return;
-    }
-
-    onChange({ formats: [...selectedFormats, format] });
-  };
-
   return (
     <section className="filters">
-      <div className="filter-group">
-        <p className="filter-title">Formats</p>
-        <div className="filter-chips">
-          {formatOptions.map((format) => (
-            <button
-              key={format}
-              type="button"
-              className={`chip ${selectedFormats.includes(format) ? 'chip-active' : ''}`}
-              onClick={() => toggleFormat(format)}
-            >
-              {format}
-            </button>
-          ))}
-        </div>
-      </div>
-
       <div className="filter-group">
         <label className="filter-title" htmlFor="year-filter">
           Year

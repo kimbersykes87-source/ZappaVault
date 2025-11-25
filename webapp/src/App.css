@@ -175,6 +175,86 @@
 .album-actions {
   display: flex;
   gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.album-action-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 10px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.album-action-button--primary {
+  background: rgba(235, 64, 52, 0.9);
+  color: white;
+}
+
+.album-action-button--primary:hover {
+  background: rgba(235, 64, 52, 1);
+  transform: translateY(-1px);
+}
+
+.album-action-button--primary:focus {
+  outline: 2px solid rgba(235, 64, 52, 0.6);
+  outline-offset: 2px;
+}
+
+.album-action-button--secondary {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: inherit;
+}
+
+.album-action-button--secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.album-action-button--secondary:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 2px;
+}
+
+.album-action-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.album-action-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.album-action-label {
+  font-weight: 500;
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.album-action-sublabel {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .album-actions .ghost {
@@ -215,6 +295,20 @@ button {
   justify-content: space-between;
   padding: 0.75rem 2rem;
   gap: 1rem;
+}
+
+.player-cover {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.player-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .player-controls {
@@ -380,5 +474,17 @@ select {
   .player-bar {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .album-actions {
+    flex-direction: column;
+  }
+
+  .album-action-button {
+    width: 100%;
+  }
+
+  .album-action-sublabel {
+    white-space: normal;
   }
 }

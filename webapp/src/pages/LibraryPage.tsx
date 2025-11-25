@@ -19,7 +19,6 @@ export function LibraryPage() {
   };
 
   const handleFilters = (filters: {
-    formats?: string[];
     sort?: 'title' | 'year' | 'recent';
     year?: number;
   }) => {
@@ -27,7 +26,7 @@ export function LibraryPage() {
   };
 
   const handleReset = () => {
-    setRequest({ q: '', formats: [], sort: 'title', page: 1, pageSize: 24 });
+    setRequest({ q: '', sort: 'title', page: 1, pageSize: 24 });
   };
 
   const handlePlay = async (albumId: string) => {
@@ -39,7 +38,7 @@ export function LibraryPage() {
         alert('Streaming links are not available for this album yet.');
         return;
       }
-      setQueue(playable, album.title);
+      setQueue(playable, album.title, album.coverUrl);
     } catch (err) {
       alert((err as Error).message);
     } finally {
@@ -58,7 +57,6 @@ export function LibraryPage() {
       </header>
 
       <FilterPanel
-        selectedFormats={request.formats ?? []}
         sort={request.sort ?? 'title'}
         year={request.year}
         onChange={handleFilters}
