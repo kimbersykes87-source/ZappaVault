@@ -367,21 +367,28 @@ async function attachSignedLinks(
 
 export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
   const { request, env, params } = context;
+  console.log(`[API DEBUG] Album API called: ${request.url}`);
+  console.log(`[API DEBUG] DROPBOX_TOKEN present: ${!!env.DROPBOX_TOKEN}`);
+  
   const snapshot = await loadLibrarySnapshot(env);
   const albumId = params?.id;
 
   if (!albumId) {
+    console.log(`[API DEBUG] Missing album id`);
     return new Response('Missing album id', { status: 400 });
   }
 
+  console.log(`[API DEBUG] Looking for album: ${albumId}`);
   const album = snapshot.albums.find((entry) => entry.id === albumId);
 
   if (!album) {
+    console.log(`[API DEBUG] Album not found: ${albumId}`);
     return new Response('Album not found', { status: 404 });
   }
 
   const url = new URL(request.url);
   const includeLinks = url.searchParams.get('links') === '1';
+  console.log(`[API DEBUG] includeLinks: ${includeLinks}`);
 
   const payload = includeLinks ? await attachSignedLinks(album, env) : album;
 
