@@ -32,7 +32,6 @@ export function AlbumCard({ album, onPlay }: AlbumCardProps) {
   const trackCount = album.tracks.length;
   const fileFormat = album.formats.length > 0 ? album.formats[0] : 'Unknown';
   const fileSize = formatFileSize(album.totalSizeBytes);
-  const playableTracks = album.tracks.filter((track) => track.streamingUrl).length;
 
   return (
     <article className="album-card">
