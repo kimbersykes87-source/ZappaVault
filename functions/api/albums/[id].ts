@@ -7,9 +7,12 @@ import type { EnvBindings } from '../../utils/library.ts';
 async function getPermanentLink(
   env: EnvBindings,
   filePath: string,
+  errors?: string[],
 ): Promise<string | undefined> {
   if (!env.DROPBOX_TOKEN) {
-    console.log(`[LINK DEBUG] No DROPBOX_TOKEN for ${filePath}`);
+    const msg = `No DROPBOX_TOKEN for ${filePath}`;
+    console.log(`[LINK DEBUG] ${msg}`);
+    if (errors) errors.push(msg);
     return undefined;
   }
 
@@ -81,7 +84,9 @@ async function getPermanentLink(
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.log(`[LINK DEBUG] create_shared_link_with_settings failed for ${filePath}: ${response.status} ${errorText}`);
+      const errorMsg = `create_shared_link_with_settings failed for ${filePath}: ${response.status} ${errorText}`;
+      console.log(`[LINK DEBUG] ${errorMsg}`);
+      if (errors) errors.push(errorMsg);
       
       // If it's a 409 conflict, the link might already exist - try to get it
       if (response.status === 409) {
@@ -118,11 +123,17 @@ async function getPermanentLink(
       
       // Log specific error codes for debugging
       if (response.status === 401) {
-        console.log(`[LINK DEBUG] ❌ 401 Unauthorized - Token is invalid or expired`);
+        const msg = `401 Unauthorized - Token is invalid or expired`;
+        console.log(`[LINK DEBUG] ❌ ${msg}`);
+        if (errors) errors.push(msg);
       } else if (response.status === 403) {
-        console.log(`[LINK DEBUG] ❌ 403 Forbidden - Token lacks 'sharing.write' permission`);
+        const msg = `403 Forbidden - Token lacks 'sharing.write' permission`;
+        console.log(`[LINK DEBUG] ❌ ${msg}`);
+        if (errors) errors.push(msg);
       } else if (response.status === 404) {
-        console.log(`[LINK DEBUG] ❌ 404 Not Found - File path does not exist: ${filePath}`);
+        const msg = `404 Not Found - File path does not exist: ${filePath}`;
+        console.log(`[LINK DEBUG] ❌ ${msg}`);
+        if (errors) errors.push(msg);
       }
       
       return undefined;
@@ -319,6 +330,7 @@ async function attachSignedLinks(
   console.log(`[LINK DEBUG] Processing album: ${album.title} (${album.tracks.length} tracks)`);
   console.log(`[LINK DEBUG] Token length: ${env.DROPBOX_TOKEN.length} chars`);
 
+  const errors: string[] = [];
   const updatedTracks = await Promise.all(
     album.tracks.map(async (track) => {
       // Convert Windows path to Dropbox path before getting permanent link
@@ -326,7 +338,7 @@ async function attachSignedLinks(
       console.log(`[LINK DEBUG] Getting link for track: ${track.title}`);
       console.log(`[LINK DEBUG]   Original path: ${track.filePath}`);
       console.log(`[LINK DEBUG]   Dropbox path: ${dropboxFilePath}`);
-      const link = await getPermanentLink(env, dropboxFilePath);
+      const link = await getPermanentLink(env, dropboxFilePath, errors);
       if (!link) {
         console.log(`[LINK DEBUG]   ❌ Failed to get link for: ${dropboxFilePath}`);
       } else {
@@ -359,12 +371,19 @@ async function attachSignedLinks(
 
   const tracksWithLinks = updatedTracks.filter(t => t.streamingUrl).length;
   console.log(`[LINK DEBUG] Album ${album.title}: ${tracksWithLinks}/${updatedTracks.length} tracks have links`);
+  
+  // Collect unique errors
+  const uniqueErrors = [...new Set(errors)];
+  if (uniqueErrors.length > 0) {
+    console.error(`[ERROR] Collected ${uniqueErrors.length} unique errors during link generation`);
+  }
 
   return {
     ...album,
     tracks: updatedTracks,
     coverUrl,
-  };
+    __linkErrors: uniqueErrors.slice(0, 5), // Return first 5 errors
+  } as Album & { __linkErrors?: string[] };
 }
 
 export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
@@ -401,12 +420,15 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
       if (tracksWithLinks === 0 && payload.tracks.length > 0) {
         console.error(`[ERROR] No links generated for album: ${album.title}`);
         console.error(`[ERROR] This suggests Dropbox API calls are failing`);
-        // Add a debug field to help diagnose
+        // Get errors from attachSignedLinks - we need to pass them through
+        // For now, add a debug field to help diagnose
         (payload as any).__debug = {
           tokenPresent: !!env.DROPBOX_TOKEN,
           tokenLength: env.DROPBOX_TOKEN?.length || 0,
           tracksProcessed: payload.tracks.length,
           tracksWithLinks: 0,
+          errors: (payload as any).__linkErrors || [],
+          note: 'Errors from Dropbox API calls are shown above',
         };
       }
     } catch (error) {
