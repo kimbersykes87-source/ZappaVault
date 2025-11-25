@@ -50,6 +50,12 @@ async function getPermanentLink(
         console.log(`[LINK DEBUG] No existing link for ${filePath} (${response.status}), will create new one`);
       } else {
         console.log(`[LINK DEBUG] list_shared_links failed for ${filePath}: ${response.status} ${errorText}`);
+        // Log specific error codes
+        if (response.status === 401) {
+          console.log(`[LINK DEBUG] ❌ 401 Unauthorized - Token is invalid or expired`);
+        } else if (response.status === 403) {
+          console.log(`[LINK DEBUG] ❌ 403 Forbidden - Token lacks 'sharing.read' permission`);
+        }
       }
     }
 
@@ -104,7 +110,19 @@ async function getPermanentLink(
             console.log(`[LINK DEBUG] Retrieved existing link after conflict: ${directLink}`);
             return directLink;
           }
+        } else {
+          const conflictError = await conflictResponse.text();
+          console.log(`[LINK DEBUG] Failed to retrieve existing link after 409: ${conflictResponse.status} ${conflictError}`);
         }
+      }
+      
+      // Log specific error codes for debugging
+      if (response.status === 401) {
+        console.log(`[LINK DEBUG] ❌ 401 Unauthorized - Token is invalid or expired`);
+      } else if (response.status === 403) {
+        console.log(`[LINK DEBUG] ❌ 403 Forbidden - Token lacks 'sharing.write' permission`);
+      } else if (response.status === 404) {
+        console.log(`[LINK DEBUG] ❌ 404 Not Found - File path does not exist: ${filePath}`);
       }
       
       return undefined;
