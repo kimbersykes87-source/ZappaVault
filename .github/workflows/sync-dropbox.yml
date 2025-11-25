@@ -46,11 +46,30 @@ jobs:
       - name: Commit and push changes
         working-directory: .
         run: |
+          echo "Checking if file exists..."
+          if [ ! -f "webapp/data/library.generated.json" ]; then
+            echo "Error: library.generated.json was not created"
+            exit 1
+          fi
+          
+          echo "File exists, checking git status..."
+          git status
+          git branch -a
+          
+          echo "Adding file to git..."
           git add webapp/data/library.generated.json
+          
+          echo "Checking for changes..."
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
+            echo "Committing changes..."
             git commit -m "chore: update library snapshot from Dropbox [skip ci]"
-            git push
+            
+            echo "Pushing to repository..."
+            git remote -v
+            BRANCH=$(git rev-parse --abbrev-ref HEAD)
+            echo "Current branch: $BRANCH"
+            git push origin "$BRANCH"
           fi
 

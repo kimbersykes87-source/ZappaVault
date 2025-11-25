@@ -248,8 +248,12 @@ async function run(): Promise<void> {
     `Wrote ${snapshot.albums.length} albums / ${snapshot.trackCount} tracks to ${outputFile}`,
   );
 
-  await uploadToCloudflare(snapshot);
-  console.log('Cloudflare KV updated (if credentials provided).');
+  try {
+    await uploadToCloudflare(snapshot);
+    console.log('Cloudflare KV updated (if credentials provided).');
+  } catch (error) {
+    console.warn('Cloudflare KV update failed (non-blocking):', error);
+  }
 }
 
 run().catch((error) => {
