@@ -173,38 +173,36 @@ function convertToDirectLink(sharedUrl: string): string {
 }
 
 function convertToDropboxPath(localPath: string): string {
-  // Convert Windows path to Dropbox path
-  // C:/Users/kimbe/Dropbox/Apps/ZappaVault/ZappaLibrary/... -> /ZappaLibrary/...
-  // The Dropbox API expects paths relative to the Dropbox root
-  // Since DROPBOX_LIBRARY_PATH is /ZappaLibrary, we extract everything after that folder
-  
-  if (localPath.startsWith('C:/') || localPath.startsWith('c:/')) {
-    // Find the ZappaLibrary folder in the path
-    const zappaLibraryIndex = localPath.toLowerCase().indexOf('zappalibrary');
-    if (zappaLibraryIndex !== -1) {
-      // Extract everything after "ZappaLibrary"
-      const afterZappaLibrary = localPath.substring(zappaLibraryIndex + 'zappalibrary'.length);
-      // Remove any leading slashes and add one
-      const cleanPath = afterZappaLibrary.replace(/^[\/\\]+/, '');
-      return `/ZappaLibrary/${cleanPath.replace(/\\/g, '/')}`;
-    }
-    
-    // Fallback: Extract the path after Dropbox
-    const dropboxIndex = localPath.toLowerCase().indexOf('/dropbox/');
-    if (dropboxIndex !== -1) {
-      const afterDropbox = localPath.substring(dropboxIndex + '/dropbox'.length);
-      // Ensure it starts with /
-      return afterDropbox.startsWith('/') ? afterDropbox : `/${afterDropbox}`;
-    }
-  }
+  // Convert Windows path to Dropbox path, or return Dropbox path as-is
+  // Handles both:
+  // - Windows paths: C:/Users/kimbe/Dropbox/Apps/ZappaVault/ZappaLibrary/... -> /Apps/ZappaVault/ZappaLibrary/...
+  // - Dropbox paths: /Apps/ZappaVault/ZappaLibrary/... -> /Apps/ZappaVault/ZappaLibrary/... (unchanged)
   
   // If already a Dropbox path (starts with /), return as is
   if (localPath.startsWith('/')) {
     return localPath;
   }
   
+  // Handle Windows paths
+  if (localPath.startsWith('C:/') || localPath.startsWith('c:/')) {
+    // Find /Dropbox/ in the path and extract everything after it
+    const dropboxIndex = localPath.toLowerCase().indexOf('/dropbox/');
+    if (dropboxIndex !== -1) {
+      const afterDropbox = localPath.substring(dropboxIndex + '/dropbox'.length);
+      return afterDropbox.startsWith('/') ? afterDropbox : `/${afterDropbox}`;
+    }
+    
+    // Fallback: Find ZappaLibrary folder
+    const zappaLibraryIndex = localPath.toLowerCase().indexOf('zappalibrary');
+    if (zappaLibraryIndex !== -1) {
+      const afterZappaLibrary = localPath.substring(zappaLibraryIndex + 'zappalibrary'.length);
+      const cleanPath = afterZappaLibrary.replace(/^[\/\\]+/, '');
+      return `/Apps/ZappaVault/ZappaLibrary/${cleanPath.replace(/\\/g, '/')}`;
+    }
+  }
+  
   // Otherwise, assume it's relative to ZappaLibrary
-  return `/ZappaLibrary/${localPath.replace(/\\/g, '/')}`;
+  return `/Apps/ZappaVault/ZappaLibrary/${localPath.replace(/\\/g, '/')}`;
 }
 
 async function listCoverFolder(

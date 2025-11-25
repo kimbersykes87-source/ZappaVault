@@ -4,8 +4,17 @@ import {
 import type { EnvBindings } from '../../../utils/library.ts';
 
 function convertToDropboxPath(localPath: string): string {
-  // Convert Windows path to Dropbox path
-  // C:/Users/kimbe/Dropbox/Apps/ZappaVault/ZappaLibrary/... -> /Apps/ZappaVault/ZappaLibrary/...
+  // Convert Windows path to Dropbox path, or return Dropbox path as-is
+  // Handles both:
+  // - Windows paths: C:/Users/kimbe/Dropbox/Apps/ZappaVault/ZappaLibrary/... -> /Apps/ZappaVault/ZappaLibrary/...
+  // - Dropbox paths: /Apps/ZappaVault/ZappaLibrary/... -> /Apps/ZappaVault/ZappaLibrary/... (unchanged)
+  
+  // If already a Dropbox path (starts with /), return as is
+  if (localPath.startsWith('/')) {
+    return localPath;
+  }
+  
+  // Handle Windows paths
   if (localPath.startsWith('C:/') || localPath.startsWith('c:/')) {
     const dropboxIndex = localPath.toLowerCase().indexOf('/dropbox/');
     if (dropboxIndex !== -1) {
@@ -13,10 +22,9 @@ function convertToDropboxPath(localPath: string): string {
       return afterDropbox.startsWith('/') ? afterDropbox : `/${afterDropbox}`;
     }
   }
-  if (localPath.startsWith('/')) {
-    return localPath;
-  }
-  return `/${localPath}`;
+  
+  // Otherwise, assume it's relative and add /
+  return `/${localPath.replace(/\\/g, '/')}`;
 }
 
 function getFolderNameFromPath(path: string): string {

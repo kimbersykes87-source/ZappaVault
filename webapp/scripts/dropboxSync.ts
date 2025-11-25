@@ -136,6 +136,31 @@ function detectFormat(filename: string): string {
   return ext || 'UNKNOWN';
 }
 
+function normalizeDropboxPath(dropboxPath: string): string {
+  // Ensure path is in Dropbox API format (starts with /)
+  // Convert Windows paths to Dropbox paths if needed
+  if (dropboxPath.startsWith('C:/') || dropboxPath.startsWith('c:/')) {
+    // Find /Dropbox/ in the path and extract everything after it
+    const dropboxIndex = dropboxPath.toLowerCase().indexOf('/dropbox/');
+    if (dropboxIndex !== -1) {
+      const afterDropbox = dropboxPath.substring(dropboxIndex + '/dropbox'.length);
+      return afterDropbox.startsWith('/') ? afterDropbox : `/${afterDropbox}`;
+    }
+    // Fallback: try to find Apps/ZappaVault/ZappaLibrary
+    const zappaLibraryIndex = dropboxPath.toLowerCase().indexOf('zappalibrary');
+    if (zappaLibraryIndex !== -1) {
+      const afterZappaLibrary = dropboxPath.substring(zappaLibraryIndex);
+      return `/${afterZappaLibrary.replace(/\\/g, '/')}`;
+    }
+  }
+  // If already starts with /, it's already a Dropbox path
+  if (dropboxPath.startsWith('/')) {
+    return dropboxPath;
+  }
+  // Otherwise, assume it's relative to root and add /
+  return `/${dropboxPath.replace(/\\/g, '/')}`;
+}
+
 function parseTrack(entry: DropboxEntry, index: number): Track | undefined {
   const extension = path.extname(entry.name).toLowerCase();
   if (!AUDIO_EXTENSIONS.includes(extension)) {
@@ -145,24 +170,108 @@ function parseTrack(entry: DropboxEntry, index: number): Track | undefined {
   const numberMatch = entry.name.match(/^(\d{1,2})/);
   const trackNumber = numberMatch ? Number(numberMatch[1]) : index + 1;
 
+  // Normalize path to ensure it's in Dropbox API format
+  const normalizedPath = normalizeDropboxPath(entry.path_display);
+
   return {
     id: slugify(entry.path_lower),
     title: entry.name.replace(/\.[^.]+$/, '').replace(/^\d{1,2}\s*-*\s*/, ''),
     durationMs: 0,
     trackNumber,
     format: detectFormat(entry.name),
-    filePath: entry.path_display,
+    filePath: normalizedPath,
     sizeBytes: entry.size ?? 0,
   };
 }
 
-function buildAlbum(folder: DropboxEntry, tracks: Track[]): Album | undefined {
+async function findCoverArt(
+  folderPath: string,
+  entries: DropboxEntry[],
+): Promise<string | undefined> {
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.tif', '.tiff'];
+  const possibleFolderNames = ['Cover', 'cover', 'Covers', 'covers', 'Artwork', 'artwork', 'Images', 'images'];
+  
+  // First, try looking in subfolders
+  for (const folderName of possibleFolderNames) {
+    const coverFolderEntries = entries.filter(
+      (entry) =>
+        entry['.tag'] === 'file' &&
+        entry.path_lower.includes(`/${folderName.toLowerCase()}/`) &&
+        imageExtensions.some((ext) => entry.name.toLowerCase().endsWith(ext)),
+    );
+    
+    if (coverFolderEntries.length > 0) {
+      // Prioritize files with "1", "front", or "cover" in the name
+      const prioritized = coverFolderEntries.sort((a, b) => {
+        const aLower = a.name.toLowerCase();
+        const bLower = b.name.toLowerCase();
+        const aHas1 = aLower.startsWith('1') || aLower.includes(' 1 ') || aLower.includes('_1_');
+        const bHas1 = bLower.startsWith('1') || bLower.includes(' 1 ') || bLower.includes('_1_');
+        const aHasFront = aLower.includes('front') || aLower.includes('cover');
+        const bHasFront = bLower.includes('front') || bLower.includes('cover');
+        
+        if (aHas1 && !bHas1) return -1;
+        if (!aHas1 && bHas1) return 1;
+        if (aHasFront && !bHasFront) return -1;
+        if (!aHasFront && bHasFront) return 1;
+        return 0;
+      });
+      
+      // Return the Dropbox path for the best match
+      return normalizeDropboxPath(prioritized[0].path_display);
+    }
+  }
+  
+  // If no cover found in subfolders, try looking in the album root folder
+  // Find files directly in the album folder (not in subfolders)
+  const folderDepth = folderPath.split('/').length;
+  const rootImageFiles = entries.filter(
+    (entry) => {
+      if (entry['.tag'] !== 'file') return false;
+      if (!imageExtensions.some((ext) => entry.name.toLowerCase().endsWith(ext))) return false;
+      
+      // Check if file is directly in the album folder (one level deeper)
+      const entryDepth = entry.path_lower.split('/').length;
+      return entryDepth === folderDepth + 1 && entry.path_lower.startsWith(folderPath.toLowerCase() + '/');
+    },
+  );
+  
+  if (rootImageFiles.length > 0) {
+    const prioritized = rootImageFiles.sort((a, b) => {
+      const aLower = a.name.toLowerCase();
+      const bLower = b.name.toLowerCase();
+      const aHas1 = aLower.startsWith('1') || aLower.includes(' 1 ') || aLower.includes('_1_');
+      const bHas1 = bLower.startsWith('1') || bLower.includes(' 1 ') || bLower.includes('_1_');
+      const aHasFront = aLower.includes('front') || aLower.includes('cover');
+      const bHasFront = bLower.includes('front') || bLower.includes('cover');
+      
+      if (aHas1 && !bHas1) return -1;
+      if (!aHas1 && bHas1) return 1;
+      if (aHasFront && !bHasFront) return -1;
+      if (!aHasFront && bHasFront) return 1;
+      return 0;
+    });
+    
+    return normalizeDropboxPath(prioritized[0].path_display);
+  }
+  
+  return undefined;
+}
+
+function buildAlbum(
+  folder: DropboxEntry,
+  tracks: Track[],
+  coverUrl?: string,
+): Album | undefined {
   if (tracks.length === 0) {
     return undefined;
   }
 
   const totalSize = tracks.reduce((sum, track) => sum + track.sizeBytes, 0);
   const formats = Array.from(new Set(tracks.map((track) => track.format)));
+
+  // Normalize location path to ensure it's in Dropbox API format
+  const normalizedLocationPath = normalizeDropboxPath(folder.path_display);
 
   return {
     id: slugify(folder.path_lower),
@@ -171,8 +280,8 @@ function buildAlbum(folder: DropboxEntry, tracks: Track[]): Album | undefined {
     era: undefined,
     genre: undefined,
     description: undefined,
-    coverUrl: undefined,
-    locationPath: folder.path_display,
+    coverUrl,
+    locationPath: normalizedLocationPath,
     lastSyncedAt: new Date().toISOString(),
     tags: [],
     tracks: tracks.sort((a, b) => a.trackNumber - b.trackNumber),
@@ -193,7 +302,10 @@ async function generateSnapshot(): Promise<LibrarySnapshot> {
       .map((entry, index) => parseTrack(entry, index))
       .filter((track): track is Track => Boolean(track));
 
-    const album = buildAlbum(folder, tracks);
+    // Find cover art for this album
+    const coverPath = await findCoverArt(folder.path_lower, entries);
+    
+    const album = buildAlbum(folder, tracks, coverPath);
     if (album) {
       albums.push(album);
     }
