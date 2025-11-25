@@ -9,6 +9,7 @@ async function getPermanentLink(
   filePath: string,
 ): Promise<string | undefined> {
   if (!env.DROPBOX_TOKEN) {
+    console.log(`[LINK DEBUG] No DROPBOX_TOKEN for ${filePath}`);
     return undefined;
   }
 
@@ -36,14 +37,18 @@ async function getPermanentLink(
       if (listPayload.links && listPayload.links.length > 0) {
         // Convert shared link to direct download link
         const sharedUrl = listPayload.links[0].url;
-        return convertToDirectLink(sharedUrl);
+        const directLink = convertToDirectLink(sharedUrl);
+        console.log(`[LINK DEBUG] Found existing link for ${filePath}: ${directLink}`);
+        return directLink;
       }
+    } else {
+      const errorText = await response.text();
+      console.log(`[LINK DEBUG] list_shared_links failed for ${filePath}: ${response.status} ${errorText}`);
     }
 
-    // If no existing link, create a new permanent shared link
-    // Try the simpler create_shared_link first (creates public link by default)
+    // If no existing link, create a new permanent shared link using the correct API
     response = await fetch(
-      'https://api.dropboxapi.com/2/sharing/create_shared_link',
+      'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings',
       {
         method: 'POST',
         headers: {
@@ -52,38 +57,26 @@ async function getPermanentLink(
         },
         body: JSON.stringify({ 
           path: filePath,
-          short_url: false
+          settings: {
+            requested_visibility: 'public',
+            audience: 'public',
+            access: 'viewer'
+          }
         }),
       },
     );
 
-    // If that fails, try with settings
-    if (!response.ok) {
-      response = await fetch(
-        'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings',
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${env.DROPBOX_TOKEN}`,
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            path: filePath,
-            settings: {}
-          }),
-        },
-      );
-    }
-
     if (!response.ok) {
       const errorText = await response.text();
-      console.log(`[LINK DEBUG] create_shared_link failed for ${filePath}: ${response.status} ${errorText}`);
+      console.log(`[LINK DEBUG] create_shared_link_with_settings failed for ${filePath}: ${response.status} ${errorText}`);
       return undefined;
     }
 
     const payload = (await response.json()) as { url: string };
     // Convert shared link to direct download link
-    return convertToDirectLink(payload.url);
+    const directLink = convertToDirectLink(payload.url);
+    console.log(`[LINK DEBUG] Created new link for ${filePath}: ${directLink}`);
+    return directLink;
   } catch (error) {
     console.log(`[LINK DEBUG] getPermanentLink error for ${filePath}:`, error);
     return undefined;
@@ -94,11 +87,22 @@ function convertToDirectLink(sharedUrl: string): string {
   // Convert Dropbox shared link to direct download link
   // https://www.dropbox.com/s/abc123/file.jpg?dl=0
   // -> https://dl.dropboxusercontent.com/s/abc123/file.jpg
-  return sharedUrl
-    .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
-    .replace('?dl=0', '')
-    .replace('?dl=1', '')
+  // Also handles dropbox.com (without www)
+  let directUrl = sharedUrl
+    .replace(/^https?:\/\/(www\.)?dropbox\.com/, 'https://dl.dropboxusercontent.com')
+    .replace(/\?dl=[01]/, '')
     .split('?')[0];
+  
+  // Ensure we have the correct format
+  if (!directUrl.startsWith('https://dl.dropboxusercontent.com')) {
+    // Fallback: try to extract the path and rebuild
+    const match = sharedUrl.match(/dropbox\.com\/([^?]+)/);
+    if (match) {
+      directUrl = `https://dl.dropboxusercontent.com/${match[1]}`;
+    }
+  }
+  
+  return directUrl;
 }
 
 function convertToDropboxPath(localPath: string): string {
