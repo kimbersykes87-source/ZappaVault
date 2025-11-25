@@ -443,7 +443,9 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
   let payload: Album;
   if (includeLinks) {
     try {
+      console.log(`[API DEBUG] Generating links for album: ${album.title}`);
       payload = await attachSignedLinks(album, env);
+      console.log(`[API DEBUG] Links generated successfully for: ${album.title}`);
       // Add debug info to response if no links were generated
       const tracksWithLinks = payload.tracks.filter(t => t.streamingUrl).length;
       if (tracksWithLinks === 0 && payload.tracks.length > 0) {
@@ -461,9 +463,15 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
         };
       }
     } catch (error) {
-      console.error(`[ERROR] attachSignedLinks failed:`, error);
-      // Return album without links if there's an error
-      payload = album;
+      console.error(`[ERROR] attachSignedLinks failed for ${album.title}:`, error);
+      console.error(`[ERROR] Error details:`, error instanceof Error ? error.message : String(error));
+      console.error(`[ERROR] Stack:`, error instanceof Error ? error.stack : 'No stack');
+      // Return album without links if there's an error - don't fail the request
+      payload = {
+        ...album,
+        tracks: album.tracks.map(t => ({ ...t, streamingUrl: undefined, downloadUrl: undefined })),
+      };
+      console.log(`[API DEBUG] Returning album without links due to error`);
     }
   } else {
     payload = album;
