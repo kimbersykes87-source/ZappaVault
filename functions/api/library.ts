@@ -175,59 +175,79 @@ async function findCoverArt(
 
   // Convert locationPath to Dropbox format
   const dropboxLocationPath = convertToDropboxPath(album.locationPath);
-  const coverFolderPath = `${dropboxLocationPath}/Cover`;
-
-  // List files in the Cover folder
-  const coverFiles = await listCoverFolder(env, coverFolderPath);
-
-  if (coverFiles.length === 0) {
-    console.log(`[COVER DEBUG] No files found in ${coverFolderPath}`);
-    return undefined;
-  }
-
-  // Filter image files
+  
+  // Try multiple folder names (case-insensitive search)
+  const possibleFolderNames = ['Cover', 'cover', 'Covers', 'covers', 'Artwork', 'artwork', 'Images', 'images'];
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp'];
-  const imageFiles = coverFiles.filter((file) => {
+  
+  // First, try looking in subfolders
+  for (const folderName of possibleFolderNames) {
+    const coverFolderPath = `${dropboxLocationPath}/${folderName}`;
+    const coverFiles = await listCoverFolder(env, coverFolderPath);
+    
+    if (coverFiles.length > 0) {
+      const imageFiles = coverFiles.filter((file) => {
+        const ext = file.toLowerCase().substring(file.lastIndexOf('.'));
+        return imageExtensions.includes(ext);
+      });
+      
+      if (imageFiles.length > 0) {
+        const prioritized = prioritizeCoverFiles(imageFiles);
+        const bestMatch = prioritized[0];
+        const coverPath = `${coverFolderPath}/${bestMatch}`;
+        console.log(`[COVER DEBUG] Album: ${album.title}, Found in ${folderName}: ${bestMatch}`);
+        const link = await getPermanentLink(env, coverPath);
+        if (link) {
+          console.log(`[COVER DEBUG] Successfully got permanent link for ${album.title}`);
+          return link;
+        }
+      }
+    }
+  }
+  
+  // If no cover found in subfolders, try looking in the album root folder
+  const rootFiles = await listCoverFolder(env, dropboxLocationPath);
+  const rootImageFiles = rootFiles.filter((file) => {
     const ext = file.toLowerCase().substring(file.lastIndexOf('.'));
     return imageExtensions.includes(ext);
   });
-
-  if (imageFiles.length === 0) {
-    return undefined;
+  
+  if (rootImageFiles.length > 0) {
+    const prioritized = prioritizeCoverFiles(rootImageFiles);
+    const bestMatch = prioritized[0];
+    const coverPath = `${dropboxLocationPath}/${bestMatch}`;
+    console.log(`[COVER DEBUG] Album: ${album.title}, Found in root: ${bestMatch}`);
+    const link = await getPermanentLink(env, coverPath);
+    if (link) {
+      console.log(`[COVER DEBUG] Successfully got permanent link for ${album.title}`);
+      return link;
+    }
   }
+  
+  console.log(`[COVER DEBUG] No cover art found for ${album.title} at ${dropboxLocationPath}`);
+  return undefined;
+}
 
-  // Prioritize files with "1" or "front" in the name (case-insensitive)
-  const prioritized = imageFiles.sort((a, b) => {
+function prioritizeCoverFiles(imageFiles: string[]): string[] {
+  return imageFiles.sort((a, b) => {
     const aLower = a.toLowerCase();
     const bLower = b.toLowerCase();
     
-    const aHas1 = aLower.startsWith('1') || aLower.includes(' 1 ');
-    const bHas1 = bLower.startsWith('1') || bLower.includes(' 1 ');
-    const aHasFront = aLower.includes('front');
-    const bHasFront = bLower.includes('front');
+    const aHas1 = aLower.startsWith('1') || aLower.includes(' 1 ') || aLower.includes('_1_') || aLower.includes('-1-');
+    const bHas1 = bLower.startsWith('1') || bLower.includes(' 1 ') || bLower.includes('_1_') || bLower.includes('-1-');
+    const aHasFront = aLower.includes('front') || aLower.includes('cover');
+    const bHasFront = bLower.includes('front') || bLower.includes('cover');
 
     // Files starting with "1" have highest priority
     if (aHas1 && !bHas1) return -1;
     if (!aHas1 && bHas1) return 1;
     
-    // Files with "front" have second priority
+    // Files with "front" or "cover" have second priority
     if (aHasFront && !bHasFront) return -1;
     if (!aHasFront && bHasFront) return 1;
     
     return 0;
   });
-
-  // Try to get a permanent link for the first prioritized file
-  const bestMatch = prioritized[0];
-  const coverPath = `${coverFolderPath}/${bestMatch}`;
-  console.log(`[COVER DEBUG] Album: ${album.title}, Found: ${bestMatch}, Path: ${coverPath}`);
-  const link = await getPermanentLink(env, coverPath);
-  if (link) {
-    console.log(`[COVER DEBUG] Successfully got permanent link for ${album.title}`);
-  } else {
-    console.log(`[COVER DEBUG] Failed to get link for ${album.title} at ${coverPath}`);
-  }
-  return link;
 }
 
 async function getCoverUrl(
