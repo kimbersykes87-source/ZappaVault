@@ -4,14 +4,64 @@
   "version": "1.0.0",
   "albums": [
     {
-      "match": "Fillmore East, June 1971",
+      "match": "200 Motels",
       "year": 1971,
       "coverArt": null,
       "era": "Mothers Of Invention",
       "genre": "Progressive Rock",
-      "description": "Live album recorded at the Fillmore East in New York City. Features performances with The Mothers of Invention and guest appearances.",
-      "tags": ["live", "classic"],
-      "subtitle": "1971 Live Album"
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "A Token of His Extreme",
+      "year": 1974,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Absolutely Free",
+      "year": 1967,
+      "coverArt": null,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Ahead Of Their Time",
+      "year": 1993,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Apostrophe (')",
+      "year": 1974,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Baby Snakes",
+      "year": 1983,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
     },
     {
       "match": "Bongo Fury",
@@ -24,14 +74,74 @@
       "subtitle": "1975 Live Album with Captain Beefheart"
     },
     {
-      "match": "Feeding the Monkies at Ma Maison",
+      "match": "Broadway The Hard Way",
+      "year": 1988,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Buffalo",
+      "year": 2007,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Burnt Weeny Sandwich",
+      "year": 1970,
+      "coverArt": null,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Carnegie Hall",
       "year": 2011,
       "coverArt": null,
       "era": "Posthumous Release",
-      "genre": "Jazz Fusion",
-      "description": "Posthumous compilation album featuring previously unreleased material from Zappa's vault. Includes studio and live recordings.",
-      "tags": ["compilation", "vault"],
-      "subtitle": "2011 Vault Release"
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Chicago '78",
+      "year": 2016,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Chunga's Revenge",
+      "year": 1970,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Civilization Phaze III",
+      "year": 1994,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Experimental",
+      "description": null,
+      "tags": [],
+      "subtitle": null
     },
     {
       "match": "Congress Shall Make No Law",
@@ -42,6 +152,846 @@
       "description": "Posthumous release featuring live performances and studio recordings. The title references Zappa's advocacy for free speech and artistic freedom.",
       "tags": ["compilation", "vault", "live"],
       "subtitle": "2010 Vault Release"
+    },
+    {
+      "match": "Cruising with Ruben & The Jets",
+      "year": 1968,
+      "coverArt": null,
+      "era": "Mothers Of Invention",
+      "genre": "Doo-Wop",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Dance Me This",
+      "year": 2015,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Synclavier",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Does Humor Belong In Music_",
+      "year": 1986,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "EIHN- Everything Is Healing Nicely",
+      "year": 1999,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Jazz Fusion",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Feeding the Monkies at Ma Maison",
+      "year": 2011,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Jazz Fusion",
+      "description": "Posthumous compilation album featuring previously unreleased material from Zappa's vault. Includes studio and live recordings.",
+      "tags": ["compilation", "vault"],
+      "subtitle": "2011 Vault Release"
+    },
+    {
+      "match": "Fillmore East, June 1971",
+      "year": 1971,
+      "coverArt": null,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": "Live album recorded at the Fillmore East in New York City. Features performances with The Mothers of Invention and guest appearances.",
+      "tags": ["live", "classic"],
+      "subtitle": "1971 Live Album"
+    },
+    {
+      "match": "Finer Moments",
+      "year": 2012,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Francesco Zappa",
+      "year": 1984,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Classical",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Frank Zappa for President",
+      "year": 2015,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Freak Out!",
+      "year": 1966,
+      "coverArt": null,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Funky Nothingness",
+      "year": 2023,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Jazz Fusion",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "FZ-OZ",
+      "year": 2002,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Greasy Love Songs",
+      "year": 2010,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Doo-Wop",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Guitar",
+      "year": 1988,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Instrumental",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Halloween",
+      "year": 2003,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Hammersmith Odeon",
+      "year": 2010,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Have I Offended Someone_",
+      "year": 1997,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Hot Rats",
+      "year": 1969,
+      "coverArt": null,
+      "era": "Mothers Of Invention",
+      "genre": "Jazz Fusion",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Imaginary Diseases",
+      "year": 2006,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Jazz Fusion",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Jazz From Hell",
+      "year": 1986,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Synclavier",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Joe's Camouflage",
+      "year": 2016,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Joe's Corsage",
+      "year": 2004,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Joe's Domage",
+      "year": 2004,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Joe's Garage Acts I, II & III",
+      "year": 1979,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Joe's Menage",
+      "year": 2015,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Joe's XMasage",
+      "year": 2014,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Just Another Band From L.A",
+      "year": 1972,
+      "coverArt": null,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "LÃ¤ther",
+      "year": 1996,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Little Dots",
+      "year": 2016,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Jazz Fusion",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Lumpy Gravy",
+      "year": 1968,
+      "coverArt": null,
+      "era": "Mothers Of Invention",
+      "genre": "Experimental",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Make A Jazz Noise Here",
+      "year": 1991,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Jazz Fusion",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Meets The Mothers Of Prevention",
+      "year": 1985,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Mothermania",
+      "year": 1969,
+      "coverArt": null,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Mystery Disc",
+      "year": 1998,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "One Shot Deal",
+      "year": 2008,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "One Size Fits All",
+      "year": 1975,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Orchestral Favorites",
+      "year": 1979,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Orchestral",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Over-Nite Sensation",
+      "year": 1973,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Playground Psychotics",
+      "year": 1992,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Plays The Music Of Frank Zappa",
+      "year": 1991,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Orchestral",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Road Tapes, Venue #1",
+      "year": 2012,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Road Tapes, Venue #2",
+      "year": 2013,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Roxy & Elsewhere",
+      "year": 1974,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Roxy By Proxy",
+      "year": 2014,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Roxy- The Movie",
+      "year": 2015,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Sheik Yerbouti",
+      "year": 1979,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Ship Arriving Too Late To Save A Drowning Witch",
+      "year": 1982,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Shut Up 'N Play Yer Guitar",
+      "year": 1981,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Instrumental",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Sleep Dirt",
+      "year": 1979,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Studio Tan",
+      "year": 1978,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "The Best Band You Never Heard In Your Life",
+      "year": 1991,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "The Crux Of The Biscuit",
+      "year": 2016,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "The Grand Wazoo",
+      "year": 1972,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Jazz Fusion",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "The Lost Episodes",
+      "year": 1996,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "The Lumpy Money P-O",
+      "year": 2009,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "The Man From Utopia",
+      "year": 1983,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "The MOFO Project-Object",
+      "year": 2006,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "The Perfect Stranger",
+      "year": 1984,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Orchestral",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "The Roxy Performances",
+      "year": 2018,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "The Yellow Shark",
+      "year": 1993,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Orchestral",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Them or Us",
+      "year": 1984,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Thing-Fish",
+      "year": 1984,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "TinselTown Rebellion",
+      "year": 1981,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Trance-Fusion",
+      "year": 2006,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Synclavier",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Uncle Meat",
+      "year": 1969,
+      "coverArt": null,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Understanding America",
+      "year": 2012,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Waka-Jawaka",
+      "year": 1972,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Jazz Fusion",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Wazoo",
+      "year": 2007,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Jazz Fusion",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Weasels Ripped My Flesh",
+      "year": 1970,
+      "coverArt": null,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "We're Only In It For The Money",
+      "year": 1968,
+      "coverArt": null,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "You Are What You Is",
+      "year": 1981,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "You Can't Do That On Stage Anymore, Vol. 1",
+      "year": 1988,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "You Can't Do That On Stage Anymore, Vol. 2",
+      "year": 1988,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "You Can't Do That On Stage Anymore, Vol. 3",
+      "year": 1989,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "You Can't Do That On Stage Anymore, Vol. 4",
+      "year": 1991,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "You Can't Do That On Stage Anymore, Vol. 5",
+      "year": 1992,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "You Can't Do That On Stage Anymore, Vol. 6",
+      "year": 1992,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Zappa '75: Zagreb/Ljubljana",
+      "year": 2022,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Zappa Erie",
+      "year": 2019,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Zappa In New York",
+      "year": 1978,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Zappa, Vol.1",
+      "year": 2016,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Zappa, Vol. 2",
+      "year": 2021,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "ZAPPAtite (Frank Zappa's Tastiest Tracks)",
+      "year": 2019,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Compilation",
+      "description": null,
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "Zoot Allures",
+      "year": 1976,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": null,
+      "tags": [],
+      "subtitle": null
     }
   ],
   "_instructions": {
@@ -55,4 +1005,3 @@
     "subtitle": "Optional subtitle"
   }
 }
-
