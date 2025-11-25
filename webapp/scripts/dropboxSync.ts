@@ -240,15 +240,21 @@ async function findCoverArt(
     );
     
     if (coverFolderEntries.length > 0) {
-      // Prioritize files with "1", "front", or "cover" in the name
+      // Prioritize files with "1", "front", "cover", or "folder" in the name
       const prioritized = coverFolderEntries.sort((a, b) => {
         const aLower = a.name.toLowerCase();
         const bLower = b.name.toLowerCase();
         const aHas1 = aLower.startsWith('1') || aLower.includes(' 1 ') || aLower.includes('_1_') || aLower.includes('-1-');
         const bHas1 = bLower.startsWith('1') || bLower.includes(' 1 ') || bLower.includes('_1_') || bLower.includes('-1-');
-        const aHasFront = aLower.includes('front') || aLower.includes('cover');
-        const bHasFront = bLower.includes('front') || bLower.includes('cover');
+        const aHasFront = aLower.includes('front') || aLower.includes('cover') || aLower.includes('folder');
+        const bHasFront = bLower.includes('front') || bLower.includes('cover') || bLower.includes('folder');
         
+        // Exact match for "folder" has high priority
+        const aIsFolder = aLower.replace(/\.[^.]+$/, '') === 'folder';
+        const bIsFolder = bLower.replace(/\.[^.]+$/, '') === 'folder';
+        
+        if (aIsFolder && !bIsFolder) return -1;
+        if (!aIsFolder && bIsFolder) return 1;
         if (aHas1 && !bHas1) return -1;
         if (!aHas1 && bHas1) return 1;
         if (aHasFront && !bHasFront) return -1;
@@ -279,9 +285,15 @@ async function findCoverArt(
         const bLower = b.name.toLowerCase();
         const aHas1 = aLower.startsWith('1') || aLower.includes(' 1 ') || aLower.includes('_1_') || aLower.includes('-1-');
         const bHas1 = bLower.startsWith('1') || bLower.includes(' 1 ') || bLower.includes('_1_') || bLower.includes('-1-');
-        const aHasFront = aLower.includes('front') || aLower.includes('cover');
-        const bHasFront = bLower.includes('front') || bLower.includes('cover');
+        const aHasFront = aLower.includes('front') || aLower.includes('cover') || aLower.includes('folder');
+        const bHasFront = bLower.includes('front') || bLower.includes('cover') || bLower.includes('folder');
         
+        // Exact match for "folder" has high priority
+        const aIsFolder = aLower.replace(/\.[^.]+$/, '') === 'folder';
+        const bIsFolder = bLower.replace(/\.[^.]+$/, '') === 'folder';
+        
+        if (aIsFolder && !bIsFolder) return -1;
+        if (!aIsFolder && bIsFolder) return 1;
         if (aHas1 && !bHas1) return -1;
         if (!aHas1 && bHas1) return 1;
         if (aHasFront && !bHasFront) return -1;
