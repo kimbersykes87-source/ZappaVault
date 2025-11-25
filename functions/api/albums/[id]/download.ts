@@ -69,11 +69,14 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
 
   // Use folder name from path for zip filename
   const folderName = getFolderNameFromPath(album.locationPath);
-  const filename = `${folderName}.zip`.replace(/"/g, '').replace(/[<>:]/g, '_');
+  // Sanitize filename - remove invalid characters for Windows
+  const filename = `${folderName}.zip`
+    .replace(/"/g, '')
+    .replace(/[<>:"/\\|?*]/g, '_')
+    .trim();
   
-  // Encode filename for Content-Disposition header (RFC 5987)
-  const encodedFilename = encodeURIComponent(filename);
-  const contentDisposition = `attachment; filename="${filename}"; filename*=UTF-8''${encodedFilename}`;
+  // Simple Content-Disposition - some browsers prefer this format
+  const contentDisposition = `attachment; filename="${filename}"`;
 
   // Get the response body as a stream
   const body = response.body;
@@ -86,6 +89,7 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
       'content-type': 'application/zip',
       'content-disposition': contentDisposition,
       'cache-control': 'no-cache',
+      'x-content-type-options': 'nosniff',
     },
   });
 };

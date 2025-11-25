@@ -78,8 +78,10 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
 
   // Use filename from path for download
   let filename = getFileNameFromPath(track.filePath);
-  // Sanitize filename - remove invalid characters
-  filename = filename.replace(/[<>:"/\\|?*]/g, '_');
+  // Sanitize filename - remove invalid characters for Windows
+  filename = filename
+    .replace(/[<>:"/\\|?*]/g, '_')
+    .trim();
   
   // Determine content type from file extension
   const ext = filename.toLowerCase().substring(filename.lastIndexOf('.'));
@@ -92,9 +94,8 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
   };
   const contentType = contentTypeMap[ext] || 'application/octet-stream';
 
-  // Encode filename for Content-Disposition header (RFC 5987)
-  const encodedFilename = encodeURIComponent(filename);
-  const contentDisposition = `attachment; filename="${filename}"; filename*=UTF-8''${encodedFilename}`;
+  // Simple Content-Disposition - some browsers prefer this format
+  const contentDisposition = `attachment; filename="${filename}"`;
 
   // Get the response body as a stream
   const body = response.body;
@@ -107,6 +108,7 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
       'content-type': contentType,
       'content-disposition': contentDisposition,
       'cache-control': 'no-cache',
+      'x-content-type-options': 'nosniff',
     },
   });
 };
