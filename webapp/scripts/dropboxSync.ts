@@ -127,8 +127,41 @@ function slugify(value: string): string {
 }
 
 function extractYear(text: string): number | undefined {
-  const match = text.match(/(19|20)\d{2}/);
-  return match ? Number(match[0]) : undefined;
+  // Try multiple patterns: (1969), [1969], - 1969, 1969, etc.
+  const patterns = [
+    /\((\d{4})\)/,           // (1969)
+    /\[(\d{4})\]/,           // [1969]
+    /[-–—]\s*(\d{4})\b/,     // - 1969 or – 1969
+    /\b(19\d{2}|20\d{2})\b/, // 1969 or 1979 (standalone)
+  ];
+  
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (match) {
+      const year = Number(match[1] || match[0]);
+      if (year >= 1900 && year <= 2100) {
+        return year;
+      }
+    }
+  }
+  
+  return undefined;
+}
+
+function parseTitleAndYear(folderName: string): { title: string; year?: number } {
+  const year = extractYear(folderName);
+  let title = folderName;
+  
+  // Remove year patterns from title
+  if (year) {
+    title = title
+      .replace(/\(\d{4}\)/, '')      // Remove (1969)
+      .replace(/\[\d{4}\]/, '')      // Remove [1969]
+      .replace(/[-–—]\s*\d{4}\b/, '') // Remove - 1969
+      .trim();
+  }
+  
+  return { title, year };
 }
 
 function detectFormat(filename: string): string {
@@ -191,7 +224,29 @@ async function findCoverArt(
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.tif', '.tiff'];
   const possibleFolderNames = ['Cover', 'cover', 'Covers', 'covers', 'Artwork', 'artwork', 'Images', 'images'];
   
-  // First, try looking in subfolders
+  // Priority 1: Common cover filenames in root (cover.jpg, folder.jpg, etc.)
+  const commonCoverNames = ['cover', 'folder', 'album', 'front', 'artwork'];
+  const folderDepth = folderPath.split('/').length;
+  const rootFiles = entries.filter(
+    (entry) => {
+      if (entry['.tag'] !== 'file') return false;
+      if (!imageExtensions.some((ext) => entry.name.toLowerCase().endsWith(ext))) return false;
+      const entryDepth = entry.path_lower.split('/').length;
+      return entryDepth === folderDepth + 1 && entry.path_lower.startsWith(folderPath.toLowerCase() + '/');
+    },
+  );
+  
+  for (const coverName of commonCoverNames) {
+    const match = rootFiles.find((entry) => {
+      const name = entry.name.toLowerCase().replace(/\.[^.]+$/, '');
+      return name === coverName || name.startsWith(coverName + '.') || name.startsWith(coverName + '_');
+    });
+    if (match) {
+      return normalizeDropboxPath(match.path_display);
+    }
+  }
+  
+  // Priority 2: Look in Cover/Artwork subfolders
   for (const folderName of possibleFolderNames) {
     const coverFolderEntries = entries.filter(
       (entry) =>
@@ -217,27 +272,13 @@ async function findCoverArt(
         return 0;
       });
       
-      // Return the Dropbox path for the best match
       return normalizeDropboxPath(prioritized[0].path_display);
     }
   }
   
-  // If no cover found in subfolders, try looking in the album root folder
-  // Find files directly in the album folder (not in subfolders)
-  const folderDepth = folderPath.split('/').length;
-  const rootImageFiles = entries.filter(
-    (entry) => {
-      if (entry['.tag'] !== 'file') return false;
-      if (!imageExtensions.some((ext) => entry.name.toLowerCase().endsWith(ext))) return false;
-      
-      // Check if file is directly in the album folder (one level deeper)
-      const entryDepth = entry.path_lower.split('/').length;
-      return entryDepth === folderDepth + 1 && entry.path_lower.startsWith(folderPath.toLowerCase() + '/');
-    },
-  );
-  
-  if (rootImageFiles.length > 0) {
-    const prioritized = rootImageFiles.sort((a, b) => {
+  // Priority 3: Any image in root folder
+  if (rootFiles.length > 0) {
+    const prioritized = rootFiles.sort((a, b) => {
       const aLower = a.name.toLowerCase();
       const bLower = b.name.toLowerCase();
       const aHas1 = aLower.startsWith('1') || aLower.includes(' 1 ') || aLower.includes('_1_');
@@ -273,10 +314,13 @@ function buildAlbum(
   // Normalize location path to ensure it's in Dropbox API format
   const normalizedLocationPath = normalizeDropboxPath(folder.path_display);
 
+  // Parse title and year from folder name
+  const { title, year } = parseTitleAndYear(folder.name);
+
   return {
     id: slugify(folder.path_lower),
-    title: folder.name,
-    year: extractYear(folder.name),
+    title: title.trim() || folder.name, // Fallback to original name if parsing removes everything
+    year,
     era: undefined,
     genre: undefined,
     description: undefined,

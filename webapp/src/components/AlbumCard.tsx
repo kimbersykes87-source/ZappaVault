@@ -59,7 +59,7 @@ export function AlbumCard({ album, onPlay }: AlbumCardProps) {
 
       <div className="album-content">
         <header>
-          <p className="album-era">{album.year ?? ''}</p>
+          {album.year && <p className="album-era">{album.year}</p>}
           <h3>{album.title}</h3>
           {album.subtitle && <p className="album-subtitle">{album.subtitle}</p>}
         </header>
