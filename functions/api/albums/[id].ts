@@ -293,14 +293,25 @@ async function attachSignedLinks(
   env: EnvBindings,
 ): Promise<Album> {
   if (!env.DROPBOX_TOKEN) {
+    console.log(`[LINK DEBUG] No DROPBOX_TOKEN available for album: ${album.title}`);
     return album;
   }
+
+  console.log(`[LINK DEBUG] Processing album: ${album.title} (${album.tracks.length} tracks)`);
 
   const updatedTracks = await Promise.all(
     album.tracks.map(async (track) => {
       // Convert Windows path to Dropbox path before getting permanent link
       const dropboxFilePath = convertToDropboxPath(track.filePath);
+      console.log(`[LINK DEBUG] Getting link for track: ${track.title}`);
+      console.log(`[LINK DEBUG]   Original path: ${track.filePath}`);
+      console.log(`[LINK DEBUG]   Dropbox path: ${dropboxFilePath}`);
       const link = await getPermanentLink(env, dropboxFilePath);
+      if (!link) {
+        console.log(`[LINK DEBUG]   ❌ Failed to get link for: ${dropboxFilePath}`);
+      } else {
+        console.log(`[LINK DEBUG]   ✅ Got link: ${link.substring(0, 50)}...`);
+      }
       return {
         ...track,
         streamingUrl: link,
@@ -313,13 +324,21 @@ async function attachSignedLinks(
   let coverUrl = album.coverUrl;
   if (coverUrl && coverUrl.startsWith('http')) {
     // Already an HTTP URL, keep it
+    console.log(`[LINK DEBUG] Cover URL already HTTP: ${coverUrl}`);
   } else {
     // Find cover art in the Cover folder, prioritizing "1" or "front" images
+    console.log(`[LINK DEBUG] Finding cover art for: ${album.title}`);
     const foundCover = await findCoverArt(env, album);
     if (foundCover) {
+      console.log(`[LINK DEBUG] ✅ Found cover art: ${foundCover}`);
       coverUrl = foundCover;
+    } else {
+      console.log(`[LINK DEBUG] ❌ No cover art found for: ${album.title}`);
     }
   }
+
+  const tracksWithLinks = updatedTracks.filter(t => t.streamingUrl).length;
+  console.log(`[LINK DEBUG] Album ${album.title}: ${tracksWithLinks}/${updatedTracks.length} tracks have links`);
 
   return {
     ...album,
