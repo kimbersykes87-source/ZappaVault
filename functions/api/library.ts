@@ -310,8 +310,24 @@ async function getCoverUrl(
     return album.coverUrl;
   }
 
-  // Find cover art in the Cover folder, prioritizing "1" or "front" images
-  return await findCoverArt(env, album);
+  // If coverUrl is a Dropbox path, convert it to an HTTP URL
+  if (album.coverUrl && album.coverUrl.startsWith('/')) {
+    console.log(`[COVER DEBUG] Converting existing cover path to HTTP URL: ${album.coverUrl}`);
+    const coverLink = await getPermanentLink(env, album.coverUrl);
+    if (coverLink) {
+      console.log(`[COVER DEBUG] ✅ Converted cover to HTTP URL: ${coverLink}`);
+      return coverLink;
+    } else {
+      console.log(`[COVER DEBUG] ❌ Failed to convert cover path: ${album.coverUrl}`);
+    }
+  }
+
+  // Fallback: Find cover art in the Cover folder if no coverUrl exists
+  if (!album.coverUrl) {
+    return await findCoverArt(env, album);
+  }
+
+  return undefined;
 }
 
 export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
