@@ -312,10 +312,12 @@ async function attachSignedLinks(
 ): Promise<Album> {
   if (!env.DROPBOX_TOKEN) {
     console.log(`[LINK DEBUG] No DROPBOX_TOKEN available for album: ${album.title}`);
+    console.error(`[ERROR] DROPBOX_TOKEN is missing in environment variables`);
     return album;
   }
 
   console.log(`[LINK DEBUG] Processing album: ${album.title} (${album.tracks.length} tracks)`);
+  console.log(`[LINK DEBUG] Token length: ${env.DROPBOX_TOKEN.length} chars`);
 
   const updatedTracks = await Promise.all(
     album.tracks.map(async (track) => {
@@ -390,7 +392,31 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
   const includeLinks = url.searchParams.get('links') === '1';
   console.log(`[API DEBUG] includeLinks: ${includeLinks}`);
 
-  const payload = includeLinks ? await attachSignedLinks(album, env) : album;
+  let payload: Album;
+  if (includeLinks) {
+    try {
+      payload = await attachSignedLinks(album, env);
+      // Add debug info to response if no links were generated
+      const tracksWithLinks = payload.tracks.filter(t => t.streamingUrl).length;
+      if (tracksWithLinks === 0 && payload.tracks.length > 0) {
+        console.error(`[ERROR] No links generated for album: ${album.title}`);
+        console.error(`[ERROR] This suggests Dropbox API calls are failing`);
+        // Add a debug field to help diagnose
+        (payload as any).__debug = {
+          tokenPresent: !!env.DROPBOX_TOKEN,
+          tokenLength: env.DROPBOX_TOKEN?.length || 0,
+          tracksProcessed: payload.tracks.length,
+          tracksWithLinks: 0,
+        };
+      }
+    } catch (error) {
+      console.error(`[ERROR] attachSignedLinks failed:`, error);
+      // Return album without links if there's an error
+      payload = album;
+    }
+  } else {
+    payload = album;
+  }
 
   return new Response(JSON.stringify({ album: payload }), {
     headers: {
