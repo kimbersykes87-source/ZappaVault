@@ -8,7 +8,7 @@ import {
 } from '../utils/library.ts';
 import type { EnvBindings } from '../utils/library.ts';
 
-async function getTemporaryLink(
+async function getPermanentLink(
   env: EnvBindings,
   filePath: string,
 ): Promise<string | undefined> {
@@ -18,30 +18,92 @@ async function getTemporaryLink(
   }
 
   try {
-    const response = await fetch(
-      'https://api.dropboxapi.com/2/files/get_temporary_link',
+    // First, try to get existing shared link
+    let response = await fetch(
+      'https://api.dropboxapi.com/2/sharing/list_shared_links',
       {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${env.DROPBOX_TOKEN}`,
           'content-type': 'application/json',
         },
-        body: JSON.stringify({ path: filePath }),
+        body: JSON.stringify({ 
+          path: filePath,
+          direct_only: false 
+        }),
       },
     );
 
+    if (response.ok) {
+      const listPayload = (await response.json()) as { 
+        links: Array<{ url: string }> 
+      };
+      if (listPayload.links && listPayload.links.length > 0) {
+        // Convert shared link to direct download link
+        const sharedUrl = listPayload.links[0].url;
+        return convertToDirectLink(sharedUrl);
+      }
+    }
+
+    // If no existing link, create a new permanent shared link
+    // Try the simpler create_shared_link first (creates public link by default)
+    response = await fetch(
+      'https://api.dropboxapi.com/2/sharing/create_shared_link',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${env.DROPBOX_TOKEN}`,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          path: filePath,
+          short_url: false
+        }),
+      },
+    );
+
+    // If that fails, try with settings
+    if (!response.ok) {
+      response = await fetch(
+        'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${env.DROPBOX_TOKEN}`,
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            path: filePath,
+            settings: {}
+          }),
+        },
+      );
+    }
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.log(`[COVER DEBUG] get_temporary_link failed for ${filePath}: ${response.status} ${errorText}`);
+      console.log(`[COVER DEBUG] create_shared_link failed for ${filePath}: ${response.status} ${errorText}`);
       return undefined;
     }
 
-    const payload = (await response.json()) as { link: string };
-    return payload.link;
+    const payload = (await response.json()) as { url: string };
+    // Convert shared link to direct download link
+    return convertToDirectLink(payload.url);
   } catch (error) {
-    console.log(`[COVER DEBUG] get_temporary_link error for ${filePath}:`, error);
+    console.log(`[COVER DEBUG] getPermanentLink error for ${filePath}:`, error);
     return undefined;
   }
+}
+
+function convertToDirectLink(sharedUrl: string): string {
+  // Convert Dropbox shared link to direct download link
+  // https://www.dropbox.com/s/abc123/file.jpg?dl=0
+  // -> https://dl.dropboxusercontent.com/s/abc123/file.jpg
+  return sharedUrl
+    .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
+    .replace('?dl=0', '')
+    .replace('?dl=1', '')
+    .split('?')[0];
 }
 
 async function listCoverFolder(
@@ -155,13 +217,13 @@ async function findCoverArt(
     return 0;
   });
 
-  // Try to get a temporary link for the first prioritized file
+  // Try to get a permanent link for the first prioritized file
   const bestMatch = prioritized[0];
   const coverPath = `${coverFolderPath}/${bestMatch}`;
   console.log(`[COVER DEBUG] Album: ${album.title}, Found: ${bestMatch}, Path: ${coverPath}`);
-  const link = await getTemporaryLink(env, coverPath);
+  const link = await getPermanentLink(env, coverPath);
   if (link) {
-    console.log(`[COVER DEBUG] Successfully got link for ${album.title}`);
+    console.log(`[COVER DEBUG] Successfully got permanent link for ${album.title}`);
   } else {
     console.log(`[COVER DEBUG] Failed to get link for ${album.title} at ${coverPath}`);
   }
@@ -249,9 +311,8 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
     {
       headers: {
         'content-type': 'application/json',
-        // Shorter cache since Dropbox links expire after 4 hours
-        // We want to regenerate links more frequently
-        'cache-control': 'public, max-age=30',
+        // Permanent links don't expire, so we can cache longer
+        'cache-control': 'public, max-age=3600',
       },
     },
   );
