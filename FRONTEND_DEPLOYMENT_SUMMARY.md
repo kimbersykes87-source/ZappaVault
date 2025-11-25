@@ -229,3 +229,4 @@ VITE_API_BASE=https://zappavault.pages.dev
 **Last Updated:** 2025-11-24
 **Deployment Status:** ✅ Live at https://zappavault.pages.dev
 
+

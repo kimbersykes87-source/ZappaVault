@@ -70,3 +70,4 @@ All functions share types defined in `shared/library.ts` to keep the UI, scripts
 | `npm run lint` | ESLint |
 | `npm run typecheck` | Standalone TS project references |
 | `npm run sync:dropbox` | Crawl Dropbox and refresh the vault snapshot |
+| `npm run upload:library` | Upload generated library to backend API (requires `ADMIN_TOKEN` and `VITE_API_BASE` in `.env`) |

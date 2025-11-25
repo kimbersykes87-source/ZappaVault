@@ -2,6 +2,8 @@ name = "frank-zappa-vault"
 compatibility_date = "2025-02-10"
 pages_build_output_dir = "./webapp/dist"
 
-# KV namespace binding is configured in Cloudflare Pages dashboard
-# No need to define it here for Pages Functions
+# KV namespace binding for Pages Functions
+[[kv_namespaces]]
+binding = "LIBRARY_KV"
+id = "139b9557516d493d893c1b35b3c6190a"
 
