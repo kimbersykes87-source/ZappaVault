@@ -123,7 +123,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
-  min-height: 320px;
+  height: 100%;
 }
 
 .album-cover {
@@ -163,6 +163,13 @@
 .album-description {
   color: rgba(255, 255, 255, 0.8);
   min-height: 3.5rem;
+  max-height: 3.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  line-height: 1.17;
 }
 
 .album-metadata {
@@ -181,6 +188,7 @@
 .album-action-button {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0.6rem 0.9rem;
   border-radius: 10px;
@@ -191,6 +199,12 @@
   flex: 1;
   min-width: 0;
   text-align: left;
+}
+
+.album-action-button--icon-only {
+  padding: 0.6rem;
+  flex: 0 0 auto;
+  min-width: auto;
 }
 
 .album-action-button--primary {
@@ -225,36 +239,10 @@
   outline-offset: 2px;
 }
 
-.album-action-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.album-action-button--icon-only svg {
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-}
-
-.album-action-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  min-width: 0;
-  flex: 1;
-}
-
-.album-action-label {
-  font-weight: 500;
-  font-size: 0.9rem;
-  line-height: 1.2;
-}
-
-.album-action-sublabel {
-  font-size: 0.75rem;
-  opacity: 0.8;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .album-actions .ghost {
@@ -477,14 +465,11 @@ select {
   }
 
   .album-actions {
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: center;
   }
 
-  .album-action-button {
-    width: 100%;
-  }
-
-  .album-action-sublabel {
-    white-space: normal;
+  .album-action-button--icon-only {
+    flex: 0 0 auto;
   }
 }

@@ -249,7 +249,9 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
     {
       headers: {
         'content-type': 'application/json',
-        'cache-control': 'public, max-age=60',
+        // Shorter cache since Dropbox links expire after 4 hours
+        // We want to regenerate links more frequently
+        'cache-control': 'public, max-age=30',
       },
     },
   );

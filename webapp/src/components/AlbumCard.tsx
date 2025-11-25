@@ -8,21 +8,21 @@ interface AlbumCardProps {
   onPlay: (albumId: string) => void | Promise<void>;
 }
 
-// Small inline SVG icons
+// Icon-only SVG icons (larger for icon-only buttons)
 const PlayIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <path d="M3 2.5L13 8L3 13.5V2.5Z" fill="currentColor" />
   </svg>
 );
 
 const DownloadIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <path d="M8 2V10M8 10L5 7M8 10L11 7M2 12H14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
 const InfoIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
     <path d="M8 6V8M8 10H8.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
@@ -37,13 +37,25 @@ export function AlbumCard({ album, onPlay }: AlbumCardProps) {
   return (
     <article className="album-card">
       <div className="album-cover">
-        {album.coverUrl ? (
-          <img src={album.coverUrl} alt={album.title} loading="lazy" />
-        ) : (
-          <div className="album-cover-placeholder">
-            <span>{album.title.slice(0, 2).toUpperCase()}</span>
-          </div>
-        )}
+        {album.coverUrl && album.coverUrl.startsWith('http') ? (
+          <img 
+            src={album.coverUrl} 
+            alt={album.title} 
+            loading="lazy"
+            onError={(e) => {
+              // Hide broken image and show placeholder instead
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
+              const placeholder = target.parentElement?.querySelector('.album-cover-placeholder') as HTMLElement;
+              if (placeholder) {
+                placeholder.style.display = 'grid';
+              }
+            }}
+          />
+        ) : null}
+        <div className="album-cover-placeholder" style={{ display: album.coverUrl && album.coverUrl.startsWith('http') ? 'none' : 'grid' }}>
+          <span>{album.title.slice(0, 2).toUpperCase()}</span>
+        </div>
       </div>
 
       <div className="album-content">
@@ -68,50 +80,29 @@ export function AlbumCard({ album, onPlay }: AlbumCardProps) {
         <button
           type="button"
           onClick={() => onPlay(album.id)}
-          className="album-action-button album-action-button--primary"
+          className="album-action-button album-action-button--primary album-action-button--icon-only"
           aria-label={`Play '${album.title}' (${trackCount} tracks)`}
+          title={`Play ${trackCount} tracks`}
         >
-          <span className="album-action-icon">
-            <PlayIcon />
-          </span>
-          <span className="album-action-content">
-            <span className="album-action-label">Play</span>
-            <span className="album-action-sublabel">
-              Stream {playableTracks > 0 ? playableTracks : trackCount} {playableTracks === 1 ? 'track' : 'tracks'} in browser
-            </span>
-          </span>
+          <PlayIcon />
         </button>
         <a
           href={getAlbumDownloadUrl(album.id)}
           target="_blank"
           rel="noreferrer"
-          className="album-action-button album-action-button--secondary"
+          className="album-action-button album-action-button--secondary album-action-button--icon-only"
           aria-label={`Download '${album.title}' (${fileFormat} album, ${fileSize})`}
+          title={`Download ${fileFormat} album (${fileSize})`}
         >
-          <span className="album-action-icon">
-            <DownloadIcon />
-          </span>
-          <span className="album-action-content">
-            <span className="album-action-label">Download</span>
-            <span className="album-action-sublabel">
-              {fileFormat} album • {fileSize}
-            </span>
-          </span>
+          <DownloadIcon />
         </a>
         <Link
           to={`/album/${album.id}`}
-          className="album-action-button album-action-button--secondary"
+          className="album-action-button album-action-button--secondary album-action-button--icon-only"
           aria-label={`View details for '${album.title}'`}
+          title="View details"
         >
-          <span className="album-action-icon">
-            <InfoIcon />
-          </span>
-          <span className="album-action-content">
-            <span className="album-action-label">Details</span>
-            <span className="album-action-sublabel">
-              Track list & liner notes
-            </span>
-          </span>
+          <InfoIcon />
         </Link>
       </footer>
     </article>
