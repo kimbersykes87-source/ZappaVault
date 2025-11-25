@@ -19,9 +19,14 @@ This file (`album-metadata.json`) is used by the Dropbox sync script to enrich a
   "era": "Mothers Of Invention",
   "genre": "Jazz Fusion",
   "description": "Frank Zappa's groundbreaking experiment mixing rock instrumentation with jazz improvisation.",
-  "tags": ["classic", "fusion"]
+  "tags": ["classic", "fusion"],
+  "subtitle": "1969 Studio Album"
 }
 ```
+
+**Note**: Descriptions are displayed in:
+- **AlbumCard**: Shows description on the homepage (truncated to 3 lines)
+- **AlbumPage**: Shows full description on the album detail page
 
 ### Cover Art Options
 
