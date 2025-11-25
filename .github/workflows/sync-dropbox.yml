@@ -8,6 +8,8 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     defaults:
       run:
         working-directory: webapp
@@ -20,6 +22,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -34,4 +38,19 @@ jobs:
       - name: Sync Dropbox snapshot
         run: npm run sync:dropbox -- --out data/library.generated.json
 
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and push changes
+        working-directory: .
+        run: |
+          git add webapp/data/library.generated.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: update library snapshot from Dropbox [skip ci]"
+            git push
+          fi
 
