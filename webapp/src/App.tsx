@@ -9,12 +9,9 @@ function App() {
     <BrowserRouter>
       <div className="app-shell">
         <header className="app-header">
-          <div>
-            <p className="meta">Frank Zappa Vault</p>
-            <h1>Extended Discography</h1>
-            <p>
-              Stream, search, and download curated recordings sourced from the family archive.
-            </p>
+          <div className="app-header-brand">
+            <img src="/Zappa-Logo.svg" alt="Frank Zappa Vault" className="app-header-logo" />
+            <h1>Frank Zappa Vault</h1>
           </div>
         </header>
         <main className="app-main">

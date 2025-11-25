@@ -2,21 +2,41 @@
   min-height: 100vh;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2.5rem 1.5rem 6rem;
+  padding: 0 1.5rem 6rem;
   color: #fdf9ef;
 }
 
 .app-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 2rem;
-  padding-bottom: 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: radial-gradient(circle at top, #1f1f32 0%, #050505 55%);
+  backdrop-filter: blur(10px);
+  padding: 1.5rem 0;
+  margin: 0 -1.5rem 2rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.app-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.app-header-logo {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+
 .app-header h1 {
-  margin: 0.2rem 0 0;
-  font-size: clamp(2rem, 3vw, 3rem);
+  margin: 0;
+  font-size: clamp(1.75rem, 2.5vw, 2.5rem);
+  font-family: 'Shrikhand', cursive;
+  font-weight: 400;
+  line-height: 1.2;
 }
 
 .app-header nav {
@@ -37,7 +57,7 @@
 }
 
 .app-main {
-  padding: 2rem 0 4rem;
+  padding: 0 0 4rem;
 }
 
 .library-header {
