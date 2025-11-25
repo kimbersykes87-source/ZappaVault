@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import type {
@@ -54,6 +54,7 @@ const args = parseArgs(process.argv.slice(2));
 const dropboxToken = process.env.DROPBOX_TOKEN;
 const rootFolder = (args.path as string) ?? process.env.DROPBOX_LIBRARY_PATH ?? '/ZappaLibrary';
 const outputFile = (args.out as string) ?? path.resolve('data/library.generated.json');
+const metadataFile = path.resolve('data/album-metadata.json');
 
 if (!dropboxToken) {
   console.error('DROPBOX_TOKEN missing. Add it to your .env file.');
@@ -299,10 +300,77 @@ async function findCoverArt(
   return undefined;
 }
 
+interface AlbumMetadata {
+  match: string; // Album name or path to match
+  year?: number;
+  coverArt?: string | null; // Cover art path (relative to album folder) or null to use auto-detection
+  era?: string;
+  genre?: string;
+  description?: string;
+  tags?: string[];
+  subtitle?: string;
+}
+
+interface MetadataDatabase {
+  version: string;
+  albums: AlbumMetadata[];
+}
+
+async function loadMetadataDatabase(): Promise<MetadataDatabase | null> {
+  try {
+    const content = await readFile(metadataFile, 'utf-8');
+    const db = JSON.parse(content) as MetadataDatabase;
+    console.log(`Loaded metadata database with ${db.albums.length} entries`);
+    return db;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      console.log('No metadata database found, using defaults');
+      return null;
+    }
+    console.warn('Error loading metadata database:', error);
+    return null;
+  }
+}
+
+function matchAlbumMetadata(
+  albumName: string,
+  albumPath: string,
+  metadataDb: MetadataDatabase | null,
+): AlbumMetadata | undefined {
+  if (!metadataDb) {
+    return undefined;
+  }
+
+  // Try exact match first
+  let match = metadataDb.albums.find(
+    (meta) => meta.match.toLowerCase() === albumName.toLowerCase(),
+  );
+
+  // Try partial match (contains)
+  if (!match) {
+    match = metadataDb.albums.find(
+      (meta) =>
+        albumName.toLowerCase().includes(meta.match.toLowerCase()) ||
+        meta.match.toLowerCase().includes(albumName.toLowerCase()),
+    );
+  }
+
+  // Try path-based match
+  if (!match) {
+    const pathLower = albumPath.toLowerCase();
+    match = metadataDb.albums.find((meta) =>
+      pathLower.includes(meta.match.toLowerCase()),
+    );
+  }
+
+  return match;
+}
+
 function buildAlbum(
   folder: DropboxEntry,
   tracks: Track[],
-  coverUrl?: string,
+  coverUrl: string | undefined,
+  metadata: AlbumMetadata | undefined,
 ): Album | undefined {
   if (tracks.length === 0) {
     return undefined;
@@ -314,20 +382,46 @@ function buildAlbum(
   // Normalize location path to ensure it's in Dropbox API format
   const normalizedLocationPath = normalizeDropboxPath(folder.path_display);
 
-  // Parse title and year from folder name
-  const { title, year } = parseTitleAndYear(folder.name);
+  // Use metadata if available, otherwise parse from folder name
+  let title: string;
+  let year: number | undefined;
+
+  if (metadata) {
+    title = folder.name; // Keep original folder name
+    year = metadata.year;
+  } else {
+    // Fallback: parse title and year from folder name
+    const parsed = parseTitleAndYear(folder.name);
+    title = parsed.title.trim() || folder.name;
+    year = parsed.year;
+  }
+
+  // Use metadata cover art path if specified, otherwise use auto-detected
+  let finalCoverUrl = coverUrl;
+  if (metadata?.coverArt !== undefined) {
+    if (metadata.coverArt === null) {
+      // null means use auto-detection (already have coverUrl)
+      finalCoverUrl = coverUrl;
+    } else if (metadata.coverArt) {
+      // Specific path provided, construct full path
+      finalCoverUrl = normalizeDropboxPath(
+        `${normalizedLocationPath}/${metadata.coverArt}`,
+      );
+    }
+  }
 
   return {
     id: slugify(folder.path_lower),
-    title: title.trim() || folder.name, // Fallback to original name if parsing removes everything
+    title,
     year,
-    era: undefined,
-    genre: undefined,
-    description: undefined,
-    coverUrl,
+    era: metadata?.era,
+    genre: metadata?.genre,
+    description: metadata?.description,
+    subtitle: metadata?.subtitle,
+    coverUrl: finalCoverUrl,
     locationPath: normalizedLocationPath,
     lastSyncedAt: new Date().toISOString(),
-    tags: [],
+    tags: metadata?.tags ?? [],
     tracks: tracks.sort((a, b) => a.trackNumber - b.trackNumber),
     formats,
     totalDurationMs: 0,
@@ -336,6 +430,9 @@ function buildAlbum(
 }
 
 async function generateSnapshot(): Promise<LibrarySnapshot> {
+  // Load metadata database
+  const metadataDb = await loadMetadataDatabase();
+
   const albumFolders = await listImmediateFolders(rootFolder);
   const albums: Album[] = [];
 
@@ -346,10 +443,27 @@ async function generateSnapshot(): Promise<LibrarySnapshot> {
       .map((entry, index) => parseTrack(entry, index))
       .filter((track): track is Track => Boolean(track));
 
-    // Find cover art for this album
-    const coverPath = await findCoverArt(folder.path_lower, entries);
-    
-    const album = buildAlbum(folder, tracks, coverPath);
+    // Match metadata from database
+    const metadata = matchAlbumMetadata(
+      folder.name,
+      folder.path_display,
+      metadataDb,
+    );
+
+    // Find cover art for this album (unless metadata specifies a path)
+    let coverPath: string | undefined;
+    if (metadata?.coverArt === null || metadata?.coverArt === undefined) {
+      // Auto-detect cover art
+      coverPath = await findCoverArt(folder.path_lower, entries);
+    } else if (metadata.coverArt) {
+      // Use metadata-specified cover art path
+      const normalizedLocationPath = normalizeDropboxPath(folder.path_display);
+      coverPath = normalizeDropboxPath(
+        `${normalizedLocationPath}/${metadata.coverArt}`,
+      );
+    }
+
+    const album = buildAlbum(folder, tracks, coverPath, metadata);
     if (album) {
       albums.push(album);
     }

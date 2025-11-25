@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Album metadata database - maps album names/paths to metadata. This file is read by the Dropbox sync script to enrich album information.",
+  "version": "1.0.0",
+  "albums": [
+    {
+      "match": "Fillmore East, June 1971",
+      "year": 1971,
+      "coverArt": null,
+      "era": null,
+      "genre": null,
+      "description": null,
+      "tags": []
+    },
+    {
+      "match": "Bongo Fury",
+      "year": 1975,
+      "coverArt": null,
+      "era": null,
+      "genre": null,
+      "description": null,
+      "tags": []
+    },
+    {
+      "match": "Feeding the Monkies at Ma Maison",
+      "year": 2011,
+      "coverArt": null,
+      "era": null,
+      "genre": null,
+      "description": null,
+      "tags": []
+    },
+    {
+      "match": "Congress Shall Make No Law",
+      "year": 2010,
+      "coverArt": null,
+      "era": null,
+      "genre": null,
+      "description": null,
+      "tags": []
+    }
+  ],
+  "_instructions": {
+    "match": "Album folder name (case-insensitive, partial matches supported)",
+    "year": "Release year (number)",
+    "coverArt": "Cover art file path relative to album folder (e.g., 'Cover/1 Front.jpg'), or null to use auto-detection",
+    "era": "Musical era/period (e.g., 'Mothers Of Invention', 'Solo Career')",
+    "genre": "Genre (e.g., 'Jazz Fusion', 'Progressive Rock')",
+    "description": "Album description/notes",
+    "tags": "Array of tags for filtering/searching",
+    "subtitle": "Optional subtitle"
+  }
+}
+
