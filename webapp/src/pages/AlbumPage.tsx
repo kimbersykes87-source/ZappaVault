@@ -48,7 +48,27 @@ export function AlbumPage() {
   return (
     <div className="album-page">
       <header className="album-page-header">
-        <div>
+        <div className="album-page-cover">
+          {album.coverUrl && album.coverUrl.startsWith('http') ? (
+            <img 
+              src={album.coverUrl} 
+              alt={album.title} 
+              loading="eager"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const placeholder = target.parentElement?.querySelector('.album-page-cover-placeholder') as HTMLElement;
+                if (placeholder) {
+                  placeholder.style.display = 'grid';
+                }
+              }}
+            />
+          ) : null}
+          <div className="album-page-cover-placeholder" style={{ display: album.coverUrl && album.coverUrl.startsWith('http') ? 'none' : 'grid' }}>
+            <span>{album.title.slice(0, 2).toUpperCase()}</span>
+          </div>
+        </div>
+        <div className="album-page-info">
           <p className="meta">
             {album.genre ?? 'Uncategorised'} ·{' '}
             {album.formats.join(' / ')}
@@ -57,13 +77,18 @@ export function AlbumPage() {
           {album.subtitle && <p className="album-subtitle">{album.subtitle}</p>}
           {album.description && <p>{album.description}</p>}
           <div className="album-page-actions">
-            <button type="button" onClick={handlePlayAlbum}>
+            <button 
+              type="button" 
+              onClick={handlePlayAlbum}
+              className="album-page-button album-page-button--primary"
+            >
               ▶ Play album
             </button>
             <a
               href={getAlbumDownloadUrl(album.id)}
               target="_blank"
               rel="noreferrer"
+              className="album-page-button album-page-button--secondary"
             >
               ⬇ Download .zip
             </a>
