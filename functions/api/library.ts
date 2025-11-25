@@ -128,6 +128,11 @@ async function listCoverFolder(
     );
 
     if (!response.ok) {
+      const errorText = await response.text();
+      // Don't log 409 (path not found) as it's expected when folder doesn't exist
+      if (response.status !== 409) {
+        console.log(`[COVER DEBUG] list_folder failed for ${coverFolderPath}: ${response.status} ${errorText}`);
+      }
       return [];
     }
 
@@ -138,7 +143,8 @@ async function listCoverFolder(
     return payload.entries
       .filter((entry) => entry['.tag'] === 'file')
       .map((entry) => entry.name);
-  } catch {
+  } catch (error) {
+    console.log(`[COVER DEBUG] list_folder error for ${coverFolderPath}:`, error);
     return [];
   }
 }
