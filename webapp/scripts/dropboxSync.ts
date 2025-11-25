@@ -422,9 +422,8 @@ function buildAlbum(
   coverUrl: string | undefined,
   metadata: AlbumMetadata | undefined,
 ): Album | undefined {
-  if (tracks.length === 0) {
-    return undefined;
-  }
+  // Allow albums with 0 tracks - they may be empty or still being populated
+  // This ensures all 106 folders are included in the library
 
   const totalSize = tracks.reduce((sum, track) => sum + track.sizeBytes, 0);
   const formats = Array.from(new Set(tracks.map((track) => track.format)));
