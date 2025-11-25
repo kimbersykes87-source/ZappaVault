@@ -80,54 +80,6 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
-.filters {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin: 1.5rem 0 2rem;
-}
-
-.filter-group {
-  flex: 1;
-  min-width: 200px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.filter-title {
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.filter-chips {
-  display: flex;
-  gap: 0.35rem;
-  flex-wrap: wrap;
-}
-
-.chip {
-  border-radius: 999px;
-  padding: 0.35rem 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: transparent;
-  cursor: pointer;
-}
-
-.chip-active {
-  background: rgba(235, 64, 52, 0.9);
-  border-color: rgba(235, 64, 52, 0.9);
-}
-
-.reset-button {
-  align-self: flex-end;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: transparent;
-  border-radius: 12px;
-  padding: 0.6rem 1rem;
-}
 
 .album-grid {
   display: grid;

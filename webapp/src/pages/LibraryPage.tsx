@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useLibraryQuery } from '../hooks/useLibraryQuery.ts';
 import { SearchBar } from '../components/SearchBar.tsx';
-import { FilterPanel } from '../components/FilterPanel.tsx';
 import { AlbumGrid } from '../components/AlbumGrid.tsx';
 import { LoadingState } from '../components/LoadingState.tsx';
 import { ErrorState } from '../components/ErrorState.tsx';
@@ -16,17 +15,6 @@ export function LibraryPage() {
 
   const handleSearch = (value: string) => {
     setRequest((prev) => ({ ...prev, q: value, page: 1 }));
-  };
-
-  const handleFilters = (filters: {
-    sort?: 'title' | 'year' | 'recent';
-    year?: number;
-  }) => {
-    setRequest((prev) => ({ ...prev, ...filters, page: 1 }));
-  };
-
-  const handleReset = () => {
-    setRequest({ q: '', sort: 'title', page: 1, pageSize: 24 });
   };
 
   const handlePlay = async (albumId: string) => {
@@ -55,13 +43,6 @@ export function LibraryPage() {
         </div>
         <SearchBar value={request.q ?? ''} onSearch={handleSearch} />
       </header>
-
-      <FilterPanel
-        sort={request.sort ?? 'title'}
-        year={request.year}
-        onChange={handleFilters}
-        onReset={handleReset}
-      />
 
       {loading && <LoadingState />}
       {error && <ErrorState message={error} onRetry={refresh} />}
