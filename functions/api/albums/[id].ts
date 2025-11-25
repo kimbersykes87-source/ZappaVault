@@ -40,10 +40,17 @@ async function getPermanentLink(
         const directLink = convertToDirectLink(sharedUrl);
         console.log(`[LINK DEBUG] Found existing link for ${filePath}: ${directLink}`);
         return directLink;
+      } else {
+        console.log(`[LINK DEBUG] No existing links found for ${filePath}, will create new one`);
       }
     } else {
       const errorText = await response.text();
-      console.log(`[LINK DEBUG] list_shared_links failed for ${filePath}: ${response.status} ${errorText}`);
+      // 409 (conflict) or 404 (not found) are expected - just log and continue
+      if (response.status === 409 || response.status === 404) {
+        console.log(`[LINK DEBUG] No existing link for ${filePath} (${response.status}), will create new one`);
+      } else {
+        console.log(`[LINK DEBUG] list_shared_links failed for ${filePath}: ${response.status} ${errorText}`);
+      }
     }
 
     // If no existing link, create a new permanent shared link using the correct API
@@ -58,9 +65,9 @@ async function getPermanentLink(
         body: JSON.stringify({ 
           path: filePath,
           settings: {
-            requested_visibility: 'public',
-            audience: 'public',
-            access: 'viewer'
+            requested_visibility: {
+              '.tag': 'public'
+            }
           }
         }),
       },
@@ -69,6 +76,37 @@ async function getPermanentLink(
     if (!response.ok) {
       const errorText = await response.text();
       console.log(`[LINK DEBUG] create_shared_link_with_settings failed for ${filePath}: ${response.status} ${errorText}`);
+      
+      // If it's a 409 conflict, the link might already exist - try to get it
+      if (response.status === 409) {
+        console.log(`[LINK DEBUG] Link already exists for ${filePath}, attempting to retrieve it`);
+        const conflictResponse = await fetch(
+          'https://api.dropboxapi.com/2/sharing/list_shared_links',
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${env.DROPBOX_TOKEN}`,
+              'content-type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              path: filePath,
+              direct_only: false 
+            }),
+          },
+        );
+        if (conflictResponse.ok) {
+          const conflictPayload = (await conflictResponse.json()) as { 
+            links: Array<{ url: string }> 
+          };
+          if (conflictPayload.links && conflictPayload.links.length > 0) {
+            const sharedUrl = conflictPayload.links[0].url;
+            const directLink = convertToDirectLink(sharedUrl);
+            console.log(`[LINK DEBUG] Retrieved existing link after conflict: ${directLink}`);
+            return directLink;
+          }
+        }
+      }
+      
       return undefined;
     }
 
