@@ -223,37 +223,20 @@ async function findCoverArt(
   entries: DropboxEntry[],
 ): Promise<string | undefined> {
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.tif', '.tiff'];
-  const possibleFolderNames = ['Cover', 'cover', 'Covers', 'covers', 'Artwork', 'artwork', 'Images', 'images'];
   
-  // Priority 1: Common cover filenames in root (cover.jpg, folder.jpg, etc.)
-  const commonCoverNames = ['cover', 'folder', 'album', 'front', 'artwork'];
-  const folderDepth = folderPath.split('/').length;
-  const rootFiles = entries.filter(
-    (entry) => {
-      if (entry['.tag'] !== 'file') return false;
-      if (!imageExtensions.some((ext) => entry.name.toLowerCase().endsWith(ext))) return false;
-      const entryDepth = entry.path_lower.split('/').length;
-      return entryDepth === folderDepth + 1 && entry.path_lower.startsWith(folderPath.toLowerCase() + '/');
-    },
-  );
-  
-  for (const coverName of commonCoverNames) {
-    const match = rootFiles.find((entry) => {
-      const name = entry.name.toLowerCase().replace(/\.[^.]+$/, '');
-      return name === coverName || name.startsWith(coverName + '.') || name.startsWith(coverName + '_');
-    });
-    if (match) {
-      return normalizeDropboxPath(match.path_display);
-    }
-  }
-  
-  // Priority 2: Look in Cover/Artwork subfolders
-  for (const folderName of possibleFolderNames) {
+  // Priority 1: Look in Cover/cover folder (most common location)
+  // Check both exact case matches to handle case-sensitive filesystems
+  const coverFolderNames = ['Cover', 'cover'];
+  for (const folderName of coverFolderNames) {
     const coverFolderEntries = entries.filter(
-      (entry) =>
-        entry['.tag'] === 'file' &&
-        entry.path_lower.includes(`/${folderName.toLowerCase()}/`) &&
-        imageExtensions.some((ext) => entry.name.toLowerCase().endsWith(ext)),
+      (entry) => {
+        if (entry['.tag'] !== 'file') return false;
+        if (!imageExtensions.some((ext) => entry.name.toLowerCase().endsWith(ext))) return false;
+        // Match files in /Cover/ or /cover/ folder (case-sensitive match for exact folder name)
+        const pathLower = entry.path_lower;
+        const expectedPath = `${folderPath.toLowerCase()}/${folderName.toLowerCase()}/`;
+        return pathLower.startsWith(expectedPath);
+      },
     );
     
     if (coverFolderEntries.length > 0) {
@@ -261,8 +244,8 @@ async function findCoverArt(
       const prioritized = coverFolderEntries.sort((a, b) => {
         const aLower = a.name.toLowerCase();
         const bLower = b.name.toLowerCase();
-        const aHas1 = aLower.startsWith('1') || aLower.includes(' 1 ') || aLower.includes('_1_');
-        const bHas1 = bLower.startsWith('1') || bLower.includes(' 1 ') || bLower.includes('_1_');
+        const aHas1 = aLower.startsWith('1') || aLower.includes(' 1 ') || aLower.includes('_1_') || aLower.includes('-1-');
+        const bHas1 = bLower.startsWith('1') || bLower.includes(' 1 ') || bLower.includes('_1_') || bLower.includes('-1-');
         const aHasFront = aLower.includes('front') || aLower.includes('cover');
         const bHasFront = bLower.includes('front') || bLower.includes('cover');
         
@@ -277,13 +260,68 @@ async function findCoverArt(
     }
   }
   
-  // Priority 3: Any image in root folder
+  // Priority 2: Look in other artwork folders (Covers, Artwork, Images, etc.)
+  const otherFolderNames = ['Covers', 'covers', 'Artwork', 'artwork', 'Images', 'images'];
+  for (const folderName of otherFolderNames) {
+    const coverFolderEntries = entries.filter(
+      (entry) => {
+        if (entry['.tag'] !== 'file') return false;
+        if (!imageExtensions.some((ext) => entry.name.toLowerCase().endsWith(ext))) return false;
+        const pathLower = entry.path_lower;
+        const expectedPath = `${folderPath.toLowerCase()}/${folderName.toLowerCase()}/`;
+        return pathLower.startsWith(expectedPath);
+      },
+    );
+    
+    if (coverFolderEntries.length > 0) {
+      const prioritized = coverFolderEntries.sort((a, b) => {
+        const aLower = a.name.toLowerCase();
+        const bLower = b.name.toLowerCase();
+        const aHas1 = aLower.startsWith('1') || aLower.includes(' 1 ') || aLower.includes('_1_') || aLower.includes('-1-');
+        const bHas1 = bLower.startsWith('1') || bLower.includes(' 1 ') || bLower.includes('_1_') || bLower.includes('-1-');
+        const aHasFront = aLower.includes('front') || aLower.includes('cover');
+        const bHasFront = bLower.includes('front') || bLower.includes('cover');
+        
+        if (aHas1 && !bHas1) return -1;
+        if (!aHas1 && bHas1) return 1;
+        if (aHasFront && !bHasFront) return -1;
+        if (!aHasFront && bHasFront) return 1;
+        return 0;
+      });
+      
+      return normalizeDropboxPath(prioritized[0].path_display);
+    }
+  }
+  
+  // Priority 3: Common cover filenames in root (cover.jpg, folder.jpg, etc.)
+  const folderDepth = folderPath.split('/').length;
+  const rootFiles = entries.filter(
+    (entry) => {
+      if (entry['.tag'] !== 'file') return false;
+      if (!imageExtensions.some((ext) => entry.name.toLowerCase().endsWith(ext))) return false;
+      const entryDepth = entry.path_lower.split('/').length;
+      return entryDepth === folderDepth + 1 && entry.path_lower.startsWith(folderPath.toLowerCase() + '/');
+    },
+  );
+  
+  const commonCoverNames = ['cover', 'folder', 'album', 'front', 'artwork'];
+  for (const coverName of commonCoverNames) {
+    const match = rootFiles.find((entry) => {
+      const name = entry.name.toLowerCase().replace(/\.[^.]+$/, '');
+      return name === coverName || name.startsWith(coverName + '.') || name.startsWith(coverName + '_');
+    });
+    if (match) {
+      return normalizeDropboxPath(match.path_display);
+    }
+  }
+  
+  // Priority 4: Any image in root folder
   if (rootFiles.length > 0) {
     const prioritized = rootFiles.sort((a, b) => {
       const aLower = a.name.toLowerCase();
       const bLower = b.name.toLowerCase();
-      const aHas1 = aLower.startsWith('1') || aLower.includes(' 1 ') || aLower.includes('_1_');
-      const bHas1 = bLower.startsWith('1') || bLower.includes(' 1 ') || bLower.includes('_1_');
+      const aHas1 = aLower.startsWith('1') || aLower.includes(' 1 ') || aLower.includes('_1_') || aLower.includes('-1-');
+      const bHas1 = bLower.startsWith('1') || bLower.includes(' 1 ') || bLower.includes('_1_') || bLower.includes('-1-');
       const aHasFront = aLower.includes('front') || aLower.includes('cover');
       const bHasFront = bLower.includes('front') || bLower.includes('cover');
       
