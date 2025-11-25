@@ -365,13 +365,29 @@ async function attachSignedLinks(
     }),
   );
 
-  // Generate cover URL - always look in the Cover folder for best match
+  // Generate cover URL - convert Dropbox path to HTTP URL if needed
   let coverUrl = album.coverUrl;
   if (coverUrl && coverUrl.startsWith('http')) {
     // Already an HTTP URL, keep it
     console.log(`[LINK DEBUG] Cover URL already HTTP: ${coverUrl}`);
-  } else {
-    // Find cover art in the Cover folder, prioritizing "1" or "front" images
+  } else if (coverUrl && coverUrl.startsWith('/')) {
+    // Cover URL is a Dropbox path, convert it to a permanent link
+    console.log(`[LINK DEBUG] Converting cover path to HTTP URL: ${coverUrl}`);
+    const coverLink = await getPermanentLink(env, coverUrl, errors);
+    if (coverLink) {
+      console.log(`[LINK DEBUG] ✅ Converted cover to HTTP URL: ${coverLink}`);
+      coverUrl = coverLink;
+    } else {
+      console.log(`[LINK DEBUG] ❌ Failed to convert cover path to HTTP URL: ${coverUrl}`);
+      // Try finding cover art as fallback
+      const foundCover = await findCoverArt(env, album);
+      if (foundCover) {
+        console.log(`[LINK DEBUG] ✅ Found cover art via search: ${foundCover}`);
+        coverUrl = foundCover;
+      }
+    }
+  } else if (!coverUrl) {
+    // No cover URL, try to find it
     console.log(`[LINK DEBUG] Finding cover art for: ${album.title}`);
     const foundCover = await findCoverArt(env, album);
     if (foundCover) {
