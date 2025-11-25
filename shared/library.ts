@@ -58,7 +58,7 @@ export interface LibraryResult {
   results: Album[];
 }
 
-export const DEFAULT_PAGE_SIZE = 24;
+export const DEFAULT_PAGE_SIZE = 200; // Show all albums by default
 
 export function applyLibraryQuery(
   snapshot: LibrarySnapshot,

@@ -7,7 +7,7 @@ const defaultRequest: LibraryRequest = {
   q: '',
   sort: 'title',
   page: 1,
-  pageSize: 24,
+  pageSize: 200, // Show all albums on homepage
 };
 
 export function useLibraryQuery() {
@@ -44,7 +44,7 @@ export function useLibraryQuery() {
     error,
     total: data?.total ?? 0,
     page: data?.page ?? 1,
-    pageSize: data?.pageSize ?? request.pageSize ?? 24,
+    pageSize: data?.pageSize ?? request.pageSize ?? 200,
     refresh: load,
   };
 }
