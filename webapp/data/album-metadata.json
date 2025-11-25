@@ -7,37 +7,41 @@
       "match": "Fillmore East, June 1971",
       "year": 1971,
       "coverArt": null,
-      "era": null,
-      "genre": null,
-      "description": null,
-      "tags": []
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": "Live album recorded at the Fillmore East in New York City. Features performances with The Mothers of Invention and guest appearances.",
+      "tags": ["live", "classic"],
+      "subtitle": "1971 Live Album"
     },
     {
       "match": "Bongo Fury",
       "year": 1975,
       "coverArt": null,
-      "era": null,
-      "genre": null,
-      "description": null,
-      "tags": []
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Collaborative live album with Captain Beefheart, recorded at the Armadillo World Headquarters in Austin, Texas. Features a mix of Zappa and Beefheart compositions.",
+      "tags": ["live", "collaboration"],
+      "subtitle": "1975 Live Album with Captain Beefheart"
     },
     {
       "match": "Feeding the Monkies at Ma Maison",
       "year": 2011,
       "coverArt": null,
-      "era": null,
-      "genre": null,
-      "description": null,
-      "tags": []
+      "era": "Posthumous Release",
+      "genre": "Jazz Fusion",
+      "description": "Posthumous compilation album featuring previously unreleased material from Zappa's vault. Includes studio and live recordings.",
+      "tags": ["compilation", "vault"],
+      "subtitle": "2011 Vault Release"
     },
     {
       "match": "Congress Shall Make No Law",
       "year": 2010,
       "coverArt": null,
-      "era": null,
-      "genre": null,
-      "description": null,
-      "tags": []
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous release featuring live performances and studio recordings. The title references Zappa's advocacy for free speech and artistic freedom.",
+      "tags": ["compilation", "vault", "live"],
+      "subtitle": "2010 Vault Release"
     }
   ],
   "_instructions": {
