@@ -9,7 +9,10 @@ import process from 'node:process';
 const accountId = process.env.CF_ACCOUNT_ID;
 const namespaceId = process.env.CF_KV_NAMESPACE_ID;
 const apiToken = process.env.CLOUDFLARE_API_TOKEN;
-const libraryPath = process.argv[2] || 'webapp/data/library.generated.json';
+// Prefer comprehensive library, fallback to generated library
+const comprehensivePath = 'webapp/data/library.comprehensive.json';
+const generatedPath = 'webapp/data/library.generated.json';
+const libraryPath = process.argv[2] || (require('fs').existsSync(comprehensivePath) ? comprehensivePath : generatedPath);
 
 if (!accountId || !namespaceId || !apiToken) {
   console.warn('⚠️  Cloudflare KV credentials not provided. Skipping KV upload.');
