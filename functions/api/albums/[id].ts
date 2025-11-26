@@ -884,16 +884,20 @@ async function attachSignedLinks(
   
   // Use durations directly from library file (they're already merged in)
   // The library file should have all durations, so prioritize those
-  trackResults.forEach((result) => {
-    // Use duration from library file if available (should be the case for all tracks)
+  console.log(`[DURATION] Processing ${trackResults.length} tracks for duration assignment`);
+  trackResults.forEach((result, index) => {
+    // CRITICAL: Use duration from library file FIRST (they're already merged in)
+    // The track object from the library should already have durationMs set
     if (result.track.durationMs > 0) {
       result.durationMs = result.track.durationMs;
-      console.log(`[DURATION] ✅ Using library duration for ${result.track.title}: ${Math.round(result.track.durationMs / 1000)}s`);
+      if (index < 3) { // Log first 3 for debugging
+        console.log(`[DURATION] ✅ Track ${index + 1} "${result.track.title}": Using library duration ${Math.round(result.track.durationMs / 1000)}s`);
+      }
       return; // Duration already in library, no need to lookup
     }
     
     // Fallback: try database lookup only if library doesn't have duration (shouldn't happen)
-    console.log(`[DURATION] ⚠️  Library missing duration for: ${result.track.title}, trying database lookup...`);
+    console.log(`[DURATION] ⚠️  Library missing duration for: ${result.track.title} (track.durationMs=${result.track.durationMs}), trying database lookup...`);
     const dropboxFilePath = convertToDropboxPath(result.track.filePath);
     const dbDuration = getDurationFromDatabase(dropboxFilePath, dbDurations);
     if (dbDuration > 0) {
@@ -902,6 +906,7 @@ async function attachSignedLinks(
       console.log(`[DURATION] ✅ Found in database (fallback): ${result.track.title} (${Math.round(dbDuration / 1000)}s)`);
     } else {
       console.log(`[DURATION] ❌ No duration found in library or database for: ${result.track.title}`);
+      console.log(`[DURATION]    Track durationMs: ${result.track.durationMs}`);
       console.log(`[DURATION]    Looking for path: ${dropboxFilePath}`);
     }
   });
@@ -1097,10 +1102,17 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
   // Debug: Log first few tracks' durations to verify library data
   if (album && album.tracks.length > 0) {
     console.log(`[API DEBUG] Album found: ${album.title}`);
-    console.log(`[API DEBUG] First 3 tracks from library:`);
-    album.tracks.slice(0, 3).forEach(track => {
-      console.log(`[API DEBUG]   Track ${track.trackNumber}: ${track.title} - ${track.durationMs}ms`);
+    console.log(`[API DEBUG] Total tracks: ${album.tracks.length}`);
+    console.log(`[API DEBUG] First 5 tracks from library with durations:`);
+    album.tracks.slice(0, 5).forEach(track => {
+      const durationSec = Math.round(track.durationMs / 1000);
+      const durationMin = Math.floor(durationSec / 60);
+      const durationSecRem = durationSec % 60;
+      const status = track.durationMs > 0 ? "✅" : "❌";
+      console.log(`[API DEBUG]   ${status} Track ${track.trackNumber}: ${track.title} - ${durationMin}:${durationSecRem.toString().padStart(2, '0')} (${track.durationMs}ms)`);
     });
+    const tracksWithDurations = album.tracks.filter(t => t.durationMs > 0).length;
+    console.log(`[API DEBUG] Tracks with durations: ${tracksWithDurations}/${album.tracks.length}`);
   }
 
   if (!album) {
