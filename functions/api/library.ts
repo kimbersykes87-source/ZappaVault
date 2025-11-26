@@ -406,7 +406,10 @@ async function getCoverUrl(
   return undefined;
 }
 
-export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
+export const onRequestGet = async (context: {
+  request: Request;
+  env: EnvBindings;
+}) => {
   const { request, env } = context;
   const snapshot = await loadLibrarySnapshot(env);
   const url = new URL(request.url);
@@ -430,43 +433,89 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
   const result = applyLibraryQuery(snapshot, query);
 
   // Generate cover URLs for albums on the current page
-  // Use Promise.allSettled to handle failures gracefully
+  // Process in smaller batches to avoid timeouts and rate limits
+  // Use the same logic as the album detail endpoint for consistency
   console.log(`[COVER DEBUG] Generating cover URLs for ${result.results.length} albums`);
   console.log(`[COVER DEBUG] DROPBOX_TOKEN present: ${!!env.DROPBOX_TOKEN}`);
   
   const albumsWithCovers = env.DROPBOX_TOKEN
-    ? await Promise.allSettled(
-        result.results.map(async (album) => {
-          try {
-            const coverUrl = await getCoverUrl(album, env);
-            // Only use the new coverUrl if it's an HTTP URL, otherwise keep undefined
-            // This prevents local file paths from being returned
-            const finalCoverUrl = coverUrl?.startsWith('http') ? coverUrl : undefined;
-            if (!finalCoverUrl) {
-              console.log(`[COVER DEBUG] No cover URL generated for ${album.title} (original: ${album.coverUrl || 'none'})`);
-            } else {
-              console.log(`[COVER DEBUG] ✅ Generated cover URL for ${album.title}`);
-            }
-            return {
-              ...album,
-              coverUrl: finalCoverUrl,
-            };
-          } catch (error) {
-            console.log(`[COVER DEBUG] Error generating cover for ${album.title}:`, error);
-            if (error instanceof Error) {
-              console.log(`[COVER DEBUG] Error details: ${error.message}`);
-            }
-            return {
-              ...album,
-              coverUrl: undefined,
-            };
-          }
-        }),
-      ).then((results) =>
-        results.map((result) =>
-          result.status === 'fulfilled' ? result.value : result.reason,
-        ),
-      )
+    ? await (async () => {
+        // Process albums in batches to avoid overwhelming the API
+        const batchSize = 10;
+        const batches: Album[][] = [];
+        for (let i = 0; i < result.results.length; i += batchSize) {
+          batches.push(result.results.slice(i, i + batchSize));
+        }
+        
+        const processedAlbums: Album[] = [];
+        
+        for (const batch of batches) {
+          const batchResults = await Promise.allSettled(
+            batch.map(async (album) => {
+              try {
+                // Use the same logic as attachSignedLinks in albums/[id].ts
+                let coverUrl = album.coverUrl;
+                
+                if (coverUrl && coverUrl.startsWith('http')) {
+                  // Already an HTTP URL, keep it
+                  console.log(`[COVER DEBUG] ${album.title}: Cover URL already HTTP`);
+                } else if (coverUrl && coverUrl.startsWith('/')) {
+                  // Cover URL is a Dropbox path, convert it to a permanent link
+                  console.log(`[COVER DEBUG] ${album.title}: Converting cover path to HTTP URL: ${coverUrl}`);
+                  const coverLink = await getPermanentLink(env, coverUrl);
+                  if (coverLink) {
+                    console.log(`[COVER DEBUG] ${album.title}: ✅ Converted to HTTP URL`);
+                    coverUrl = coverLink;
+                  } else {
+                    console.log(`[COVER DEBUG] ${album.title}: ❌ Failed to convert, trying fallback search`);
+                    // Try finding cover art as fallback
+                    const foundCover = await findCoverArt(env, album);
+                    if (foundCover) {
+                      console.log(`[COVER DEBUG] ${album.title}: ✅ Found via fallback search`);
+                      coverUrl = foundCover;
+                    }
+                  }
+                } else if (!coverUrl) {
+                  // No cover URL, try to find it
+                  console.log(`[COVER DEBUG] ${album.title}: No coverUrl, searching for cover art`);
+                  const foundCover = await findCoverArt(env, album);
+                  if (foundCover) {
+                    console.log(`[COVER DEBUG] ${album.title}: ✅ Found via search`);
+                    coverUrl = foundCover;
+                  } else {
+                    console.log(`[COVER DEBUG] ${album.title}: ❌ No cover art found`);
+                  }
+                }
+                
+                // Only use the new coverUrl if it's an HTTP URL
+                const finalCoverUrl = coverUrl?.startsWith('http') ? coverUrl : undefined;
+                
+                return {
+                  ...album,
+                  coverUrl: finalCoverUrl,
+                };
+              } catch (error) {
+                console.log(`[COVER DEBUG] Error generating cover for ${album.title}:`, error);
+                if (error instanceof Error) {
+                  console.log(`[COVER DEBUG] Error details: ${error.message}`);
+                }
+                return {
+                  ...album,
+                  coverUrl: album.coverUrl?.startsWith('http') ? album.coverUrl : undefined,
+                };
+              }
+            }),
+          );
+          
+          processedAlbums.push(
+            ...batchResults.map((result) =>
+              result.status === 'fulfilled' ? result.value : result.reason,
+            ),
+          );
+        }
+        
+        return processedAlbums;
+      })()
     : (() => {
         console.log(`[COVER DEBUG] ⚠️ DROPBOX_TOKEN not set, skipping cover URL generation`);
         return result.results;
