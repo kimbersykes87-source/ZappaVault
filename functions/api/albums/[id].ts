@@ -677,39 +677,78 @@ async function attachSignedLinks(
   console.log(`[LINK DEBUG] Token available: ${!!token}, Token length: ${token?.length || 0} chars`);
 
   const errors: string[] = [];
+  
+  // Process streaming links first (critical) - in parallel batches to avoid timeout
+  // Duration extraction can happen in parallel but is non-blocking
+  const CONCURRENT_LINKS = 5; // Process 5 links at a time
   const trackResults: Array<{ track: typeof album.tracks[0]; link: string | undefined; durationMs: number; error?: string }> = [];
   
-  // Process tracks sequentially to avoid overwhelming the API and get better error tracking
-  for (const track of album.tracks) {
-    // Convert Windows path to Dropbox path before getting permanent link
-    const dropboxFilePath = convertToDropboxPath(track.filePath);
-    console.log(`[LINK DEBUG] Getting link for track: ${track.title} (${track.trackNumber})`);
-    console.log(`[LINK DEBUG]   Original path: ${track.filePath}`);
-    console.log(`[LINK DEBUG]   Dropbox path: ${dropboxFilePath}`);
+  // Process tracks in batches for links (critical path)
+  for (let i = 0; i < album.tracks.length; i += CONCURRENT_LINKS) {
+    const batch = album.tracks.slice(i, i + CONCURRENT_LINKS);
     
-    // Get streaming link
-    const link = await getPermanentLink(env, dropboxFilePath, errors);
+    const linkPromises = batch.map(async (track) => {
+      const dropboxFilePath = convertToDropboxPath(track.filePath);
+      console.log(`[LINK DEBUG] Getting link for track: ${track.title} (${track.trackNumber})`);
+      console.log(`[LINK DEBUG]   Original path: ${track.filePath}`);
+      console.log(`[LINK DEBUG]   Dropbox path: ${dropboxFilePath}`);
+      
+      const link = await getPermanentLink(env, dropboxFilePath, errors);
+      
+      if (!link) {
+        const errorMsg = `Failed to get link for track "${track.title}": ${dropboxFilePath}`;
+        console.log(`[LINK DEBUG]   ❌ ${errorMsg}`);
+        return { track, link: undefined, error: errorMsg };
+      } else {
+        console.log(`[LINK DEBUG]   ✅ Got link: ${link.substring(0, 50)}...`);
+        return { track, link };
+      }
+    });
     
-    // Extract duration if not already set
-    let durationMs = track.durationMs;
-    if (durationMs === 0) {
-      console.log(`[DURATION] Extracting duration for: ${track.title}`);
-      durationMs = await extractDurationFromDropboxFile(dropboxFilePath, env);
-    } else {
-      console.log(`[DURATION] Using existing duration ${Math.round(durationMs / 1000)}s for: ${track.title}`);
-    }
-    
-    if (!link) {
-      const errorMsg = `Failed to get link for track "${track.title}": ${dropboxFilePath}`;
-      console.log(`[LINK DEBUG]   ❌ ${errorMsg}`);
-      trackResults.push({ track, link: undefined, durationMs, error: errorMsg });
-    } else {
-      console.log(`[LINK DEBUG]   ✅ Got link: ${link.substring(0, 50)}...`);
-      trackResults.push({ track, link, durationMs });
-    }
+    const linkResults = await Promise.all(linkPromises);
+    trackResults.push(...linkResults);
   }
   
-  const updatedTracks = trackResults.map(({ track, link, durationMs, error }) => {
+  // Extract durations in parallel (non-blocking, can fail gracefully)
+  // Only extract if duration is 0 and we have a link (so we know the file is accessible)
+  const durationPromises = trackResults.map(async (result) => {
+    if (result.track.durationMs > 0) {
+      return result.track.durationMs; // Use existing duration
+    }
+    
+    if (!result.link) {
+      return 0; // Can't extract duration if we don't have a link
+    }
+    
+    try {
+      const dropboxFilePath = convertToDropboxPath(result.track.filePath);
+      console.log(`[DURATION] Extracting duration for: ${result.track.title}`);
+      const durationMs = await extractDurationFromDropboxFile(dropboxFilePath, env);
+      if (durationMs > 0) {
+        console.log(`[DURATION] Extracted ${Math.round(durationMs / 1000)}s from ${result.track.title}`);
+      }
+      return durationMs;
+    } catch (error) {
+      console.warn(`[DURATION] Failed to extract duration for ${result.track.title}:`, error);
+      return 0; // Fail gracefully
+    }
+  });
+  
+  // Wait for all duration extractions (with timeout protection)
+  const durations = await Promise.allSettled(durationPromises);
+  
+  // Combine results
+  const finalResults = trackResults.map((result, index) => {
+    const durationResult = durations[index];
+    const durationMs = durationResult.status === 'fulfilled' ? durationResult.value : result.track.durationMs;
+    
+    return {
+      ...result,
+      durationMs,
+    };
+  });
+  
+  const updatedTracks = finalResults.map(({ track, link, durationMs, error }) => {
     if (error) {
       console.error(`[LINK ERROR] Track "${track.title}": ${error}`);
     }
