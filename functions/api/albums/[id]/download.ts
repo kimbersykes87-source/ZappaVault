@@ -44,7 +44,7 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
     return new Response('Missing album id', { status: 400 });
   }
 
-  const token = await getValidDropboxToken(env);
+  let token = await getValidDropboxToken(env);
   if (!token) {
     return new Response('Dropbox token not configured', { status: 500 });
   }
