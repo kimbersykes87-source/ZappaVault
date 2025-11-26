@@ -1,17 +1,30 @@
 import type { EnvBindings } from '../../utils/library.ts';
 import type { LibrarySnapshot } from '../../shared/library.ts';
 
-// Import the library data from TypeScript file (more reliable than JSON import in CF Workers)
-import { libraryData } from '../data/library.generated.ts';
-
 /**
  * Serve library.generated.json file
  * This endpoint makes library.generated.json accessible to other Functions
- * We import it directly to avoid issues with fetching static assets
+ * We fetch it from the static asset URL (works reliably in CF Pages)
  */
-export const onRequestGet: PagesFunction<EnvBindings> = async () => {
+export const onRequestGet: PagesFunction<EnvBindings> = async ({ request }) => {
   try {
-    const data = libraryData as LibrarySnapshot;
+    // Fetch from static asset using absolute URL
+    // In Cloudflare Pages, static assets are served from the root
+    const url = new URL(request.url);
+    const libraryUrl = new URL('/data/library.generated.json', url.origin);
+    
+    console.log(`[LIBRARY-DATA] Fetching from: ${libraryUrl.toString()}`);
+    
+    const response = await fetch(libraryUrl.toString(), {
+      // Use cache: 'default' to allow Cloudflare's edge cache
+      cache: 'default',
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch library: ${response.status} ${response.statusText}`);
+    }
+    
+    const data = await response.json() as LibrarySnapshot;
     console.log(`[LIBRARY-DATA] ✅ Serving library: ${data.albumCount} albums, ${data.trackCount} tracks`);
     
     // Verify it has durations
