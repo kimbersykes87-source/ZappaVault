@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-11-26T00:55:10.522Z",
+  "generatedAt": "2025-11-26T01:36:28.626Z",
   "albumCount": 106,
   "trackCount": 1887,
   "albums": [
@@ -13,7 +13,7 @@
       "subtitle": "1971 Live Album",
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Fillmore East, June 1971/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Fillmore East, June 1971",
-      "lastSyncedAt": "2025-11-26T00:53:52.197Z",
+      "lastSyncedAt": "2025-11-26T01:35:13.945Z",
       "tags": [
         "live",
         "classic"
@@ -144,7 +144,7 @@
       "subtitle": "1975 Live Album with Captain Beefheart",
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Bongo Fury/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Bongo Fury",
-      "lastSyncedAt": "2025-11-26T00:53:52.951Z",
+      "lastSyncedAt": "2025-11-26T01:35:14.654Z",
       "tags": [
         "live",
         "collaboration"
@@ -248,7 +248,7 @@
       "subtitle": "2011 Vault Release",
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Feeding the Monkies at Ma Maison/Cover/1 Front.jpeg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Feeding the Monkies at Ma Maison",
-      "lastSyncedAt": "2025-11-26T00:53:53.783Z",
+      "lastSyncedAt": "2025-11-26T01:35:15.330Z",
       "tags": [
         "compilation",
         "vault"
@@ -316,7 +316,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Absolutely Free/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Absolutely Free",
-      "lastSyncedAt": "2025-11-26T00:53:54.489Z",
+      "lastSyncedAt": "2025-11-26T01:35:16.009Z",
       "tags": [],
       "tracks": [
         {
@@ -471,7 +471,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Chunga's Revenge/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Chunga's Revenge",
-      "lastSyncedAt": "2025-11-26T00:53:55.198Z",
+      "lastSyncedAt": "2025-11-26T01:35:16.828Z",
       "tags": [],
       "tracks": [
         {
@@ -581,7 +581,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/200 Motels/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/200 Motels",
-      "lastSyncedAt": "2025-11-26T00:53:55.928Z",
+      "lastSyncedAt": "2025-11-26T01:35:17.545Z",
       "tags": [],
       "tracks": [
         {
@@ -952,7 +952,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Civilization Phaze III/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Civilization Phaze III",
-      "lastSyncedAt": "2025-11-26T00:53:56.671Z",
+      "lastSyncedAt": "2025-11-26T01:35:18.259Z",
       "tags": [],
       "tracks": [
         {
@@ -1341,7 +1341,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Broadway The Hard Way/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Broadway The Hard Way",
-      "lastSyncedAt": "2025-11-26T00:53:57.382Z",
+      "lastSyncedAt": "2025-11-26T01:35:18.932Z",
       "tags": [],
       "tracks": [
         {
@@ -1514,7 +1514,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/FZ-OZ/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/FZ-OZ",
-      "lastSyncedAt": "2025-11-26T00:53:58.102Z",
+      "lastSyncedAt": "2025-11-26T01:35:19.643Z",
       "tags": [],
       "tracks": [
         {
@@ -1777,7 +1777,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Cruising with Ruben & The Jets/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Cruising with Ruben & The Jets",
-      "lastSyncedAt": "2025-11-26T00:53:59.509Z",
+      "lastSyncedAt": "2025-11-26T01:35:20.420Z",
       "tags": [],
       "tracks": [
         {
@@ -1914,7 +1914,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Francesco Zappa/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Francesco Zappa",
-      "lastSyncedAt": "2025-11-26T00:54:00.224Z",
+      "lastSyncedAt": "2025-11-26T01:35:21.119Z",
       "tags": [],
       "tracks": [
         {
@@ -2087,7 +2087,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/EIHN- Everything Is Healing Nicely/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/EIHN- Everything Is Healing Nicely",
-      "lastSyncedAt": "2025-11-26T00:54:00.941Z",
+      "lastSyncedAt": "2025-11-26T01:35:21.851Z",
       "tags": [],
       "tracks": [
         {
@@ -2217,10 +2217,17 @@
     {
       "id": "apps-zappavault-zappalibrary-aaafnraa",
       "title": "AAAFNRAA",
+      "year": 1991,
+      "era": "Posthumous Release",
+      "genre": "Compilation",
+      "description": "Posthumous compilation album featuring selections from throughout Zappa's career. The title stands for 'Any Way The Wind Blows' and includes material from various eras and musical styles.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/AAAFNRAA/cover.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/AAAFNRAA",
-      "lastSyncedAt": "2025-11-26T00:54:01.429Z",
-      "tags": [],
+      "lastSyncedAt": "2025-11-26T01:35:22.348Z",
+      "tags": [
+        "compilation"
+      ],
       "tracks": [
         {
           "id": "apps-zappavault-zappalibrary-aaafnraa-01-tryin-to-grow-a-chin-flac",
@@ -2338,7 +2345,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Does Humor Belong In Music_/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Does Humor Belong In Music_",
-      "lastSyncedAt": "2025-11-26T00:54:02.180Z",
+      "lastSyncedAt": "2025-11-26T01:35:24.349Z",
       "tags": [],
       "tracks": [
         {
@@ -2448,7 +2455,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Baby Snakes/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Baby Snakes",
-      "lastSyncedAt": "2025-11-26T00:54:02.907Z",
+      "lastSyncedAt": "2025-11-26T01:35:25.205Z",
       "tags": [],
       "tracks": [
         {
@@ -2540,7 +2547,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/A Token of His Extreme/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/A Token of His Extreme",
-      "lastSyncedAt": "2025-11-26T00:54:03.647Z",
+      "lastSyncedAt": "2025-11-26T01:35:25.866Z",
       "tags": [],
       "tracks": [
         {
@@ -2659,7 +2666,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Apostrophe (')/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Apostrophe (')",
-      "lastSyncedAt": "2025-11-26T00:54:04.459Z",
+      "lastSyncedAt": "2025-11-26T01:35:26.675Z",
       "tags": [],
       "tracks": [
         {
@@ -2760,7 +2767,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Burnt Weeny Sandwich/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Burnt Weeny Sandwich",
-      "lastSyncedAt": "2025-11-26T00:54:05.290Z",
+      "lastSyncedAt": "2025-11-26T01:35:27.412Z",
       "tags": [],
       "tracks": [
         {
@@ -2861,7 +2868,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Ahead Of Their Time/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Ahead Of Their Time",
-      "lastSyncedAt": "2025-11-26T00:54:05.997Z",
+      "lastSyncedAt": "2025-11-26T01:35:28.066Z",
       "tags": [],
       "tracks": [
         {
@@ -3061,7 +3068,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Dance Me This/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Dance Me This",
-      "lastSyncedAt": "2025-11-26T00:54:06.756Z",
+      "lastSyncedAt": "2025-11-26T01:35:28.739Z",
       "tags": [],
       "tracks": [
         {
@@ -3180,7 +3187,7 @@
       "subtitle": "2010 Vault Release",
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Congress Shall Make No Law/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Congress Shall Make No Law",
-      "lastSyncedAt": "2025-11-26T00:54:07.459Z",
+      "lastSyncedAt": "2025-11-26T01:35:29.403Z",
       "tags": [
         "compilation",
         "vault",
@@ -3321,7 +3328,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Finer Moments/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Finer Moments",
-      "lastSyncedAt": "2025-11-26T00:54:08.190Z",
+      "lastSyncedAt": "2025-11-26T01:35:30.602Z",
       "tags": [],
       "tracks": [
         {
@@ -3458,7 +3465,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Buffalo/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Buffalo",
-      "lastSyncedAt": "2025-11-26T00:54:08.971Z",
+      "lastSyncedAt": "2025-11-26T01:35:31.310Z",
       "tags": [],
       "tracks": [
         {
@@ -3712,7 +3719,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Roxy- The Movie/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Roxy- The Movie",
-      "lastSyncedAt": "2025-11-26T00:54:09.707Z",
+      "lastSyncedAt": "2025-11-26T01:35:32.203Z",
       "tags": [],
       "tracks": [
         {
@@ -3912,7 +3919,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Uncle Meat/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Uncle Meat",
-      "lastSyncedAt": "2025-11-26T00:54:10.451Z",
+      "lastSyncedAt": "2025-11-26T01:35:32.904Z",
       "tags": [],
       "tracks": [
         {
@@ -4202,7 +4209,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Roxy By Proxy/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Roxy By Proxy",
-      "lastSyncedAt": "2025-11-26T00:54:11.159Z",
+      "lastSyncedAt": "2025-11-26T01:35:33.588Z",
       "tags": [],
       "tracks": [
         {
@@ -4339,7 +4346,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Ship Arriving Too Late To Save A Drowning Witch/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Ship Arriving Too Late To Save A Drowning Witch",
-      "lastSyncedAt": "2025-11-26T00:54:11.857Z",
+      "lastSyncedAt": "2025-11-26T01:35:34.313Z",
       "tags": [],
       "tracks": [
         {
@@ -4413,7 +4420,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Lumpy Money P-O/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Lumpy Money P-O",
-      "lastSyncedAt": "2025-11-26T00:54:12.598Z",
+      "lastSyncedAt": "2025-11-26T01:35:34.982Z",
       "tags": [],
       "tracks": [
         {
@@ -5126,7 +5133,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/One Size Fits All/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/One Size Fits All",
-      "lastSyncedAt": "2025-11-26T00:54:13.352Z",
+      "lastSyncedAt": "2025-11-26T01:35:35.702Z",
       "tags": [],
       "tracks": [
         {
@@ -5227,7 +5234,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 4/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 4",
-      "lastSyncedAt": "2025-11-26T00:54:14.072Z",
+      "lastSyncedAt": "2025-11-26T01:35:36.404Z",
       "tags": [],
       "tracks": [
         {
@@ -5553,7 +5560,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Sheik Yerbouti/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Sheik Yerbouti",
-      "lastSyncedAt": "2025-11-26T00:54:14.749Z",
+      "lastSyncedAt": "2025-11-26T01:35:37.065Z",
       "tags": [],
       "tracks": [
         {
@@ -5735,7 +5742,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/You Are What You Is/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/You Are What You Is",
-      "lastSyncedAt": "2025-11-26T00:54:15.557Z",
+      "lastSyncedAt": "2025-11-26T01:35:37.703Z",
       "tags": [],
       "tracks": [
         {
@@ -5926,7 +5933,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 5/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 5",
-      "lastSyncedAt": "2025-11-26T00:54:16.287Z",
+      "lastSyncedAt": "2025-11-26T01:35:38.396Z",
       "tags": [],
       "tracks": [
         {
@@ -6288,7 +6295,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Zappa, Vol.1/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Zappa, Vol.1",
-      "lastSyncedAt": "2025-11-26T00:54:16.940Z",
+      "lastSyncedAt": "2025-11-26T01:35:39.040Z",
       "tags": [],
       "tracks": [
         {
@@ -6371,7 +6378,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Zappa In New York/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Zappa In New York",
-      "lastSyncedAt": "2025-11-26T00:54:17.607Z",
+      "lastSyncedAt": "2025-11-26T01:35:39.758Z",
       "tags": [],
       "tracks": [
         {
@@ -6526,7 +6533,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Joe's Garage Acts I, II & III/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Joe's Garage Acts I, II & III",
-      "lastSyncedAt": "2025-11-26T00:54:18.326Z",
+      "lastSyncedAt": "2025-11-26T01:35:40.463Z",
       "tags": [],
       "tracks": [
         {
@@ -6708,7 +6715,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/We're Only In It For The Money/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/We're Only In It For The Money",
-      "lastSyncedAt": "2025-11-26T00:54:19.031Z",
+      "lastSyncedAt": "2025-11-26T01:35:41.146Z",
       "tags": [],
       "tracks": [
         {
@@ -6856,10 +6863,18 @@
     {
       "id": "apps-zappavault-zappalibrary-the-old-masters-box-3",
       "title": "The Old Masters, Box 3",
+      "year": 1987,
+      "era": "Solo Career",
+      "genre": "Compilation",
+      "description": "Third volume in The Old Masters box set series, featuring remastered versions of albums from the 1970s. Includes material from various periods showcasing Zappa's evolving musical style.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Old Masters, Box 3/The Old Masters, Box 3.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Old Masters, Box 3",
-      "lastSyncedAt": "2025-11-26T00:54:19.715Z",
-      "tags": [],
+      "lastSyncedAt": "2025-11-26T01:35:41.840Z",
+      "tags": [
+        "compilation",
+        "box set"
+      ],
       "tracks": [],
       "formats": [],
       "totalDurationMs": 0,
@@ -6875,7 +6890,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Meets The Mothers Of Prevention/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Meets The Mothers Of Prevention",
-      "lastSyncedAt": "2025-11-26T00:54:20.505Z",
+      "lastSyncedAt": "2025-11-26T01:35:42.509Z",
       "tags": [],
       "tracks": [
         {
@@ -6985,7 +7000,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Lumpy Gravy/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Lumpy Gravy",
-      "lastSyncedAt": "2025-11-26T00:54:21.276Z",
+      "lastSyncedAt": "2025-11-26T01:35:43.196Z",
       "tags": [],
       "tracks": [
         {
@@ -7023,7 +7038,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Them or Us/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Them or Us",
-      "lastSyncedAt": "2025-11-26T00:54:22.007Z",
+      "lastSyncedAt": "2025-11-26T01:35:43.976Z",
       "tags": [],
       "tracks": [
         {
@@ -7169,7 +7184,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Just Another Band From L.A/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Just Another Band From L.A",
-      "lastSyncedAt": "2025-11-26T00:54:22.737Z",
+      "lastSyncedAt": "2025-11-26T01:35:44.591Z",
       "tags": [],
       "tracks": [
         {
@@ -7234,7 +7249,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 2/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 2",
-      "lastSyncedAt": "2025-11-26T00:54:23.433Z",
+      "lastSyncedAt": "2025-11-26T01:35:45.289Z",
       "tags": [],
       "tracks": [
         {
@@ -7425,7 +7440,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Joe's Domage/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Joe's Domage",
-      "lastSyncedAt": "2025-11-26T00:54:24.283Z",
+      "lastSyncedAt": "2025-11-26T01:35:46.011Z",
       "tags": [],
       "tracks": [
         {
@@ -7535,7 +7550,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Roxy Performances/Cover/cover.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Roxy Performances",
-      "lastSyncedAt": "2025-11-26T00:54:25.067Z",
+      "lastSyncedAt": "2025-11-26T01:35:46.716Z",
       "tags": [],
       "tracks": [
         {
@@ -8304,9 +8319,14 @@
     {
       "id": "apps-zappavault-zappalibrary-quaudiophiliac",
       "title": "quAUDIOPHILIAc",
+      "year": 2004,
+      "era": "Posthumous Release",
+      "genre": "Synclavier",
+      "description": "Posthumous release featuring Synclavier compositions from Zappa's vault. Electronic music showcasing advanced compositional techniques and rhythmic complexity.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/quAUDIOPHILIAc/1 DVD-Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/quAUDIOPHILIAc",
-      "lastSyncedAt": "2025-11-26T00:54:25.749Z",
+      "lastSyncedAt": "2025-11-26T01:35:47.448Z",
       "tags": [],
       "tracks": [],
       "formats": [],
@@ -8316,10 +8336,18 @@
     {
       "id": "apps-zappavault-zappalibrary-the-dub-room-special",
       "title": "The Dub Room Special",
+      "year": 1982,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Compilation album featuring live performances and studio recordings. Includes material from various periods, showcasing Zappa's diverse musical output and production techniques.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Dub Room Special/1 DVD-Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Dub Room Special",
-      "lastSyncedAt": "2025-11-26T00:54:26.421Z",
-      "tags": [],
+      "lastSyncedAt": "2025-11-26T01:35:48.124Z",
+      "tags": [
+        "compilation",
+        "live"
+      ],
       "tracks": [],
       "formats": [],
       "totalDurationMs": 0,
@@ -8335,7 +8363,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Greasy Love Songs/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Greasy Love Songs",
-      "lastSyncedAt": "2025-11-26T00:54:27.125Z",
+      "lastSyncedAt": "2025-11-26T01:35:48.925Z",
       "tags": [],
       "tracks": [
         {
@@ -8537,10 +8565,17 @@
     {
       "id": "apps-zappavault-zappalibrary-philly-76",
       "title": "Philly '76",
+      "year": 2009,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous live album recorded in Philadelphia in 1976. Features performances from the late 1970s touring band with complex arrangements and extended improvisations.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Philly '76/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Philly '76",
-      "lastSyncedAt": "2025-11-26T00:54:27.659Z",
-      "tags": [],
+      "lastSyncedAt": "2025-11-26T01:35:49.366Z",
+      "tags": [
+        "live"
+      ],
       "tracks": [
         {
           "id": "apps-zappavault-zappalibrary-philly-76-cd-1-01-the-purple-lagoon-mp3",
@@ -8766,7 +8801,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Carnegie Hall/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Carnegie Hall",
-      "lastSyncedAt": "2025-11-26T00:54:28.378Z",
+      "lastSyncedAt": "2025-11-26T01:35:50.041Z",
       "tags": [],
       "tracks": [
         {
@@ -9092,7 +9127,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Chicago '78/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Chicago '78",
-      "lastSyncedAt": "2025-11-26T00:54:29.092Z",
+      "lastSyncedAt": "2025-11-26T01:35:50.714Z",
       "tags": [],
       "tracks": [
         {
@@ -9265,7 +9300,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Make A Jazz Noise Here/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Make A Jazz Noise Here",
-      "lastSyncedAt": "2025-11-26T00:54:29.802Z",
+      "lastSyncedAt": "2025-11-26T01:35:51.403Z",
       "tags": [],
       "tracks": [
         {
@@ -9503,10 +9538,18 @@
     {
       "id": "apps-zappavault-zappalibrary-the-old-masters-box-1",
       "title": "The Old Masters, Box 1",
+      "year": 1985,
+      "era": "Solo Career",
+      "genre": "Compilation",
+      "description": "First volume in The Old Masters box set series, featuring remastered versions of early Mothers of Invention albums. Includes Freak Out!, Absolutely Free, and We're Only In It For The Money.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Old Masters, Box 1/The Old Masters, Box 1.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Old Masters, Box 1",
-      "lastSyncedAt": "2025-11-26T00:54:30.461Z",
-      "tags": [],
+      "lastSyncedAt": "2025-11-26T01:35:52.063Z",
+      "tags": [
+        "compilation",
+        "box set"
+      ],
       "tracks": [],
       "formats": [],
       "totalDurationMs": 0,
@@ -9517,7 +9560,7 @@
       "title": "Zappa ’75： Zagreb／Ljubljana",
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Zappa ’75： Zagreb／Ljubljana/Cover/cover.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Zappa ’75： Zagreb／Ljubljana",
-      "lastSyncedAt": "2025-11-26T00:54:31.164Z",
+      "lastSyncedAt": "2025-11-26T01:35:52.762Z",
       "tags": [],
       "tracks": [
         {
@@ -9771,7 +9814,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Shut Up 'N Play Yer Guitar/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Shut Up 'N Play Yer Guitar",
-      "lastSyncedAt": "2025-11-26T00:54:31.927Z",
+      "lastSyncedAt": "2025-11-26T01:35:53.373Z",
       "tags": [],
       "tracks": [
         {
@@ -9944,7 +9987,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Freak Out!/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Freak Out!",
-      "lastSyncedAt": "2025-11-26T00:54:32.671Z",
+      "lastSyncedAt": "2025-11-26T01:35:54.052Z",
       "tags": [],
       "tracks": [
         {
@@ -10099,7 +10142,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/One Shot Deal/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/One Shot Deal",
-      "lastSyncedAt": "2025-11-26T00:54:33.650Z",
+      "lastSyncedAt": "2025-11-26T01:35:54.727Z",
       "tags": [],
       "tracks": [
         {
@@ -10200,7 +10243,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Joe's Corsage/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Joe's Corsage",
-      "lastSyncedAt": "2025-11-26T00:54:34.414Z",
+      "lastSyncedAt": "2025-11-26T01:35:55.348Z",
       "tags": [],
       "tracks": [
         {
@@ -10328,7 +10371,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Halloween/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Halloween",
-      "lastSyncedAt": "2025-11-26T00:54:35.112Z",
+      "lastSyncedAt": "2025-11-26T01:35:56.149Z",
       "tags": [],
       "tracks": [
         {
@@ -10465,7 +10508,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Little Dots/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Little Dots",
-      "lastSyncedAt": "2025-11-26T00:54:35.804Z",
+      "lastSyncedAt": "2025-11-26T01:35:56.799Z",
       "tags": [],
       "tracks": [
         {
@@ -10548,7 +10591,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Road Tapes, Venue #2/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Road Tapes, Venue #2",
-      "lastSyncedAt": "2025-11-26T00:54:36.521Z",
+      "lastSyncedAt": "2025-11-26T01:35:57.419Z",
       "tags": [],
       "tracks": [
         {
@@ -10739,7 +10782,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Studio Tan/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Studio Tan",
-      "lastSyncedAt": "2025-11-26T00:54:37.232Z",
+      "lastSyncedAt": "2025-11-26T01:35:58.070Z",
       "tags": [],
       "tracks": [
         {
@@ -10795,7 +10838,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Plays The Music Of Frank Zappa/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Plays The Music Of Frank Zappa",
-      "lastSyncedAt": "2025-11-26T00:54:37.903Z",
+      "lastSyncedAt": "2025-11-26T01:35:58.723Z",
       "tags": [],
       "tracks": [
         {
@@ -10878,7 +10921,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 3/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 3",
-      "lastSyncedAt": "2025-11-26T00:54:38.646Z",
+      "lastSyncedAt": "2025-11-26T01:35:59.428Z",
       "tags": [],
       "tracks": [
         {
@@ -11123,7 +11166,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Zappa, Vol. 2/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Zappa, Vol. 2",
-      "lastSyncedAt": "2025-11-26T00:54:39.312Z",
+      "lastSyncedAt": "2025-11-26T01:36:00.048Z",
       "tags": [],
       "tracks": [
         {
@@ -11179,7 +11222,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Best Band You Never Heard In Your Life/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Best Band You Never Heard In Your Life",
-      "lastSyncedAt": "2025-11-26T00:54:40.057Z",
+      "lastSyncedAt": "2025-11-26T01:36:00.683Z",
       "tags": [],
       "tracks": [
         {
@@ -11397,7 +11440,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/TinselTown Rebellion/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/TinselTown Rebellion",
-      "lastSyncedAt": "2025-11-26T00:54:40.786Z",
+      "lastSyncedAt": "2025-11-26T01:36:01.320Z",
       "tags": [],
       "tracks": [
         {
@@ -11552,7 +11595,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Frank Zappa for President/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Frank Zappa for President",
-      "lastSyncedAt": "2025-11-26T00:54:41.466Z",
+      "lastSyncedAt": "2025-11-26T01:36:02.069Z",
       "tags": [],
       "tracks": [
         {
@@ -11635,7 +11678,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Trance-Fusion/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Trance-Fusion",
-      "lastSyncedAt": "2025-11-26T00:54:42.180Z",
+      "lastSyncedAt": "2025-11-26T01:36:02.698Z",
       "tags": [],
       "tracks": [
         {
@@ -11799,7 +11842,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Zappa Erie/Cover/Cover.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Zappa Erie",
-      "lastSyncedAt": "2025-11-26T00:54:42.923Z",
+      "lastSyncedAt": "2025-11-26T01:36:03.444Z",
       "tags": [],
       "tracks": [
         {
@@ -12467,7 +12510,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 1/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 1",
-      "lastSyncedAt": "2025-11-26T00:54:43.639Z",
+      "lastSyncedAt": "2025-11-26T01:36:04.237Z",
       "tags": [],
       "tracks": [
         {
@@ -12730,7 +12773,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Wazoo/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Wazoo",
-      "lastSyncedAt": "2025-11-26T00:54:44.362Z",
+      "lastSyncedAt": "2025-11-26T01:36:04.900Z",
       "tags": [],
       "tracks": [
         {
@@ -12849,7 +12892,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Funky Nothingness/Cover/cover.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Funky Nothingness",
-      "lastSyncedAt": "2025-11-26T00:54:45.066Z",
+      "lastSyncedAt": "2025-11-26T01:36:05.532Z",
       "tags": [],
       "tracks": [
         {
@@ -13094,7 +13137,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Understanding America/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Understanding America",
-      "lastSyncedAt": "2025-11-26T00:54:46.522Z",
+      "lastSyncedAt": "2025-11-26T01:36:06.210Z",
       "tags": [],
       "tracks": [
         {
@@ -13393,7 +13436,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Imaginary Diseases/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Imaginary Diseases",
-      "lastSyncedAt": "2025-11-26T00:54:47.220Z",
+      "lastSyncedAt": "2025-11-26T01:36:06.868Z",
       "tags": [],
       "tracks": [
         {
@@ -13476,7 +13519,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Hot Rats/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Hot Rats",
-      "lastSyncedAt": "2025-11-26T00:54:47.902Z",
+      "lastSyncedAt": "2025-11-26T01:36:07.542Z",
       "tags": [],
       "tracks": [
         {
@@ -13550,7 +13593,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Jazz From Hell/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Jazz From Hell",
-      "lastSyncedAt": "2025-11-26T00:54:48.633Z",
+      "lastSyncedAt": "2025-11-26T01:36:08.435Z",
       "tags": [],
       "tracks": [
         {
@@ -13642,7 +13685,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Lost Episodes/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Lost Episodes",
-      "lastSyncedAt": "2025-11-26T00:54:49.330Z",
+      "lastSyncedAt": "2025-11-26T01:36:09.296Z",
       "tags": [],
       "tracks": [
         {
@@ -13932,7 +13975,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Weasels Ripped My Flesh/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Weasels Ripped My Flesh",
-      "lastSyncedAt": "2025-11-26T00:54:50.036Z",
+      "lastSyncedAt": "2025-11-26T01:36:09.999Z",
       "tags": [],
       "tracks": [
         {
@@ -14033,7 +14076,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Playground Psychotics/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Playground Psychotics",
-      "lastSyncedAt": "2025-11-26T00:54:50.764Z",
+      "lastSyncedAt": "2025-11-26T01:36:10.715Z",
       "tags": [],
       "tracks": [
         {
@@ -14566,7 +14609,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Hammersmith Odeon/Cover/1 Box-Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Hammersmith Odeon",
-      "lastSyncedAt": "2025-11-26T00:54:51.516Z",
+      "lastSyncedAt": "2025-11-26T01:36:11.376Z",
       "tags": [],
       "tracks": [
         {
@@ -14840,10 +14883,18 @@
     {
       "id": "apps-zappavault-zappalibrary-the-old-masters-box-2",
       "title": "The Old Masters, Box 2",
+      "year": 1986,
+      "era": "Solo Career",
+      "genre": "Compilation",
+      "description": "Second volume in The Old Masters box set series, featuring remastered versions of albums from the late 1960s and early 1970s. Includes Cruising with Ruben & The Jets, Uncle Meat, and Hot Rats.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Old Masters, Box 2/The Old Masters, Box 2.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Old Masters, Box 2",
-      "lastSyncedAt": "2025-11-26T00:54:52.235Z",
-      "tags": [],
+      "lastSyncedAt": "2025-11-26T01:36:11.972Z",
+      "tags": [
+        "compilation",
+        "box set"
+      ],
       "tracks": [],
       "formats": [],
       "totalDurationMs": 0,
@@ -14859,7 +14910,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Perfect Stranger/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Perfect Stranger",
-      "lastSyncedAt": "2025-11-26T00:54:52.968Z",
+      "lastSyncedAt": "2025-11-26T01:36:12.651Z",
       "tags": [],
       "tracks": [
         {
@@ -14942,7 +14993,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Roxy & Elsewhere/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Roxy & Elsewhere",
-      "lastSyncedAt": "2025-11-26T00:54:53.639Z",
+      "lastSyncedAt": "2025-11-26T01:36:13.294Z",
       "tags": [],
       "tracks": [
         {
@@ -15052,7 +15103,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Over-Nite Sensation/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Over-Nite Sensation",
-      "lastSyncedAt": "2025-11-26T00:54:54.321Z",
+      "lastSyncedAt": "2025-11-26T01:36:13.905Z",
       "tags": [],
       "tracks": [
         {
@@ -15135,7 +15186,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 6/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 6",
-      "lastSyncedAt": "2025-11-26T00:54:55.017Z",
+      "lastSyncedAt": "2025-11-26T01:36:14.568Z",
       "tags": [],
       "tracks": [
         {
@@ -15488,7 +15539,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Zoot Allures/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Zoot Allures",
-      "lastSyncedAt": "2025-11-26T00:54:55.819Z",
+      "lastSyncedAt": "2025-11-26T01:36:15.230Z",
       "tags": [],
       "tracks": [
         {
@@ -15589,7 +15640,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The MOFO Project-Object/Cover/1 Original Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The MOFO Project-Object",
-      "lastSyncedAt": "2025-11-26T00:54:56.515Z",
+      "lastSyncedAt": "2025-11-26T01:36:15.899Z",
       "tags": [],
       "tracks": [
         {
@@ -16257,7 +16308,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Road Tapes, Venue #1/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Road Tapes, Venue #1",
-      "lastSyncedAt": "2025-11-26T00:54:57.200Z",
+      "lastSyncedAt": "2025-11-26T01:36:16.618Z",
       "tags": [],
       "tracks": [
         {
@@ -16394,7 +16445,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Joe's XMasage/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Joe's XMasage",
-      "lastSyncedAt": "2025-11-26T00:54:57.877Z",
+      "lastSyncedAt": "2025-11-26T01:36:17.457Z",
       "tags": [],
       "tracks": [
         {
@@ -16513,7 +16564,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Orchestral Favorites/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Orchestral Favorites",
-      "lastSyncedAt": "2025-11-26T00:54:58.525Z",
+      "lastSyncedAt": "2025-11-26T01:36:18.101Z",
       "tags": [],
       "tracks": [
         {
@@ -16578,7 +16629,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/ZAPPAtite (Frank Zappa's Tastiest Tracks)/Cover/cover.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/ZAPPAtite (Frank Zappa's Tastiest Tracks)",
-      "lastSyncedAt": "2025-11-26T00:54:59.199Z",
+      "lastSyncedAt": "2025-11-26T01:36:18.738Z",
       "tags": [],
       "tracks": [
         {
@@ -16760,7 +16811,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Sleep Dirt/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Sleep Dirt",
-      "lastSyncedAt": "2025-11-26T00:54:59.855Z",
+      "lastSyncedAt": "2025-11-26T01:36:19.360Z",
       "tags": [],
       "tracks": [
         {
@@ -16843,7 +16894,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Yellow Shark/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Yellow Shark",
-      "lastSyncedAt": "2025-11-26T00:55:00.580Z",
+      "lastSyncedAt": "2025-11-26T01:36:20.038Z",
       "tags": [],
       "tracks": [
         {
@@ -17027,9 +17078,14 @@
     {
       "id": "apps-zappavault-zappalibrary-l-ther",
       "title": "Läther",
+      "year": 1996,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous release of a quadruple album originally intended for release in 1977 but blocked by Warner Bros. Features a mix of studio and live material from 1976-1977.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Läther/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Läther",
-      "lastSyncedAt": "2025-11-26T00:55:01.270Z",
+      "lastSyncedAt": "2025-11-26T01:36:20.762Z",
       "tags": [],
       "tracks": [
         {
@@ -17292,7 +17348,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Mothermania/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Mothermania",
-      "lastSyncedAt": "2025-11-26T00:55:01.986Z",
+      "lastSyncedAt": "2025-11-26T01:36:21.441Z",
       "tags": [],
       "tracks": [
         {
@@ -17411,7 +17467,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Grand Wazoo/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Grand Wazoo",
-      "lastSyncedAt": "2025-11-26T00:55:02.707Z",
+      "lastSyncedAt": "2025-11-26T01:36:22.594Z",
       "tags": [],
       "tracks": [
         {
@@ -17476,7 +17532,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Thing-Fish/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Thing-Fish",
-      "lastSyncedAt": "2025-11-26T00:55:04.798Z",
+      "lastSyncedAt": "2025-11-26T01:36:23.302Z",
       "tags": [],
       "tracks": [
         {
@@ -17694,7 +17750,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Waka-Jawaka/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Waka-Jawaka",
-      "lastSyncedAt": "2025-11-26T00:55:05.577Z",
+      "lastSyncedAt": "2025-11-26T01:36:23.950Z",
       "tags": [],
       "tracks": [
         {
@@ -17750,7 +17806,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Mystery Disc/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Mystery Disc",
-      "lastSyncedAt": "2025-11-26T00:55:06.293Z",
+      "lastSyncedAt": "2025-11-26T01:36:24.601Z",
       "tags": [],
       "tracks": [
         {
@@ -18085,7 +18141,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Joe's Menage/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Joe's Menage",
-      "lastSyncedAt": "2025-11-26T00:55:06.980Z",
+      "lastSyncedAt": "2025-11-26T01:36:25.264Z",
       "tags": [],
       "tracks": [
         {
@@ -18177,7 +18233,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Man From Utopia/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Man From Utopia",
-      "lastSyncedAt": "2025-11-26T00:55:07.741Z",
+      "lastSyncedAt": "2025-11-26T01:36:25.912Z",
       "tags": [],
       "tracks": [
         {
@@ -18296,7 +18352,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Have I Offended Someone_/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Have I Offended Someone_",
-      "lastSyncedAt": "2025-11-26T00:55:08.520Z",
+      "lastSyncedAt": "2025-11-26T01:36:26.545Z",
       "tags": [],
       "tracks": [
         {
@@ -18451,7 +18507,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Joe's Camouflage/Cover/1 Front.tif",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Joe's Camouflage",
-      "lastSyncedAt": "2025-11-26T00:55:09.181Z",
+      "lastSyncedAt": "2025-11-26T01:36:27.326Z",
       "tags": [],
       "tracks": [
         {
@@ -18606,7 +18662,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Guitar/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Guitar",
-      "lastSyncedAt": "2025-11-26T00:55:09.842Z",
+      "lastSyncedAt": "2025-11-26T01:36:27.940Z",
       "tags": [],
       "tracks": [
         {
@@ -18914,7 +18970,7 @@
       "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Crux Of The Biscuit/Cover/cover.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Crux Of The Biscuit",
-      "lastSyncedAt": "2025-11-26T00:55:10.522Z",
+      "lastSyncedAt": "2025-11-26T01:36:28.626Z",
       "tags": [],
       "tracks": [
         {
