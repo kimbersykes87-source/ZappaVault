@@ -88,12 +88,52 @@ function getDurationFromDatabase(
     return duration;
   }
   
-  // Try matching by filename (in case paths differ slightly)
+  // Try with URL encoding normalization (handle special characters like apostrophes)
+  const urlEncoded = encodeURI(normalizedPath);
+  duration = durations.get(urlEncoded);
+  if (duration) {
+    return duration;
+  }
+  
+  // Try matching by filename with better normalization
   const fileName = normalizedPath.split('/').pop() || '';
   if (fileName) {
+    // Normalize filename: remove extra spaces, handle special chars
+    const normalizedFileName = fileName
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim();
+    
     for (const [dbPath, dbDuration] of durations.entries()) {
+      const dbFileName = dbPath.split('/').pop() || '';
+      const normalizedDbFileName = dbFileName
+        .toLowerCase()
+        .replace(/\s+/g, ' ')
+        .trim();
+      
+      // Exact filename match
+      if (normalizedDbFileName === normalizedFileName) {
+        return dbDuration;
+      }
+      
+      // Ends with filename (for paths that might differ)
       if (dbPath.toLowerCase().endsWith(fileName.toLowerCase())) {
         return dbDuration;
+      }
+    }
+  }
+  
+  // Last resort: try partial path matching (match last 2 path segments)
+  const pathParts = normalizedPath.split('/').filter(p => p);
+  if (pathParts.length >= 2) {
+    const lastTwoParts = pathParts.slice(-2).join('/').toLowerCase();
+    for (const [dbPath, dbDuration] of durations.entries()) {
+      const dbPathParts = dbPath.split('/').filter(p => p);
+      if (dbPathParts.length >= 2) {
+        const dbLastTwoParts = dbPathParts.slice(-2).join('/').toLowerCase();
+        if (dbLastTwoParts === lastTwoParts) {
+          return dbDuration;
+        }
       }
     }
   }
@@ -844,19 +884,23 @@ async function attachSignedLinks(
   
   // Try to get durations from database for all tracks
   trackResults.forEach((result) => {
-    if (result.track.durationMs === 0) {
-      const dropboxFilePath = convertToDropboxPath(result.track.filePath);
-      const dbDuration = getDurationFromDatabase(dropboxFilePath, dbDurations);
-      if (dbDuration > 0) {
+    // Always try database lookup, even if track already has a duration (database might be more accurate)
+    const dropboxFilePath = convertToDropboxPath(result.track.filePath);
+    const dbDuration = getDurationFromDatabase(dropboxFilePath, dbDurations);
+    if (dbDuration > 0) {
+      // Only update if current duration is 0 or if database duration is different (prefer database)
+      if (result.track.durationMs === 0 || result.track.durationMs !== dbDuration) {
         result.durationMs = dbDuration;
-        dbDurationCount++;
+        if (result.track.durationMs === 0) {
+          dbDurationCount++;
+        }
         console.log(`[DURATION] ✅ Found in database: ${result.track.title} (${Math.round(dbDuration / 1000)}s)`);
-      } else {
-        // Debug: log when we can't find a duration
-        console.log(`[DURATION] ⚠️  No duration found for: ${result.track.title}`);
-        console.log(`[DURATION]    Looking for path: ${dropboxFilePath}`);
-        console.log(`[DURATION]    Database has ${dbDurations.size / 2} entries`);
       }
+    } else if (result.track.durationMs === 0) {
+      // Only log missing durations if they're actually 0 (to reduce noise)
+      // Commented out to reduce log spam - uncomment for debugging
+      // console.log(`[DURATION] ⚠️  No duration found for: ${result.track.title}`);
+      // console.log(`[DURATION]    Looking for path: ${dropboxFilePath}`);
     }
   });
   
