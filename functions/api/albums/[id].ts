@@ -882,39 +882,27 @@ async function attachSignedLinks(
   const dbDurations = await loadTrackDurations(request);
   let dbDurationCount = 0;
   
-  // Try to get durations from database for all tracks
+  // Use durations directly from library file (they're already merged in)
+  // Only do runtime lookup as fallback if duration is still 0
   trackResults.forEach((result) => {
-    // Always try database lookup, even if track already has a duration (database might be more accurate)
+    // Use duration from library file if available
+    if (result.track.durationMs > 0) {
+      result.durationMs = result.track.durationMs;
+      return; // Duration already in library, no need to lookup
+    }
+    
+    // Fallback: try database lookup only if library doesn't have duration
     const dropboxFilePath = convertToDropboxPath(result.track.filePath);
     const dbDuration = getDurationFromDatabase(dropboxFilePath, dbDurations);
     if (dbDuration > 0) {
-      // Only update if current duration is 0 or if database duration is different (prefer database)
-      if (result.track.durationMs === 0 || result.track.durationMs !== dbDuration) {
-        result.durationMs = dbDuration;
-        if (result.track.durationMs === 0) {
-          dbDurationCount++;
-        }
-        console.log(`[DURATION] ✅ Found in database: ${result.track.title} (${Math.round(dbDuration / 1000)}s)`);
-      }
-    } else if (result.track.durationMs === 0) {
+      result.durationMs = dbDuration;
+      dbDurationCount++;
+      console.log(`[DURATION] ✅ Found in database (fallback): ${result.track.title} (${Math.round(dbDuration / 1000)}s)`);
+    } else {
       // Log first few missing durations for debugging
       if (dbDurationCount < 5) {
         console.log(`[DURATION] ⚠️  No duration found for: ${result.track.title}`);
         console.log(`[DURATION]    Looking for path: ${dropboxFilePath}`);
-        console.log(`[DURATION]    Path length: ${dropboxFilePath.length}, Database entries: ${dbDurations.size / 2}`);
-        // Try to find similar paths
-        const fileName = dropboxFilePath.split('/').pop() || '';
-        let foundSimilar = false;
-        for (const [dbPath] of dbDurations.entries()) {
-          if (dbPath.toLowerCase().includes(fileName.toLowerCase().substring(0, 10))) {
-            console.log(`[DURATION]    Similar path in DB: ${dbPath.substring(0, 100)}`);
-            foundSimilar = true;
-            break;
-          }
-        }
-        if (!foundSimilar) {
-          console.log(`[DURATION]    No similar paths found in database`);
-        }
       }
     }
   });
