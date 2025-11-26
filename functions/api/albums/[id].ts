@@ -16,7 +16,7 @@ async function dropboxRequestWithRefresh<T>(
   let token = await getValidDropboxToken(env);
   
   if (!token) {
-    throw new Error('No Dropbox token available. Please configure DROPBOX_TOKEN or refresh token credentials.');
+    throw new Error('No Dropbox token available. Please configure refresh token credentials (DROPBOX_REFRESH_TOKEN, DROPBOX_APP_KEY, DROPBOX_APP_SECRET).');
   }
 
   let response = await fetch(`https://api.dropboxapi.com/2/${endpoint}`, {
@@ -56,13 +56,18 @@ async function dropboxRequestWithRefresh<T>(
           });
         } catch (refreshError) {
           console.error('[LINK DEBUG] Failed to refresh token:', refreshError);
+          // Re-throw token refresh errors as they're critical
+          throw new Error(`Token refresh failed: ${refreshError instanceof Error ? refreshError.message : String(refreshError)}`);
         }
       }
-    } catch {
+    } catch (parseError) {
       // If parsing fails, continue with original response
+      console.error('[LINK DEBUG] Failed to parse error response:', parseError);
     }
   }
 
+  // Return response even if not ok - let caller handle specific status codes
+  // (e.g., 409 conflict, 404 not found are expected in some cases)
   return response;
 }
 
@@ -81,14 +86,22 @@ async function getPermanentLink(
 
   try {
     // First, try to get existing shared link
-    let response = await dropboxRequestWithRefresh(
-      'sharing/list_shared_links',
-      { 
-        path: filePath,
-        direct_only: false 
-      },
-      env,
-    );
+    let response: Response;
+    try {
+      response = await dropboxRequestWithRefresh(
+        'sharing/list_shared_links',
+        { 
+          path: filePath,
+          direct_only: false 
+        },
+        env,
+      );
+    } catch (requestError) {
+      const errorMsg = `Failed to request shared links for ${filePath}: ${requestError instanceof Error ? requestError.message : String(requestError)}`;
+      console.error(`[LINK DEBUG] ${errorMsg}`);
+      if (errors) errors.push(errorMsg);
+      return undefined;
+    }
 
     if (response.ok) {
       const listPayload = (await response.json()) as { 
@@ -122,18 +135,25 @@ async function getPermanentLink(
     }
 
     // If no existing link, create a new permanent shared link using the correct API
-    response = await dropboxRequestWithRefresh(
-      'sharing/create_shared_link_with_settings',
-      { 
-        path: filePath,
-        settings: {
-          requested_visibility: {
-            '.tag': 'public'
+    try {
+      response = await dropboxRequestWithRefresh(
+        'sharing/create_shared_link_with_settings',
+        { 
+          path: filePath,
+          settings: {
+            requested_visibility: {
+              '.tag': 'public'
+            }
           }
-        }
-      },
-      env,
-    );
+        },
+        env,
+      );
+    } catch (requestError) {
+      const errorMsg = `Failed to create shared link for ${filePath}: ${requestError instanceof Error ? requestError.message : String(requestError)}`;
+      console.error(`[LINK DEBUG] ${errorMsg}`);
+      if (errors) errors.push(errorMsg);
+      return undefined;
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -144,14 +164,22 @@ async function getPermanentLink(
       // If it's a 409 conflict, the link might already exist - try to get it
       if (response.status === 409) {
         console.log(`[LINK DEBUG] Link already exists for ${filePath}, attempting to retrieve it`);
-        const conflictResponse = await dropboxRequestWithRefresh(
-          'sharing/list_shared_links',
-          { 
-            path: filePath,
-            direct_only: false 
-          },
-          env,
-        );
+        let conflictResponse: Response;
+        try {
+          conflictResponse = await dropboxRequestWithRefresh(
+            'sharing/list_shared_links',
+            { 
+              path: filePath,
+              direct_only: false 
+            },
+            env,
+          );
+        } catch (requestError) {
+          const errorMsg = `Failed to retrieve existing link after conflict for ${filePath}: ${requestError instanceof Error ? requestError.message : String(requestError)}`;
+          console.error(`[LINK DEBUG] ${errorMsg}`);
+          if (errors) errors.push(errorMsg);
+          return undefined;
+        }
         if (conflictResponse.ok) {
           const conflictPayload = (await conflictResponse.json()) as { 
             links: Array<{ url: string }> 
