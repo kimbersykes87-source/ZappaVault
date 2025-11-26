@@ -8,6 +8,7 @@ import type {
   Track,
 } from '../../shared/library.ts';
 import { refreshAccessToken } from './refreshDropboxToken.ts';
+import { loadTrackDurations, getTrackDuration } from './loadTrackDurations.ts';
 
 const DROPBOX_API = 'https://api.dropboxapi.com/2';
 const AUDIO_EXTENSIONS = ['.flac', '.mp3', '.wav', '.aiff', '.ogg'];
@@ -276,7 +277,11 @@ function normalizeDropboxPath(dropboxPath: string): string {
   return `/${dropboxPath.replace(/\\/g, '/')}`;
 }
 
-function parseTrack(entry: DropboxEntry, index: number): Track | undefined {
+function parseTrack(
+  entry: DropboxEntry,
+  index: number,
+  durationMap: Map<string, number>,
+): Track | undefined {
   const extension = path.extname(entry.name).toLowerCase();
   if (!AUDIO_EXTENSIONS.includes(extension)) {
     return undefined;
@@ -288,10 +293,13 @@ function parseTrack(entry: DropboxEntry, index: number): Track | undefined {
   // Normalize path to ensure it's in Dropbox API format
   const normalizedPath = normalizeDropboxPath(entry.path_display);
 
+  // Look up duration from database
+  const durationMs = getTrackDuration(durationMap, normalizedPath);
+
   return {
     id: slugify(entry.path_lower),
     title: entry.name.replace(/\.[^.]+$/, '').replace(/^\d{1,2}\s*-*\s*/, ''),
-    durationMs: 0,
+    durationMs,
     trackNumber,
     format: detectFormat(entry.name),
     filePath: normalizedPath,
@@ -538,6 +546,7 @@ function buildAlbum(
   // This ensures all 106 folders are included in the library
 
   const totalSize = tracks.reduce((sum, track) => sum + track.sizeBytes, 0);
+  const totalDuration = tracks.reduce((sum, track) => sum + track.durationMs, 0);
   const formats = Array.from(new Set(tracks.map((track) => track.format)));
 
   // Normalize location path to ensure it's in Dropbox API format
@@ -585,7 +594,7 @@ function buildAlbum(
     tags: metadata?.tags ?? [],
     tracks: tracks.sort((a, b) => a.trackNumber - b.trackNumber),
     formats,
-    totalDurationMs: 0,
+    totalDurationMs: totalDuration,
     totalSizeBytes: totalSize,
   };
 }
@@ -593,6 +602,9 @@ function buildAlbum(
 async function generateSnapshot(): Promise<LibrarySnapshot> {
   // Load metadata database
   const metadataDb = await loadMetadataDatabase();
+  
+  // Load track durations from SQLite database
+  const durationMap = loadTrackDurations();
 
   const albumFolders = await listImmediateFolders(rootFolder);
   const albums: Album[] = [];
@@ -601,7 +613,7 @@ async function generateSnapshot(): Promise<LibrarySnapshot> {
     const entries = await listFolderRecursive(folder.path_lower);
     const tracks = entries
       .filter((entry) => entry['.tag'] === 'file')
-      .map((entry, index) => parseTrack(entry, index))
+      .map((entry, index) => parseTrack(entry, index, durationMap))
       .filter((track): track is Track => Boolean(track));
 
     // Match metadata from database
