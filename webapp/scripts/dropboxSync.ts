@@ -73,7 +73,29 @@ async function dropboxRequest<T>(endpoint: string, body: Record<string, unknown>
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`Dropbox error (${endpoint}): ${text}`);
+    let errorMessage = `Dropbox error (${endpoint}): ${text}`;
+    
+    // Provide helpful error messages for common issues
+    try {
+      const errorData = JSON.parse(text);
+      if (errorData.error?.['.tag'] === 'expired_access_token') {
+        errorMessage = `❌ Dropbox access token has expired!\n\n` +
+          `To fix this:\n` +
+          `1. Generate a new token at: https://www.dropbox.com/developers/apps\n` +
+          `2. Update the DROPBOX_TOKEN secret in GitHub Actions\n` +
+          `   (Settings → Secrets and variables → Actions)\n` +
+          `3. Re-run the sync workflow\n\n` +
+          `Original error: ${text}`;
+      } else if (errorData.error?.['.tag'] === 'invalid_access_token') {
+        errorMessage = `❌ Invalid Dropbox access token!\n\n` +
+          `Please check that DROPBOX_TOKEN is set correctly.\n\n` +
+          `Original error: ${text}`;
+      }
+    } catch {
+      // If parsing fails, use the original error message
+    }
+    
+    throw new Error(errorMessage);
   }
 
   return (await response.json()) as T;
