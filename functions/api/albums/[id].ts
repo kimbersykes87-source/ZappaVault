@@ -688,30 +688,55 @@ async function attachSignedLinks(
   const trackResults: Array<{ track: typeof album.tracks[0]; link: string | undefined; durationMs: number; error?: string }> = [];
   
   // Process tracks in batches for links (critical path)
+  // Use Promise.allSettled to ensure we continue even if individual tracks fail
   for (let i = 0; i < album.tracks.length; i += CONCURRENT_LINKS) {
     const batch = album.tracks.slice(i, i + CONCURRENT_LINKS);
-    console.log(`[LINK DEBUG] Processing batch ${Math.floor(i / CONCURRENT_LINKS) + 1}/${Math.ceil(album.tracks.length / CONCURRENT_LINKS)} (tracks ${i + 1}-${Math.min(i + CONCURRENT_LINKS, album.tracks.length)})`);
+    const batchNum = Math.floor(i / CONCURRENT_LINKS) + 1;
+    const totalBatches = Math.ceil(album.tracks.length / CONCURRENT_LINKS);
+    console.log(`[LINK DEBUG] Processing batch ${batchNum}/${totalBatches} (tracks ${i + 1}-${Math.min(i + CONCURRENT_LINKS, album.tracks.length)})`);
     
-    const linkPromises = batch.map(async (track) => {
-      const dropboxFilePath = convertToDropboxPath(track.filePath);
-      console.log(`[LINK DEBUG] Getting link for track: ${track.title} (${track.trackNumber})`);
-      console.log(`[LINK DEBUG]   Original path: ${track.filePath}`);
-      console.log(`[LINK DEBUG]   Dropbox path: ${dropboxFilePath}`);
+    try {
+      const linkPromises = batch.map(async (track) => {
+        try {
+          const dropboxFilePath = convertToDropboxPath(track.filePath);
+          console.log(`[LINK DEBUG] Getting link for track: ${track.title} (${track.trackNumber})`);
+          console.log(`[LINK DEBUG]   Original path: ${track.filePath}`);
+          console.log(`[LINK DEBUG]   Dropbox path: ${dropboxFilePath}`);
+          
+          const link = await getPermanentLink(env, dropboxFilePath, errors);
+          
+          if (!link) {
+            const errorMsg = `Failed to get link for track "${track.title}": ${dropboxFilePath}`;
+            console.log(`[LINK DEBUG]   ❌ ${errorMsg}`);
+            return { track, link: undefined, durationMs: track.durationMs, error: errorMsg };
+          } else {
+            console.log(`[LINK DEBUG]   ✅ Got link: ${link.substring(0, 50)}...`);
+            return { track, link, durationMs: track.durationMs };
+          }
+        } catch (error) {
+          const errorMsg = `Exception getting link for track "${track.title}": ${error instanceof Error ? error.message : String(error)}`;
+          console.error(`[LINK DEBUG]   ❌ ${errorMsg}`);
+          return { track, link: undefined, durationMs: track.durationMs, error: errorMsg };
+        }
+      });
       
-      const link = await getPermanentLink(env, dropboxFilePath, errors);
+      // Use allSettled to continue even if some tracks fail
+      const linkResults = await Promise.allSettled(linkPromises);
+      linkResults.forEach((result) => {
+        if (result.status === 'fulfilled') {
+          trackResults.push(result.value);
+        } else {
+          // This shouldn't happen since we catch errors in the promise, but handle it anyway
+          console.error(`[LINK DEBUG] Promise rejected unexpectedly:`, result.reason);
+          // We can't add a track result here without the track object, so we skip it
+        }
+      });
       
-      if (!link) {
-        const errorMsg = `Failed to get link for track "${track.title}": ${dropboxFilePath}`;
-        console.log(`[LINK DEBUG]   ❌ ${errorMsg}`);
-        return { track, link: undefined, durationMs: track.durationMs, error: errorMsg };
-      } else {
-        console.log(`[LINK DEBUG]   ✅ Got link: ${link.substring(0, 50)}...`);
-        return { track, link, durationMs: track.durationMs };
-      }
-    });
-    
-    const linkResults = await Promise.all(linkPromises);
-    trackResults.push(...linkResults);
+      console.log(`[LINK DEBUG] Completed batch ${batchNum}/${totalBatches} (${linkResults.filter(r => r.status === 'fulfilled').length}/${batch.length} succeeded)`);
+    } catch (error) {
+      console.error(`[LINK DEBUG] Batch ${batchNum} failed completely:`, error);
+      // Continue to next batch even if this one fails
+    }
   }
   
   console.log(`[LINK DEBUG] Completed link generation for all ${trackResults.length} tracks`);
