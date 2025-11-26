@@ -41,21 +41,34 @@ export const onRequestGet = async (context: {
       const response = await fetch(targetUrl, {
         method: 'GET',
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; ZappaVault/1.0)',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': '*/*',
+          'Accept-Language': 'en-US,en;q=0.9',
         },
         signal: controller.signal,
+        redirect: 'follow',
       });
 
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        const errorText = await response.text().catch(() => 'Unknown error');
+        let errorText = 'Unknown error';
+        try {
+          errorText = await response.text();
+        } catch (e) {
+          console.error(`[PROXY] Could not read error response body:`, e);
+        }
+        
         console.error(`[PROXY] Fetch failed: ${response.status} ${response.statusText} for ${targetUrl}`);
-        console.error(`[PROXY] Error details: ${errorText.substring(0, 200)}`);
-        return new Response(`Failed to fetch: ${response.status} ${response.statusText}`, {
+        console.error(`[PROXY] Error details: ${errorText.substring(0, 500)}`);
+        console.error(`[PROXY] Response headers:`, Object.fromEntries(response.headers.entries()));
+        
+        // Return the actual status code from Dropbox, not 500
+        return new Response(`Failed to fetch from Dropbox: ${response.status} ${response.statusText}\n${errorText.substring(0, 200)}`, {
           status: response.status,
           headers: {
             'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'text/plain',
           },
         });
       }
@@ -82,7 +95,7 @@ export const onRequestGet = async (context: {
     } catch (fetchError) {
       clearTimeout(timeoutId);
       if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-        console.error(`[PROXY] Timeout fetching ${targetUrl}`);
+        console.error(`[PROXY] Timeout fetching ${targetUrl} (30s)`);
         return new Response('Request timeout', {
           status: 504,
           headers: {
@@ -91,14 +104,38 @@ export const onRequestGet = async (context: {
           },
         });
       }
+      
+      // Log network errors in detail
+      if (fetchError instanceof Error) {
+        console.error(`[PROXY] Network error fetching ${targetUrl}:`, fetchError.name, fetchError.message);
+        console.error(`[PROXY] Error stack:`, fetchError.stack);
+      } else {
+        console.error(`[PROXY] Unknown error type:`, fetchError);
+      }
+      
       throw fetchError; // Re-throw to be caught by outer catch
     }
   } catch (error) {
-    console.error(`[PROXY] Error fetching ${targetUrl}:`, error);
+    console.error(`[PROXY] Unexpected error fetching ${targetUrl}:`, error);
     const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorName = error instanceof Error ? error.name : 'UnknownError';
+    console.error(`[PROXY] Error type: ${errorName}`);
     console.error(`[PROXY] Error stack:`, error instanceof Error ? error.stack : 'No stack');
-    return new Response(`Proxy error: ${errorMessage}`, {
-      status: 500,
+    
+    // Provide more specific error messages
+    let statusCode = 500;
+    let errorMsg = `Proxy error: ${errorMessage}`;
+    
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      statusCode = 502; // Bad Gateway
+      errorMsg = 'Network error: Could not connect to Dropbox';
+    } else if (error instanceof Error && error.name === 'AbortError') {
+      statusCode = 504; // Gateway Timeout
+      errorMsg = 'Request timeout';
+    }
+    
+    return new Response(errorMsg, {
+      status: statusCode,
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'text/plain',
