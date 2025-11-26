@@ -13,7 +13,7 @@ async function getPermanentLink(
   filePath: string,
 ): Promise<string | undefined> {
   if (!env.DROPBOX_TOKEN) {
-    console.log(`[LINK DEBUG] No DROPBOX_TOKEN for ${filePath}`);
+    console.log(`[COVER DEBUG] No DROPBOX_TOKEN for ${filePath}`);
     return undefined;
   }
 
@@ -43,18 +43,24 @@ async function getPermanentLink(
         const sharedUrl = listPayload.links[0].url;
         // This is for cover art, so it's an image
         const directLink = convertToDirectLink(sharedUrl, true);
-        console.log(`[LINK DEBUG] Found existing link for ${filePath}: ${directLink}`);
+        console.log(`[COVER DEBUG] Found existing link for ${filePath}: ${directLink.substring(0, 80)}...`);
         return directLink;
       } else {
-        console.log(`[LINK DEBUG] No existing links found for ${filePath}, will create new one`);
+        console.log(`[COVER DEBUG] No existing links found for ${filePath}, will create new one`);
       }
     } else {
       const errorText = await response.text();
       // 409 (conflict) or 404 (not found) are expected - just log and continue
       if (response.status === 409 || response.status === 404) {
-        console.log(`[LINK DEBUG] No existing link for ${filePath} (${response.status}), will create new one`);
+        console.log(`[COVER DEBUG] No existing link for ${filePath} (${response.status}), will create new one`);
       } else {
-        console.log(`[LINK DEBUG] list_shared_links failed for ${filePath}: ${response.status} ${errorText}`);
+        console.log(`[COVER DEBUG] list_shared_links failed for ${filePath}: ${response.status} ${errorText}`);
+        // Log specific error codes for debugging
+        if (response.status === 401) {
+          console.log(`[COVER DEBUG] ❌ 401 Unauthorized - Token is invalid or expired`);
+        } else if (response.status === 403) {
+          console.log(`[COVER DEBUG] ❌ 403 Forbidden - Token lacks 'sharing.read' permission`);
+        }
       }
     }
 
@@ -120,10 +126,14 @@ async function getPermanentLink(
     // Convert shared link to direct download link
     // This is for cover art, so it's an image
     const directLink = convertToDirectLink(payload.url, true);
-    console.log(`[LINK DEBUG] Created new link for ${filePath}: ${directLink}`);
+    console.log(`[COVER DEBUG] Created new link for ${filePath}: ${directLink.substring(0, 80)}...`);
     return directLink;
   } catch (error) {
-    console.log(`[LINK DEBUG] getPermanentLink error for ${filePath}:`, error);
+    console.log(`[COVER DEBUG] getPermanentLink error for ${filePath}:`, error);
+    if (error instanceof Error) {
+      console.log(`[COVER DEBUG] Error message: ${error.message}`);
+      console.log(`[COVER DEBUG] Error stack: ${error.stack}`);
+    }
     return undefined;
   }
 }
@@ -413,6 +423,9 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
 
   // Generate cover URLs for albums on the current page
   // Use Promise.allSettled to handle failures gracefully
+  console.log(`[COVER DEBUG] Generating cover URLs for ${result.results.length} albums`);
+  console.log(`[COVER DEBUG] DROPBOX_TOKEN present: ${!!env.DROPBOX_TOKEN}`);
+  
   const albumsWithCovers = env.DROPBOX_TOKEN
     ? await Promise.allSettled(
         result.results.map(async (album) => {
@@ -422,7 +435,9 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
             // This prevents local file paths from being returned
             const finalCoverUrl = coverUrl?.startsWith('http') ? coverUrl : undefined;
             if (!finalCoverUrl) {
-              console.log(`[COVER DEBUG] No cover URL generated for ${album.title}`);
+              console.log(`[COVER DEBUG] No cover URL generated for ${album.title} (original: ${album.coverUrl || 'none'})`);
+            } else {
+              console.log(`[COVER DEBUG] ✅ Generated cover URL for ${album.title}`);
             }
             return {
               ...album,
@@ -430,6 +445,9 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
             };
           } catch (error) {
             console.log(`[COVER DEBUG] Error generating cover for ${album.title}:`, error);
+            if (error instanceof Error) {
+              console.log(`[COVER DEBUG] Error details: ${error.message}`);
+            }
             return {
               ...album,
               coverUrl: undefined,
@@ -441,7 +459,13 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
           result.status === 'fulfilled' ? result.value : result.reason,
         ),
       )
-    : result.results;
+    : (() => {
+        console.log(`[COVER DEBUG] ⚠️ DROPBOX_TOKEN not set, skipping cover URL generation`);
+        return result.results;
+      })();
+  
+  const coversGenerated = albumsWithCovers.filter(a => a.coverUrl?.startsWith('http')).length;
+  console.log(`[COVER DEBUG] Generated ${coversGenerated}/${albumsWithCovers.length} cover URLs`);
 
   return new Response(
     JSON.stringify({
