@@ -449,7 +449,10 @@ export const onRequestGet = async (context: {
         
         const processedAlbums: Album[] = [];
         
-        for (const batch of batches) {
+        for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+          const batch = batches[batchIndex];
+          console.log(`[COVER DEBUG] Processing batch ${batchIndex + 1}/${batches.length} (${batch.length} albums)`);
+          
           const batchResults = await Promise.allSettled(
             batch.map(async (album) => {
               try {
@@ -498,7 +501,9 @@ export const onRequestGet = async (context: {
                 console.log(`[COVER DEBUG] Error generating cover for ${album.title}:`, error);
                 if (error instanceof Error) {
                   console.log(`[COVER DEBUG] Error details: ${error.message}`);
+                  console.log(`[COVER DEBUG] Error stack: ${error.stack}`);
                 }
+                // Return album with original coverUrl if it's already HTTP, otherwise undefined
                 return {
                   ...album,
                   coverUrl: album.coverUrl?.startsWith('http') ? album.coverUrl : undefined,
@@ -507,11 +512,28 @@ export const onRequestGet = async (context: {
             }),
           );
           
-          processedAlbums.push(
-            ...batchResults.map((result) =>
-              result.status === 'fulfilled' ? result.value : result.reason,
-            ),
-          );
+          // Process results and handle both fulfilled and rejected promises
+          for (let i = 0; i < batchResults.length; i++) {
+            const result = batchResults[i];
+            const album = batch[i];
+            
+            if (result.status === 'fulfilled') {
+              processedAlbums.push(result.value);
+            } else {
+              // For rejected promises, log the error and add the album without cover
+              console.error(`[COVER DEBUG] Batch promise rejected for ${album.title}:`, result.reason);
+              // Add the album with its original coverUrl (if it's already HTTP) or undefined
+              processedAlbums.push({
+                ...album,
+                coverUrl: album.coverUrl?.startsWith('http') ? album.coverUrl : undefined,
+              });
+            }
+          }
+          
+          // Add a delay between batches to avoid rate limits (except for the last batch)
+          if (batchIndex < batches.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+          }
         }
         
         return processedAlbums;

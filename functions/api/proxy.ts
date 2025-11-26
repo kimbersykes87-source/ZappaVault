@@ -33,45 +33,66 @@ export const onRequestGet = async (context: {
   try {
     console.log(`[PROXY] Fetching: ${targetUrl}`);
     
-    // Fetch the content from Dropbox
-    const response = await fetch(targetUrl, {
-      method: 'GET',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; ZappaVault/1.0)',
-      },
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => 'Unknown error');
-      console.error(`[PROXY] Fetch failed: ${response.status} ${response.statusText} for ${targetUrl}`);
-      console.error(`[PROXY] Error details: ${errorText.substring(0, 200)}`);
-      return new Response(`Failed to fetch: ${response.status} ${response.statusText}`, {
-        status: response.status,
+    // Fetch the content from Dropbox with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    
+    try {
+      const response = await fetch(targetUrl, {
+        method: 'GET',
         headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; ZappaVault/1.0)',
+        },
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => 'Unknown error');
+        console.error(`[PROXY] Fetch failed: ${response.status} ${response.statusText} for ${targetUrl}`);
+        console.error(`[PROXY] Error details: ${errorText.substring(0, 200)}`);
+        return new Response(`Failed to fetch: ${response.status} ${response.statusText}`, {
+          status: response.status,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+          },
+        });
+      }
+
+      // Get the content type from the response
+      const contentType = response.headers.get('content-type') || 'application/octet-stream';
+      
+      // Get the content
+      const content = await response.arrayBuffer();
+      
+      console.log(`[PROXY] Success: ${content.byteLength} bytes, type: ${contentType}`);
+
+      // Return with CORS headers
+      return new Response(content, {
+        status: 200,
+        headers: {
+          'Content-Type': contentType,
           'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+          'Cache-Control': 'public, max-age=3600',
         },
       });
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+        console.error(`[PROXY] Timeout fetching ${targetUrl}`);
+        return new Response('Request timeout', {
+          status: 504,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'text/plain',
+          },
+        });
+      }
+      throw fetchError; // Re-throw to be caught by outer catch
     }
-
-    // Get the content type from the response
-    const contentType = response.headers.get('content-type') || 'application/octet-stream';
-    
-    // Get the content
-    const content = await response.arrayBuffer();
-    
-    console.log(`[PROXY] Success: ${content.byteLength} bytes, type: ${contentType}`);
-
-    // Return with CORS headers
-    return new Response(content, {
-      status: 200,
-      headers: {
-        'Content-Type': contentType,
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Cache-Control': 'public, max-age=3600',
-      },
-    });
   } catch (error) {
     console.error(`[PROXY] Error fetching ${targetUrl}:`, error);
     const errorMessage = error instanceof Error ? error.message : String(error);
