@@ -883,15 +883,17 @@ async function attachSignedLinks(
   let dbDurationCount = 0;
   
   // Use durations directly from library file (they're already merged in)
-  // Only do runtime lookup as fallback if duration is still 0
+  // The library file should have all durations, so prioritize those
   trackResults.forEach((result) => {
-    // Use duration from library file if available
+    // Use duration from library file if available (should be the case for all tracks)
     if (result.track.durationMs > 0) {
       result.durationMs = result.track.durationMs;
+      console.log(`[DURATION] ✅ Using library duration for ${result.track.title}: ${Math.round(result.track.durationMs / 1000)}s`);
       return; // Duration already in library, no need to lookup
     }
     
-    // Fallback: try database lookup only if library doesn't have duration
+    // Fallback: try database lookup only if library doesn't have duration (shouldn't happen)
+    console.log(`[DURATION] ⚠️  Library missing duration for: ${result.track.title}, trying database lookup...`);
     const dropboxFilePath = convertToDropboxPath(result.track.filePath);
     const dbDuration = getDurationFromDatabase(dropboxFilePath, dbDurations);
     if (dbDuration > 0) {
@@ -899,11 +901,8 @@ async function attachSignedLinks(
       dbDurationCount++;
       console.log(`[DURATION] ✅ Found in database (fallback): ${result.track.title} (${Math.round(dbDuration / 1000)}s)`);
     } else {
-      // Log first few missing durations for debugging
-      if (dbDurationCount < 5) {
-        console.log(`[DURATION] ⚠️  No duration found for: ${result.track.title}`);
-        console.log(`[DURATION]    Looking for path: ${dropboxFilePath}`);
-      }
+      console.log(`[DURATION] ❌ No duration found in library or database for: ${result.track.title}`);
+      console.log(`[DURATION]    Looking for path: ${dropboxFilePath}`);
     }
   });
   
