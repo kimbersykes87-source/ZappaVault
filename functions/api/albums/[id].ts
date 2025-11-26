@@ -334,14 +334,21 @@ function prioritizeCoverFiles(imageFiles: string[]): string[] {
     
     const aHas1 = aLower.startsWith('1') || aLower.includes(' 1 ') || aLower.includes('_1_') || aLower.includes('-1-');
     const bHas1 = bLower.startsWith('1') || bLower.includes(' 1 ') || bLower.includes('_1_') || bLower.includes('-1-');
-    const aHasFront = aLower.includes('front') || aLower.includes('cover');
-    const bHasFront = bLower.includes('front') || bLower.includes('cover');
-
-    // Files starting with "1" have highest priority
+    const aHasFront = aLower.includes('front') || aLower.includes('cover') || aLower.includes('folder');
+    const bHasFront = bLower.includes('front') || bLower.includes('cover') || bLower.includes('folder');
+    
+    // Exact match for "folder" has highest priority
+    const aIsFolder = aLower.replace(/\.[^.]+$/, '') === 'folder';
+    const bIsFolder = bLower.replace(/\.[^.]+$/, '') === 'folder';
+    
+    if (aIsFolder && !bIsFolder) return -1;
+    if (!aIsFolder && bIsFolder) return 1;
+    
+    // Files starting with "1" have second priority
     if (aHas1 && !bHas1) return -1;
     if (!aHas1 && bHas1) return 1;
     
-    // Files with "front" or "cover" have second priority
+    // Files with "front", "cover", or "folder" have third priority
     if (aHasFront && !bHasFront) return -1;
     if (!aHasFront && bHasFront) return 1;
     
