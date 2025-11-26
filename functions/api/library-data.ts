@@ -1,6 +1,6 @@
-import type { EnvBindings } from '../../utils/library.ts';
-import type { LibrarySnapshot } from '../../shared/library.ts';
-import { loadLibrarySnapshot } from '../../utils/library.ts';
+import type { EnvBindings } from '../utils/library.ts';
+import type { LibrarySnapshot } from '../shared/library.ts';
+import { loadLibrarySnapshot } from '../utils/library.ts';
 
 /**
  * Serve library.generated.json file
