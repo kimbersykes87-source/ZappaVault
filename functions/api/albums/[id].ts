@@ -754,17 +754,19 @@ async function attachSignedLinks(
   }
   
   // Combine durations with track results
-  const durations = trackResults.map((result) => {
-    if (result.track.durationMs > 0) {
-      return result.track.durationMs; // Use existing duration
+  const finalResults = trackResults.map((result) => {
+    let durationMs = result.track.durationMs;
+    
+    // Use existing duration if available
+    if (durationMs > 0) {
+      return {
+        ...result,
+        durationMs,
+      };
     }
-    return durationMap.get(result.track.id) || 0; // Use extracted duration or 0
-  });
-  
-  // Combine results
-  const finalResults = trackResults.map((result, index) => {
-    const durationResult = durations[index];
-    const durationMs = durationResult.status === 'fulfilled' ? durationResult.value : result.track.durationMs;
+    
+    // Use extracted duration from map
+    durationMs = durationMap.get(result.track.id) || 0;
     
     return {
       ...result,
