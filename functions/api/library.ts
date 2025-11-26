@@ -432,113 +432,35 @@ export const onRequestGet = async (context: {
 
   const result = applyLibraryQuery(snapshot, query);
 
-  // Generate cover URLs for albums on the current page
-  // Process in smaller batches to avoid timeouts and rate limits
-  // Use the same logic as the album detail endpoint for consistency
+  // Generate static cover URLs for albums
+  // Static covers are served from /covers/ directory in Cloudflare Pages
+  // This is much faster and more reliable than Dropbox API calls
   console.log(`[COVER DEBUG] Generating cover URLs for ${result.results.length} albums`);
-  console.log(`[COVER DEBUG] DROPBOX_TOKEN present: ${!!env.DROPBOX_TOKEN}`);
   
-  const albumsWithCovers = env.DROPBOX_TOKEN
-    ? await (async () => {
-        // Process albums sequentially to avoid timeouts and rate limits
-        // Cloudflare Pages Functions have a 30-50 second timeout limit
-        // Processing all albums in parallel can easily exceed this
-        const startTime = Date.now();
-        const maxProcessingTime = 25000; // 25 seconds - leave buffer for response serialization
-        const processedAlbums: Album[] = [];
-        
-        console.log(`[COVER DEBUG] Processing ${result.results.length} albums sequentially`);
-        
-        for (let i = 0; i < result.results.length; i++) {
-          const album = result.results[i];
-          const elapsed = Date.now() - startTime;
-          
-          // Check if we're running out of time - return what we have so far
-          if (elapsed > maxProcessingTime) {
-            console.warn(`[COVER DEBUG] ⚠️ Timeout approaching (${elapsed}ms), returning ${processedAlbums.length}/${result.results.length} albums`);
-            // Add remaining albums without cover URLs
-            for (let j = i; j < result.results.length; j++) {
-              processedAlbums.push({
-                ...result.results[j],
-                coverUrl: result.results[j].coverUrl?.startsWith('http') ? result.results[j].coverUrl : undefined,
-              });
-            }
-            break;
-          }
-          
-          try {
-            // Use the same logic as attachSignedLinks in albums/[id].ts
-            let coverUrl = album.coverUrl;
-            
-            if (coverUrl && coverUrl.startsWith('http')) {
-              // Already an HTTP URL, keep it
-              console.log(`[COVER DEBUG] ${album.title}: Cover URL already HTTP`);
-            } else if (coverUrl && coverUrl.startsWith('/')) {
-              // Cover URL is a Dropbox path, convert it to a permanent link
-              console.log(`[COVER DEBUG] ${album.title}: Converting cover path to HTTP URL: ${coverUrl}`);
-              const coverLink = await getPermanentLink(env, coverUrl);
-              if (coverLink) {
-                console.log(`[COVER DEBUG] ${album.title}: ✅ Converted to HTTP URL`);
-                coverUrl = coverLink;
-              } else {
-                console.log(`[COVER DEBUG] ${album.title}: ❌ Failed to convert, trying fallback search`);
-                // Try finding cover art as fallback
-                const foundCover = await findCoverArt(env, album);
-                if (foundCover) {
-                  console.log(`[COVER DEBUG] ${album.title}: ✅ Found via fallback search`);
-                  coverUrl = foundCover;
-                }
-              }
-            } else if (!coverUrl) {
-              // No cover URL, try to find it
-              console.log(`[COVER DEBUG] ${album.title}: No coverUrl, searching for cover art`);
-              const foundCover = await findCoverArt(env, album);
-              if (foundCover) {
-                console.log(`[COVER DEBUG] ${album.title}: ✅ Found via search`);
-                coverUrl = foundCover;
-              } else {
-                console.log(`[COVER DEBUG] ${album.title}: ❌ No cover art found`);
-              }
-            }
-            
-            // Only use the new coverUrl if it's an HTTP URL
-            const finalCoverUrl = coverUrl?.startsWith('http') ? coverUrl : undefined;
-            
-            processedAlbums.push({
-              ...album,
-              coverUrl: finalCoverUrl,
-            });
-          } catch (error) {
-            console.log(`[COVER DEBUG] Error generating cover for ${album.title}:`, error);
-            if (error instanceof Error) {
-              console.log(`[COVER DEBUG] Error details: ${error.message}`);
-              console.log(`[COVER DEBUG] Error stack: ${error.stack}`);
-            }
-            // Return album with original coverUrl if it's already HTTP, otherwise undefined
-            processedAlbums.push({
-              ...album,
-              coverUrl: album.coverUrl?.startsWith('http') ? album.coverUrl : undefined,
-            });
-          }
-          
-          // Add a small delay between albums to avoid rate limits
-          if (i < result.results.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-          }
-        }
-        
-        const totalTime = Date.now() - startTime;
-        console.log(`[COVER DEBUG] Processed ${processedAlbums.length} albums in ${totalTime}ms`);
-        
-        return processedAlbums;
-      })()
-    : (() => {
-        console.log(`[COVER DEBUG] ⚠️ DROPBOX_TOKEN not set, skipping cover URL generation`);
-        return result.results;
-      })();
+  const albumsWithCovers = result.results.map((album) => {
+    // Try static cover first (from public/covers/)
+    // Check multiple extensions in case the file has a different extension
+    const extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+    
+    // Default to .jpg (most common)
+    // The browser will handle 404s gracefully if the file doesn't exist
+    const staticCoverUrl = `/covers/${album.id}.jpg`;
+    
+    // If album already has an HTTP URL (Dropbox link), keep it as fallback
+    // Otherwise use static URL
+    const coverUrl = album.coverUrl?.startsWith('http') 
+      ? album.coverUrl  // Keep existing Dropbox URL as fallback
+      : staticCoverUrl; // Use static URL
+    
+    return {
+      ...album,
+      coverUrl,
+    };
+  });
   
-  const coversGenerated = albumsWithCovers.filter(a => a.coverUrl?.startsWith('http')).length;
-  console.log(`[COVER DEBUG] Generated ${coversGenerated}/${albumsWithCovers.length} cover URLs`);
+  const staticCovers = albumsWithCovers.filter(a => a.coverUrl?.startsWith('/')).length;
+  const dropboxCovers = albumsWithCovers.filter(a => a.coverUrl?.startsWith('http')).length;
+  console.log(`[COVER DEBUG] Static covers: ${staticCovers}, Dropbox covers: ${dropboxCovers}`);
 
   return new Response(
     JSON.stringify({

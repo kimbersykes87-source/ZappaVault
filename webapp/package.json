@@ -9,6 +9,7 @@
     "build:skip-check": "vite build",
     "lint": "eslint .",
     "sync:dropbox": "tsx scripts/dropboxSync.ts",
+    "copy:covers": "tsx scripts/copyCoverArt.ts",
     "upload:library": "tsx scripts/uploadLibrary.ts",
     "upload:cloudflare": "tsx scripts/uploadToCloudflare.ts",
     "upload:kv": "tsx scripts/uploadToKV.ts",

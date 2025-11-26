@@ -651,6 +651,24 @@ async function run(): Promise<void> {
     console.error('   Check your Cloudflare credentials and try again.');
     // Don't exit - the file generation was successful
   }
+
+  // Optionally copy cover art to public/covers (if --copy-covers flag is set)
+  if (args['copy-covers'] || process.env.COPY_COVERS === 'true') {
+    console.log('\n📸 Copying cover art to public/covers...');
+    try {
+      const { execSync } = await import('child_process');
+      const webappDir = path.resolve(path.dirname(outputFile), '..');
+      execSync('npm run copy:covers', { 
+        stdio: 'inherit', 
+        cwd: webappDir,
+        env: { ...process.env, DROPBOX_LIBRARY_PATH: rootFolder }
+      });
+      console.log('✅ Cover art copy completed');
+    } catch (error) {
+      console.warn('⚠️  Failed to copy cover art:', error);
+      console.warn('   You can run "npm run copy:covers" manually later.');
+    }
+  }
 }
 
 run().catch((error) => {

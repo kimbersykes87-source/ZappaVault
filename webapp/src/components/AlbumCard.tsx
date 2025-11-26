@@ -36,9 +36,9 @@ export function AlbumCard({ album, onPlay }: AlbumCardProps) {
   return (
     <article className="album-card">
       <div className="album-cover">
-        {album.coverUrl && album.coverUrl.startsWith('http') ? (
+        {album.coverUrl ? (
           <img 
-            src={getProxyUrl(album.coverUrl)} 
+            src={album.coverUrl.startsWith('/') ? album.coverUrl : getProxyUrl(album.coverUrl)} 
             alt={album.title} 
             loading="lazy"
             onError={(e) => {
@@ -57,7 +57,7 @@ export function AlbumCard({ album, onPlay }: AlbumCardProps) {
             }}
           />
         ) : null}
-        <div className="album-cover-placeholder" style={{ display: album.coverUrl && album.coverUrl.startsWith('http') ? 'none' : 'grid' }}>
+        <div className="album-cover-placeholder" style={{ display: album.coverUrl ? 'none' : 'grid' }}>
           <span>{album.title.slice(0, 2).toUpperCase()}</span>
         </div>
       </div>

@@ -49,9 +49,9 @@ export function AlbumPage() {
     <div className="album-page">
       <header className="album-page-header">
         <div className="album-page-cover">
-          {album.coverUrl && album.coverUrl.startsWith('http') ? (
+          {album.coverUrl ? (
             <img 
-              src={getProxyUrl(album.coverUrl)} 
+              src={album.coverUrl.startsWith('/') ? album.coverUrl : getProxyUrl(album.coverUrl)} 
               alt={album.title} 
               loading="eager"
               onError={(e) => {
@@ -64,7 +64,7 @@ export function AlbumPage() {
               }}
             />
           ) : null}
-          <div className="album-page-cover-placeholder" style={{ display: album.coverUrl && album.coverUrl.startsWith('http') ? 'none' : 'grid' }}>
+          <div className="album-page-cover-placeholder" style={{ display: album.coverUrl ? 'none' : 'grid' }}>
             <span>{album.title.slice(0, 2).toUpperCase()}</span>
           </div>
         </div>
