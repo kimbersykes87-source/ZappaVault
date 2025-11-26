@@ -447,17 +447,14 @@ export const onRequestGet = async (context: {
     }
     
     // Extract extension from original coverUrl if it exists
-    // The copy script preserves the original extension, so we should match it
+    // The copy script preserves the original extension, so we should match it exactly
     let extension = '.jpg'; // default
     if (album.coverUrl) {
       // Extract extension from path like "/Apps/.../file.jpg" or "/Apps/.../file.png"
       const match = album.coverUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i);
       if (match) {
+        // Keep the original extension (don't normalize .jpeg to .jpg)
         extension = `.${match[1].toLowerCase()}`;
-        // Normalize .jpeg to .jpg for consistency
-        if (extension === '.jpeg') {
-          extension = '.jpg';
-        }
       }
     }
     
