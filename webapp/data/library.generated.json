@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2025-11-25T23:39:34.058Z",
+  "generatedAt": "2025-11-26T00:05:40.871Z",
   "albumCount": 106,
-  "trackCount": 1853,
+  "trackCount": 1867,
   "albums": [
     {
       "id": "apps-zappavault-zappalibrary-fillmore-east-june-1971",
@@ -13,7 +13,7 @@
       "subtitle": "1971 Live Album",
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Fillmore East, June 1971/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Fillmore East, June 1971",
-      "lastSyncedAt": "2025-11-25T23:38:10.726Z",
+      "lastSyncedAt": "2025-11-26T00:04:16.841Z",
       "tags": [
         "live",
         "classic"
@@ -144,7 +144,7 @@
       "subtitle": "1975 Live Album with Captain Beefheart",
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Bongo Fury/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Bongo Fury",
-      "lastSyncedAt": "2025-11-25T23:38:11.484Z",
+      "lastSyncedAt": "2025-11-26T00:04:17.703Z",
       "tags": [
         "live",
         "collaboration"
@@ -248,7 +248,7 @@
       "subtitle": "2011 Vault Release",
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Feeding the Monkies at Ma Maison/Cover/1 Front.jpeg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Feeding the Monkies at Ma Maison",
-      "lastSyncedAt": "2025-11-25T23:38:12.236Z",
+      "lastSyncedAt": "2025-11-26T00:04:18.484Z",
       "tags": [
         "compilation",
         "vault"
@@ -309,9 +309,14 @@
     {
       "id": "apps-zappavault-zappalibrary-absolutely-free",
       "title": "Absolutely Free",
+      "year": 1967,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": "The second Mothers of Invention album, featuring satirical social commentary and experimental compositions. Includes the suite 'America Drinks and Goes Home'.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Absolutely Free/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Absolutely Free",
-      "lastSyncedAt": "2025-11-25T23:38:12.978Z",
+      "lastSyncedAt": "2025-11-26T00:04:19.269Z",
       "tags": [],
       "tracks": [
         {
@@ -459,9 +464,14 @@
     {
       "id": "apps-zappavault-zappalibrary-chunga-s-revenge",
       "title": "Chunga's Revenge",
+      "year": 1970,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Zappa's first solo album after disbanding the original Mothers. Features a mix of studio and live tracks with jazz fusion and rock elements.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Chunga's Revenge/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Chunga's Revenge",
-      "lastSyncedAt": "2025-11-25T23:38:13.780Z",
+      "lastSyncedAt": "2025-11-26T00:04:20.061Z",
       "tags": [],
       "tracks": [
         {
@@ -564,9 +574,14 @@
     {
       "id": "apps-zappavault-zappalibrary-200-motels",
       "title": "200 Motels",
+      "year": 1971,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": "Soundtrack to the surreal film of the same name, featuring orchestral arrangements and rock compositions. A satirical rock opera about life on the road.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/200 Motels/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/200 Motels",
-      "lastSyncedAt": "2025-11-25T23:38:14.631Z",
+      "lastSyncedAt": "2025-11-26T00:04:20.883Z",
       "tags": [],
       "tracks": [
         {
@@ -930,9 +945,14 @@
     {
       "id": "apps-zappavault-zappalibrary-civilization-phaze-iii",
       "title": "Civilization Phaze III",
+      "year": 1994,
+      "era": "Posthumous Release",
+      "genre": "Experimental",
+      "description": "Posthumous release featuring Synclavier compositions and spoken word pieces. A continuation of Zappa's experimental electronic music work.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Civilization Phaze III/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Civilization Phaze III",
-      "lastSyncedAt": "2025-11-25T23:38:15.394Z",
+      "lastSyncedAt": "2025-11-26T00:04:21.900Z",
       "tags": [],
       "tracks": [
         {
@@ -1314,9 +1334,14 @@
     {
       "id": "apps-zappavault-zappalibrary-broadway-the-hard-way",
       "title": "Broadway The Hard Way",
+      "year": 1988,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Live album from the 1988 tour, featuring political satire and social commentary. Includes covers of 'Stairway to Heaven' and 'Purple Haze'.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Broadway The Hard Way/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Broadway The Hard Way",
-      "lastSyncedAt": "2025-11-25T23:38:16.147Z",
+      "lastSyncedAt": "2025-11-26T00:04:22.690Z",
       "tags": [],
       "tracks": [
         {
@@ -1482,9 +1507,14 @@
     {
       "id": "apps-zappavault-zappalibrary-fz-oz",
       "title": "FZ-OZ",
+      "year": 2002,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous live album recorded in Australia in 1976. Features performances from the mid-1970s touring band with complex arrangements and extended improvisations.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/FZ-OZ/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/FZ-OZ",
-      "lastSyncedAt": "2025-11-25T23:38:16.957Z",
+      "lastSyncedAt": "2025-11-26T00:04:23.520Z",
       "tags": [],
       "tracks": [
         {
@@ -1740,9 +1770,14 @@
     {
       "id": "apps-zappavault-zappalibrary-cruising-with-ruben-the-jets",
       "title": "Cruising with Ruben & The Jets",
+      "year": 1968,
+      "era": "Mothers Of Invention",
+      "genre": "Doo-Wop",
+      "description": "A doo-wop concept album parodying 1950s rock and roll. Features The Mothers performing in the style of early rock groups with Zappa's characteristic humor.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Cruising with Ruben & The Jets/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Cruising with Ruben & The Jets",
-      "lastSyncedAt": "2025-11-25T23:38:17.674Z",
+      "lastSyncedAt": "2025-11-26T00:04:24.295Z",
       "tags": [],
       "tracks": [
         {
@@ -1872,9 +1907,14 @@
     {
       "id": "apps-zappavault-zappalibrary-francesco-zappa",
       "title": "Francesco Zappa",
+      "year": 1984,
+      "era": "Solo Career",
+      "genre": "Classical",
+      "description": "Album featuring Zappa's Synclavier arrangements of compositions by 18th-century Italian composer Francesco Zappa (no relation). Classical music with electronic instrumentation.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Francesco Zappa/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Francesco Zappa",
-      "lastSyncedAt": "2025-11-25T23:38:18.407Z",
+      "lastSyncedAt": "2025-11-26T00:04:25.121Z",
       "tags": [],
       "tracks": [
         {
@@ -2040,9 +2080,14 @@
     {
       "id": "apps-zappavault-zappalibrary-eihn-everything-is-healing-nicely",
       "title": "EIHN- Everything Is Healing Nicely",
+      "year": 1999,
+      "era": "Posthumous Release",
+      "genre": "Jazz Fusion",
+      "description": "Posthumous release featuring live recordings from the 1975 tour with the Grand Wazoo band. Focuses on jazz fusion and instrumental compositions.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/EIHN- Everything Is Healing Nicely/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/EIHN- Everything Is Healing Nicely",
-      "lastSyncedAt": "2025-11-25T23:38:19.175Z",
+      "lastSyncedAt": "2025-11-26T00:04:25.846Z",
       "tags": [],
       "tracks": [
         {
@@ -2172,21 +2217,56 @@
     {
       "id": "apps-zappavault-zappalibrary-aaafnraa",
       "title": "AAAFNRAA",
-      "coverUrl": "/Apps/ZappaVault/ZappaLibrary/AAAFNRAA/AAAFNRAA.jpg",
+      "coverUrl": "/Apps/ZappaVault/ZappaLibrary/AAAFNRAA/cover.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/AAAFNRAA",
-      "lastSyncedAt": "2025-11-25T23:38:19.927Z",
+      "lastSyncedAt": "2025-11-26T00:04:26.353Z",
       "tags": [],
-      "tracks": [],
-      "formats": [],
+      "tracks": [
+        {
+          "id": "apps-zappavault-zappalibrary-aaafnraa-02-dead-girls-of-london-flac",
+          "title": ". Dead Girls of London",
+          "durationMs": 0,
+          "trackNumber": 2,
+          "format": "FLAC",
+          "filePath": "/Apps/ZappaVault/ZappaLibrary/AAAFNRAA/02. Dead Girls of London.flac",
+          "sizeBytes": 16757625
+        },
+        {
+          "id": "apps-zappavault-zappalibrary-aaafnraa-06-girlie-woman-flac",
+          "title": ". Girlie Woman",
+          "durationMs": 0,
+          "trackNumber": 6,
+          "format": "FLAC",
+          "filePath": "/Apps/ZappaVault/ZappaLibrary/AAAFNRAA/06. Girlie Woman.flac",
+          "sizeBytes": 18456594
+        },
+        {
+          "id": "apps-zappavault-zappalibrary-aaafnraa-11-everyone-is-going-mad-flac",
+          "title": ". Everyone Is Going Mad",
+          "durationMs": 0,
+          "trackNumber": 11,
+          "format": "FLAC",
+          "filePath": "/Apps/ZappaVault/ZappaLibrary/AAAFNRAA/11. Everyone Is Going Mad.flac",
+          "sizeBytes": 17483120
+        }
+      ],
+      "formats": [
+        "FLAC"
+      ],
       "totalDurationMs": 0,
-      "totalSizeBytes": 0
+      "totalSizeBytes": 52697339
     },
     {
       "id": "apps-zappavault-zappalibrary-does-humor-belong-in-music",
       "title": "Does Humor Belong In Music_",
+      "year": 1986,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Live album from the 1984 tour, featuring performances with the final touring band. Includes both comedic and serious compositions showcasing Zappa's musical range.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Does Humor Belong In Music_/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Does Humor Belong In Music_",
-      "lastSyncedAt": "2025-11-25T23:38:21.101Z",
+      "lastSyncedAt": "2025-11-26T00:04:27.163Z",
       "tags": [],
       "tracks": [
         {
@@ -2289,9 +2369,14 @@
     {
       "id": "apps-zappavault-zappalibrary-baby-snakes",
       "title": "Baby Snakes",
+      "year": 1983,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Live album and soundtrack to the concert film of the same name, recorded in New York in 1977. Features performances with Terry Bozzio and Adrian Belew.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Baby Snakes/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Baby Snakes",
-      "lastSyncedAt": "2025-11-25T23:38:21.827Z",
+      "lastSyncedAt": "2025-11-26T00:04:27.952Z",
       "tags": [],
       "tracks": [
         {
@@ -2376,9 +2461,14 @@
     {
       "id": "apps-zappavault-zappalibrary-a-token-of-his-extreme",
       "title": "A Token of His Extreme",
+      "year": 1974,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Live album recorded during the 1974 tour, featuring performances from the Roxy Theatre and other venues. Showcases Zappa's virtuosic guitar work and complex arrangements.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/A Token of His Extreme/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/A Token of His Extreme",
-      "lastSyncedAt": "2025-11-25T23:38:22.622Z",
+      "lastSyncedAt": "2025-11-26T00:04:28.769Z",
       "tags": [],
       "tracks": [
         {
@@ -2490,9 +2580,14 @@
     {
       "id": "apps-zappavault-zappalibrary-apostrophe",
       "title": "Apostrophe (')",
+      "year": 1974,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "One of Zappa's most commercially successful albums, featuring jazz fusion, progressive rock, and comedic elements. Includes the classic 'Don't Eat The Yellow Snow' suite.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Apostrophe (')/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Apostrophe (')",
-      "lastSyncedAt": "2025-11-25T23:38:23.356Z",
+      "lastSyncedAt": "2025-11-26T00:04:29.585Z",
       "tags": [],
       "tracks": [
         {
@@ -2586,9 +2681,14 @@
     {
       "id": "apps-zappavault-zappalibrary-burnt-weeny-sandwich",
       "title": "Burnt Weeny Sandwich",
+      "year": 1970,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": "Compilation album featuring studio and live recordings from the late 1960s. Mixes experimental compositions with doo-wop and rock elements.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Burnt Weeny Sandwich/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Burnt Weeny Sandwich",
-      "lastSyncedAt": "2025-11-25T23:38:24.055Z",
+      "lastSyncedAt": "2025-11-26T00:04:30.366Z",
       "tags": [],
       "tracks": [
         {
@@ -2682,9 +2782,14 @@
     {
       "id": "apps-zappavault-zappalibrary-ahead-of-their-time",
       "title": "Ahead Of Their Time",
+      "year": 1993,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous live album recorded at the Royal Festival Hall in London, 1968. Features early Mothers of Invention performances with orchestral backing.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Ahead Of Their Time/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Ahead Of Their Time",
-      "lastSyncedAt": "2025-11-25T23:38:25.258Z",
+      "lastSyncedAt": "2025-11-26T00:04:31.178Z",
       "tags": [],
       "tracks": [
         {
@@ -2877,9 +2982,14 @@
     {
       "id": "apps-zappavault-zappalibrary-dance-me-this",
       "title": "Dance Me This",
+      "year": 2015,
+      "era": "Posthumous Release",
+      "genre": "Synclavier",
+      "description": "Posthumous release featuring Synclavier compositions from Zappa's final years. Electronic music showcasing his compositional techniques and rhythmic complexity.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Dance Me This/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Dance Me This",
-      "lastSyncedAt": "2025-11-25T23:38:25.991Z",
+      "lastSyncedAt": "2025-11-26T00:04:31.925Z",
       "tags": [],
       "tracks": [
         {
@@ -2998,7 +3108,7 @@
       "subtitle": "2010 Vault Release",
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Congress Shall Make No Law/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Congress Shall Make No Law",
-      "lastSyncedAt": "2025-11-25T23:38:26.747Z",
+      "lastSyncedAt": "2025-11-26T00:04:32.734Z",
       "tags": [
         "compilation",
         "vault",
@@ -3132,9 +3242,14 @@
     {
       "id": "apps-zappavault-zappalibrary-finer-moments",
       "title": "Finer Moments",
+      "year": 2012,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous compilation featuring previously unreleased live and studio recordings from various periods. Curated selections from Zappa's vault.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Finer Moments/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Finer Moments",
-      "lastSyncedAt": "2025-11-25T23:38:27.535Z",
+      "lastSyncedAt": "2025-11-26T00:04:33.447Z",
       "tags": [],
       "tracks": [
         {
@@ -3264,9 +3379,14 @@
     {
       "id": "apps-zappavault-zappalibrary-buffalo",
       "title": "Buffalo",
+      "year": 2007,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous live album recorded in Buffalo, New York in 1974. Features performances from the Roxy & Elsewhere era band with George Duke and Ruth Underwood.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Buffalo/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Buffalo",
-      "lastSyncedAt": "2025-11-25T23:38:28.318Z",
+      "lastSyncedAt": "2025-11-26T00:04:34.206Z",
       "tags": [],
       "tracks": [
         {
@@ -3513,9 +3633,14 @@
     {
       "id": "apps-zappavault-zappalibrary-roxy-the-movie",
       "title": "Roxy- The Movie",
+      "year": 2015,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Soundtrack to the concert film documenting the Roxy Theatre performances. Features the complete audio from the film with the mid-1970s touring band.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Roxy- The Movie/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Roxy- The Movie",
-      "lastSyncedAt": "2025-11-25T23:38:29.100Z",
+      "lastSyncedAt": "2025-11-26T00:04:35.017Z",
       "tags": [],
       "tracks": [
         {
@@ -3708,9 +3833,14 @@
     {
       "id": "apps-zappavault-zappalibrary-uncle-meat",
       "title": "Uncle Meat",
+      "year": 1969,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": "Double album soundtrack to an unfinished film project. Features a mix of studio recordings, live performances, and spoken word, showcasing the band's experimental approach.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Uncle Meat/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Uncle Meat",
-      "lastSyncedAt": "2025-11-25T23:38:30.025Z",
+      "lastSyncedAt": "2025-11-26T00:04:35.801Z",
       "tags": [],
       "tracks": [
         {
@@ -3993,9 +4123,14 @@
     {
       "id": "apps-zappavault-zappalibrary-roxy-by-proxy",
       "title": "Roxy By Proxy",
+      "year": 2014,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous live album featuring additional performances from the Roxy Theatre era. Complements the original Roxy & Elsewhere album with more material from those shows.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Roxy By Proxy/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Roxy By Proxy",
-      "lastSyncedAt": "2025-11-25T23:38:30.792Z",
+      "lastSyncedAt": "2025-11-26T00:04:36.612Z",
       "tags": [],
       "tracks": [
         {
@@ -4125,9 +4260,14 @@
     {
       "id": "apps-zappavault-zappalibrary-ship-arriving-too-late-to-save-a-drowning-witch",
       "title": "Ship Arriving Too Late To Save A Drowning Witch",
+      "year": 1982,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Studio album featuring complex compositions and the early 1980s touring band. Includes 'Valley Girl' featuring Moon Unit Zappa, which became a surprise hit.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Ship Arriving Too Late To Save A Drowning Witch/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Ship Arriving Too Late To Save A Drowning Witch",
-      "lastSyncedAt": "2025-11-25T23:38:31.544Z",
+      "lastSyncedAt": "2025-11-26T00:04:37.424Z",
       "tags": [],
       "tracks": [
         {
@@ -4194,9 +4334,14 @@
     {
       "id": "apps-zappavault-zappalibrary-the-lumpy-money-p-o",
       "title": "The Lumpy Money P-O",
+      "year": 2009,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous release featuring outtakes and alternate versions from the Lumpy Gravy album sessions. Includes material from the original 1967 recording sessions.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Lumpy Money P-O/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Lumpy Money P-O",
-      "lastSyncedAt": "2025-11-25T23:38:32.343Z",
+      "lastSyncedAt": "2025-11-26T00:04:38.204Z",
       "tags": [],
       "tracks": [
         {
@@ -4902,9 +5047,14 @@
     {
       "id": "apps-zappavault-zappalibrary-one-size-fits-all",
       "title": "One Size Fits All",
+      "year": 1975,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Studio album featuring complex compositions and virtuosic performances. Includes the epic 'Inca Roads' and showcases the mid-1970s touring band.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/One Size Fits All/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/One Size Fits All",
-      "lastSyncedAt": "2025-11-25T23:38:33.109Z",
+      "lastSyncedAt": "2025-11-26T00:04:38.998Z",
       "tags": [],
       "tracks": [
         {
@@ -4998,9 +5148,14 @@
     {
       "id": "apps-zappavault-zappalibrary-you-can-t-do-that-on-stage-anymore-vol-4",
       "title": "You Can't Do That On Stage Anymore, Vol. 4",
+      "year": 1991,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Fourth volume in the live series, featuring performances from the 1984 tour. Showcases the final touring band with complex arrangements and extended solos.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 4/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 4",
-      "lastSyncedAt": "2025-11-25T23:38:33.837Z",
+      "lastSyncedAt": "2025-11-26T00:04:39.767Z",
       "tags": [],
       "tracks": [
         {
@@ -5319,9 +5474,14 @@
     {
       "id": "apps-zappavault-zappalibrary-sheik-yerbouti",
       "title": "Sheik Yerbouti",
+      "year": 1979,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Double album featuring a mix of studio and live tracks. Includes popular songs like 'Dancin' Fool' and 'Bobby Brown', showcasing Zappa's satirical songwriting and complex arrangements.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Sheik Yerbouti/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Sheik Yerbouti",
-      "lastSyncedAt": "2025-11-25T23:38:34.574Z",
+      "lastSyncedAt": "2025-11-26T00:04:40.569Z",
       "tags": [],
       "tracks": [
         {
@@ -5496,9 +5656,14 @@
     {
       "id": "apps-zappavault-zappalibrary-you-are-what-you-is",
       "title": "You Are What You Is",
+      "year": 1981,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Double album featuring satirical songs addressing various social issues and cultural phenomena. Includes complex arrangements and showcases the early 1980s touring band.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/You Are What You Is/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/You Are What You Is",
-      "lastSyncedAt": "2025-11-25T23:38:35.294Z",
+      "lastSyncedAt": "2025-11-26T00:04:41.921Z",
       "tags": [],
       "tracks": [
         {
@@ -5682,9 +5847,14 @@
     {
       "id": "apps-zappavault-zappalibrary-you-can-t-do-that-on-stage-anymore-vol-5",
       "title": "You Can't Do That On Stage Anymore, Vol. 5",
+      "year": 1992,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Fifth volume in the live series, featuring performances from various tours. Includes material showcasing the evolution of Zappa's compositions across different eras.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 5/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 5",
-      "lastSyncedAt": "2025-11-25T23:38:36.066Z",
+      "lastSyncedAt": "2025-11-26T00:04:42.796Z",
       "tags": [],
       "tracks": [
         {
@@ -6039,9 +6209,14 @@
     {
       "id": "apps-zappavault-zappalibrary-zappa-vol-1",
       "title": "Zappa, Vol.1",
+      "year": 2016,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous compilation featuring previously unreleased material from Zappa's vault. Curated selections showcasing various aspects of his musical output.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Zappa, Vol.1/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Zappa, Vol.1",
-      "lastSyncedAt": "2025-11-25T23:38:36.799Z",
+      "lastSyncedAt": "2025-11-26T00:04:43.549Z",
       "tags": [],
       "tracks": [
         {
@@ -6117,9 +6292,14 @@
     {
       "id": "apps-zappavault-zappalibrary-zappa-in-new-york",
       "title": "Zappa In New York",
+      "year": 1978,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Live double album recorded at the Palladium in New York City in 1976. Features performances with the late 1970s touring band, including complex instrumental compositions.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Zappa In New York/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Zappa In New York",
-      "lastSyncedAt": "2025-11-25T23:38:37.552Z",
+      "lastSyncedAt": "2025-11-26T00:04:44.315Z",
       "tags": [],
       "tracks": [
         {
@@ -6267,9 +6447,14 @@
     {
       "id": "apps-zappavault-zappalibrary-joe-s-garage-acts-i-ii-iii",
       "title": "Joe's Garage Acts I, II & III",
+      "year": 1979,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "A rock opera telling the story of Joe, a musician in a dystopian future where music is illegal. Released as three separate albums, later combined. Features complex compositions and social commentary.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Joe's Garage Acts I, II & III/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Joe's Garage Acts I, II & III",
-      "lastSyncedAt": "2025-11-25T23:38:38.487Z",
+      "lastSyncedAt": "2025-11-26T00:04:45.150Z",
       "tags": [],
       "tracks": [
         {
@@ -6444,9 +6629,14 @@
     {
       "id": "apps-zappavault-zappalibrary-we-re-only-in-it-for-the-money",
       "title": "We're Only In It For The Money",
+      "year": 1968,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": "Satirical concept album parodying The Beatles' Sgt. Pepper's Lonely Hearts Club Band. Features social commentary, experimental music, and collage-style production techniques.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/We're Only In It For The Money/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/We're Only In It For The Money",
-      "lastSyncedAt": "2025-11-25T23:38:39.221Z",
+      "lastSyncedAt": "2025-11-26T00:04:45.887Z",
       "tags": [],
       "tracks": [
         {
@@ -6596,7 +6786,7 @@
       "title": "The Old Masters, Box 3",
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Old Masters, Box 3/The Old Masters, Box 3.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Old Masters, Box 3",
-      "lastSyncedAt": "2025-11-25T23:38:39.985Z",
+      "lastSyncedAt": "2025-11-26T00:04:46.633Z",
       "tags": [],
       "tracks": [],
       "formats": [],
@@ -6606,9 +6796,14 @@
     {
       "id": "apps-zappavault-zappalibrary-meets-the-mothers-of-prevention",
       "title": "Meets The Mothers Of Prevention",
+      "year": 1985,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Album addressing censorship and the Parents Music Resource Center (PMRC). Features both Synclavier compositions and live tracks with political commentary.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Meets The Mothers Of Prevention/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Meets The Mothers Of Prevention",
-      "lastSyncedAt": "2025-11-25T23:38:40.708Z",
+      "lastSyncedAt": "2025-11-26T00:04:47.368Z",
       "tags": [],
       "tracks": [
         {
@@ -6711,9 +6906,14 @@
     {
       "id": "apps-zappavault-zappalibrary-lumpy-gravy",
       "title": "Lumpy Gravy",
+      "year": 1968,
+      "era": "Mothers Of Invention",
+      "genre": "Experimental",
+      "description": "Experimental album featuring orchestral arrangements, spoken word, and musique concrète. Originally released as a solo album, later credited to The Mothers of Invention.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Lumpy Gravy/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Lumpy Gravy",
-      "lastSyncedAt": "2025-11-25T23:38:41.465Z",
+      "lastSyncedAt": "2025-11-26T00:04:48.299Z",
       "tags": [],
       "tracks": [
         {
@@ -6744,9 +6944,14 @@
     {
       "id": "apps-zappavault-zappalibrary-them-or-us",
       "title": "Them or Us",
+      "year": 1984,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Double album featuring a mix of studio and live tracks. Includes covers, original compositions, and addresses themes of censorship and social commentary.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Them or Us/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Them or Us",
-      "lastSyncedAt": "2025-11-25T23:38:42.215Z",
+      "lastSyncedAt": "2025-11-26T00:04:49.091Z",
       "tags": [],
       "tracks": [
         {
@@ -6885,9 +7090,14 @@
     {
       "id": "apps-zappavault-zappalibrary-just-another-band-from-l-a",
       "title": "Just Another Band From L.A",
+      "year": 1972,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": "Live album recorded in Los Angeles featuring performances with Flo & Eddie. Includes extended comedic routines and rock compositions.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Just Another Band From L.A/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Just Another Band From L.A",
-      "lastSyncedAt": "2025-11-25T23:38:42.959Z",
+      "lastSyncedAt": "2025-11-26T00:04:49.882Z",
       "tags": [],
       "tracks": [
         {
@@ -6945,9 +7155,14 @@
     {
       "id": "apps-zappavault-zappalibrary-you-can-t-do-that-on-stage-anymore-vol-2",
       "title": "You Can't Do That On Stage Anymore, Vol. 2",
+      "year": 1988,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Second volume in the live series, featuring performances from the Helsinki concerts in 1974. Showcases the mid-1970s touring band with extended improvisations.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 2/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 2",
-      "lastSyncedAt": "2025-11-25T23:38:43.855Z",
+      "lastSyncedAt": "2025-11-26T00:04:50.659Z",
       "tags": [],
       "tracks": [
         {
@@ -7131,9 +7346,14 @@
     {
       "id": "apps-zappavault-zappalibrary-joe-s-domage",
       "title": "Joe's Domage",
+      "year": 2004,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous release featuring outtakes and alternate versions from the Joe's Garage project. Includes material that didn't make it onto the final album.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Joe's Domage/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Joe's Domage",
-      "lastSyncedAt": "2025-11-25T23:38:44.596Z",
+      "lastSyncedAt": "2025-11-26T00:04:51.443Z",
       "tags": [],
       "tracks": [
         {
@@ -7236,9 +7456,14 @@
     {
       "id": "apps-zappavault-zappalibrary-the-roxy-performances",
       "title": "The Roxy Performances",
+      "year": 2018,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous box set featuring complete performances from the Roxy Theatre in December 1973. Comprehensive documentation of those legendary shows with the mid-1970s band.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Roxy Performances/Cover/cover.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Roxy Performances",
-      "lastSyncedAt": "2025-11-25T23:38:45.394Z",
+      "lastSyncedAt": "2025-11-26T00:04:52.296Z",
       "tags": [],
       "tracks": [
         {
@@ -8009,7 +8234,7 @@
       "title": "quAUDIOPHILIAc",
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/quAUDIOPHILIAc/1 DVD-Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/quAUDIOPHILIAc",
-      "lastSyncedAt": "2025-11-25T23:38:46.121Z",
+      "lastSyncedAt": "2025-11-26T00:04:53.039Z",
       "tags": [],
       "tracks": [],
       "formats": [],
@@ -8021,7 +8246,7 @@
       "title": "The Dub Room Special",
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Dub Room Special/1 DVD-Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Dub Room Special",
-      "lastSyncedAt": "2025-11-25T23:38:46.854Z",
+      "lastSyncedAt": "2025-11-26T00:04:53.763Z",
       "tags": [],
       "tracks": [],
       "formats": [],
@@ -8031,9 +8256,14 @@
     {
       "id": "apps-zappavault-zappalibrary-greasy-love-songs",
       "title": "Greasy Love Songs",
+      "year": 2010,
+      "era": "Posthumous Release",
+      "genre": "Doo-Wop",
+      "description": "Posthumous compilation focusing on Zappa's doo-wop and vocal group arrangements. Features material from Cruising with Ruben & The Jets and related recordings.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Greasy Love Songs/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Greasy Love Songs",
-      "lastSyncedAt": "2025-11-25T23:38:47.818Z",
+      "lastSyncedAt": "2025-11-26T00:04:54.563Z",
       "tags": [],
       "tracks": [
         {
@@ -8235,21 +8465,128 @@
     {
       "id": "apps-zappavault-zappalibrary-philly-76",
       "title": "Philly '76",
-      "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Philly '76/1 Front.jpg",
+      "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Philly '76/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Philly '76",
-      "lastSyncedAt": "2025-11-25T23:38:48.615Z",
+      "lastSyncedAt": "2025-11-26T00:04:55.092Z",
       "tags": [],
-      "tracks": [],
-      "formats": [],
+      "tracks": [
+        {
+          "id": "apps-zappavault-zappalibrary-philly-76-cd-1-01-the-purple-lagoon-mp3",
+          "title": "The Purple Lagoon",
+          "durationMs": 0,
+          "trackNumber": 1,
+          "format": "MP3",
+          "filePath": "/Apps/ZappaVault/ZappaLibrary/Philly '76/CD 1/01 - The Purple Lagoon.mp3",
+          "sizeBytes": 7067008
+        },
+        {
+          "id": "apps-zappavault-zappalibrary-philly-76-cd-1-03-the-poodle-lecture-mp3",
+          "title": "The Poodle Lecture",
+          "durationMs": 0,
+          "trackNumber": 3,
+          "format": "MP3",
+          "filePath": "/Apps/ZappaVault/ZappaLibrary/Philly '76/CD 1/03 - The Poodle Lecture.mp3",
+          "sizeBytes": 7154473
+        },
+        {
+          "id": "apps-zappavault-zappalibrary-philly-76-cd-2-04-rudy-wants-to-buy-yez-a-drink-mp3",
+          "title": "Rudy Wants To Buy Yez A Drink",
+          "durationMs": 0,
+          "trackNumber": 4,
+          "format": "MP3",
+          "filePath": "/Apps/ZappaVault/ZappaLibrary/Philly '76/CD 2/04 - Rudy Wants To Buy Yez A Drink.mp3",
+          "sizeBytes": 4213453
+        },
+        {
+          "id": "apps-zappavault-zappalibrary-philly-76-cd-1-04-dirty-love-mp3",
+          "title": "Dirty Love",
+          "durationMs": 0,
+          "trackNumber": 4,
+          "format": "MP3",
+          "filePath": "/Apps/ZappaVault/ZappaLibrary/Philly '76/CD 1/04 - Dirty Love.mp3",
+          "sizeBytes": 7812666
+        },
+        {
+          "id": "apps-zappavault-zappalibrary-philly-76-cd-2-05-would-you-go-all-the-way-mp3",
+          "title": "Would You Go All The Way",
+          "durationMs": 0,
+          "trackNumber": 5,
+          "format": "MP3",
+          "filePath": "/Apps/ZappaVault/ZappaLibrary/Philly '76/CD 2/05 - Would You Go All The Way.mp3",
+          "sizeBytes": 4066479
+        },
+        {
+          "id": "apps-zappavault-zappalibrary-philly-76-cd-1-05-wind-up-workin-in-a-gas-station-mp3",
+          "title": "Wind Up Workin' In A Gas Station",
+          "durationMs": 0,
+          "trackNumber": 5,
+          "format": "MP3",
+          "filePath": "/Apps/ZappaVault/ZappaLibrary/Philly '76/CD 1/05 - Wind Up Workin' In A Gas Station.mp3",
+          "sizeBytes": 5297242
+        },
+        {
+          "id": "apps-zappavault-zappalibrary-philly-76-cd-2-06-daddy-daddy-daddy-mp3",
+          "title": "Daddy, Daddy, Daddy",
+          "durationMs": 0,
+          "trackNumber": 6,
+          "format": "MP3",
+          "filePath": "/Apps/ZappaVault/ZappaLibrary/Philly '76/CD 2/06 - Daddy, Daddy, Daddy.mp3",
+          "sizeBytes": 3884972
+        },
+        {
+          "id": "apps-zappavault-zappalibrary-philly-76-cd-2-09-stranded-in-the-jungle-mp3",
+          "title": "Stranded In The Jungle",
+          "durationMs": 0,
+          "trackNumber": 9,
+          "format": "MP3",
+          "filePath": "/Apps/ZappaVault/ZappaLibrary/Philly '76/CD 2/09 - Stranded In The Jungle.mp3",
+          "sizeBytes": 6082935
+        },
+        {
+          "id": "apps-zappavault-zappalibrary-philly-76-cd-1-10-manx-need-women-mp3",
+          "title": "Manx Need Women",
+          "durationMs": 0,
+          "trackNumber": 10,
+          "format": "MP3",
+          "filePath": "/Apps/ZappaVault/ZappaLibrary/Philly '76/CD 1/10 - Manx Need Women.mp3",
+          "sizeBytes": 3454644
+        },
+        {
+          "id": "apps-zappavault-zappalibrary-philly-76-cd-2-10-find-her-finer-mp3",
+          "title": "Find Her Finer",
+          "durationMs": 0,
+          "trackNumber": 10,
+          "format": "MP3",
+          "filePath": "/Apps/ZappaVault/ZappaLibrary/Philly '76/CD 2/10 - Find Her Finer.mp3",
+          "sizeBytes": 5860602
+        },
+        {
+          "id": "apps-zappavault-zappalibrary-philly-76-cd-2-11-camarillo-brillo-mp3",
+          "title": "Camarillo Brillo",
+          "durationMs": 0,
+          "trackNumber": 11,
+          "format": "MP3",
+          "filePath": "/Apps/ZappaVault/ZappaLibrary/Philly '76/CD 2/11 - Camarillo Brillo.mp3",
+          "sizeBytes": 7510343
+        }
+      ],
+      "formats": [
+        "MP3"
+      ],
       "totalDurationMs": 0,
-      "totalSizeBytes": 0
+      "totalSizeBytes": 62404817
     },
     {
       "id": "apps-zappavault-zappalibrary-carnegie-hall",
       "title": "Carnegie Hall",
+      "year": 2011,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous live album recorded at Carnegie Hall in New York City in 1971. Features performances with The Mothers of Invention and orchestral arrangements.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Carnegie Hall/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Carnegie Hall",
-      "lastSyncedAt": "2025-11-25T23:38:49.435Z",
+      "lastSyncedAt": "2025-11-26T00:04:55.895Z",
       "tags": [],
       "tracks": [
         {
@@ -8568,9 +8905,14 @@
     {
       "id": "apps-zappavault-zappalibrary-chicago-78",
       "title": "Chicago '78",
+      "year": 2016,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous live album recorded in Chicago in 1978. Features performances from the late 1970s touring band with complex instrumental arrangements.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Chicago '78/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Chicago '78",
-      "lastSyncedAt": "2025-11-25T23:38:50.142Z",
+      "lastSyncedAt": "2025-11-26T00:04:56.756Z",
       "tags": [],
       "tracks": [
         {
@@ -8736,9 +9078,14 @@
     {
       "id": "apps-zappavault-zappalibrary-make-a-jazz-noise-here",
       "title": "Make A Jazz Noise Here",
+      "year": 1991,
+      "era": "Solo Career",
+      "genre": "Jazz Fusion",
+      "description": "Live album from the 1988 tour, focusing on jazz fusion and instrumental compositions. Features complex arrangements and extended solos.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Make A Jazz Noise Here/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Make A Jazz Noise Here",
-      "lastSyncedAt": "2025-11-25T23:38:50.886Z",
+      "lastSyncedAt": "2025-11-26T00:04:57.567Z",
       "tags": [],
       "tracks": [
         {
@@ -8978,7 +9325,7 @@
       "title": "The Old Masters, Box 1",
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Old Masters, Box 1/The Old Masters, Box 1.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Old Masters, Box 1",
-      "lastSyncedAt": "2025-11-25T23:38:52.583Z",
+      "lastSyncedAt": "2025-11-26T00:04:58.271Z",
       "tags": [],
       "tracks": [],
       "formats": [],
@@ -8990,7 +9337,7 @@
       "title": "Zappa ’75： Zagreb／Ljubljana",
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Zappa ’75： Zagreb／Ljubljana/Cover/cover.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Zappa ’75： Zagreb／Ljubljana",
-      "lastSyncedAt": "2025-11-25T23:38:53.326Z",
+      "lastSyncedAt": "2025-11-26T00:04:59.033Z",
       "tags": [],
       "tracks": [
         {
@@ -9237,9 +9584,14 @@
     {
       "id": "apps-zappavault-zappalibrary-shut-up-n-play-yer-guitar",
       "title": "Shut Up 'N Play Yer Guitar",
+      "year": 1981,
+      "era": "Solo Career",
+      "genre": "Instrumental",
+      "description": "Triple album featuring entirely instrumental guitar solos extracted from live performances. Showcases Zappa's virtuosic improvisational guitar work without vocals or lyrics.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Shut Up 'N Play Yer Guitar/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Shut Up 'N Play Yer Guitar",
-      "lastSyncedAt": "2025-11-25T23:38:54.107Z",
+      "lastSyncedAt": "2025-11-26T00:04:59.790Z",
       "tags": [],
       "tracks": [
         {
@@ -9405,9 +9757,14 @@
     {
       "id": "apps-zappavault-zappalibrary-freak-out",
       "title": "Freak Out!",
+      "year": 1966,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": "The debut album by The Mothers of Invention, a double album that helped define progressive rock. Features social satire, experimental music, and early psychedelic rock.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Freak Out!/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Freak Out!",
-      "lastSyncedAt": "2025-11-25T23:38:54.832Z",
+      "lastSyncedAt": "2025-11-26T00:05:00.565Z",
       "tags": [],
       "tracks": [
         {
@@ -9555,9 +9912,14 @@
     {
       "id": "apps-zappavault-zappalibrary-one-shot-deal",
       "title": "One Shot Deal",
+      "year": 2008,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous compilation featuring one-off performances and rare live recordings from various tours. Includes material from different eras and lineups.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/One Shot Deal/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/One Shot Deal",
-      "lastSyncedAt": "2025-11-25T23:38:55.564Z",
+      "lastSyncedAt": "2025-11-26T00:05:01.406Z",
       "tags": [],
       "tracks": [
         {
@@ -9651,9 +10013,14 @@
     {
       "id": "apps-zappavault-zappalibrary-joe-s-corsage",
       "title": "Joe's Corsage",
+      "year": 2004,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous release featuring early versions and outtakes from the Joe's Garage project. Includes studio sessions and alternate takes from 1978-1979.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Joe's Corsage/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Joe's Corsage",
-      "lastSyncedAt": "2025-11-25T23:38:56.335Z",
+      "lastSyncedAt": "2025-11-26T00:05:02.190Z",
       "tags": [],
       "tracks": [
         {
@@ -9774,9 +10141,14 @@
     {
       "id": "apps-zappavault-zappalibrary-halloween",
       "title": "Halloween",
+      "year": 2003,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous live album featuring Halloween performances from New York in 1978. Zappa traditionally performed special Halloween shows with extended sets.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Halloween/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Halloween",
-      "lastSyncedAt": "2025-11-25T23:38:57.114Z",
+      "lastSyncedAt": "2025-11-26T00:05:02.923Z",
       "tags": [],
       "tracks": [
         {
@@ -9906,9 +10278,14 @@
     {
       "id": "apps-zappavault-zappalibrary-little-dots",
       "title": "Little Dots",
+      "year": 2016,
+      "era": "Posthumous Release",
+      "genre": "Jazz Fusion",
+      "description": "Posthumous live album featuring jazz fusion performances from 1976. Includes extended instrumental compositions and improvisations.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Little Dots/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Little Dots",
-      "lastSyncedAt": "2025-11-25T23:38:57.846Z",
+      "lastSyncedAt": "2025-11-26T00:05:03.686Z",
       "tags": [],
       "tracks": [
         {
@@ -9984,9 +10361,14 @@
     {
       "id": "apps-zappavault-zappalibrary-road-tapes-venue-2",
       "title": "Road Tapes, Venue #2",
+      "year": 2013,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous live album from the Road Tapes series, featuring performances from another venue. Continues the documentation of Zappa's extensive touring.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Road Tapes, Venue #2/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Road Tapes, Venue #2",
-      "lastSyncedAt": "2025-11-25T23:38:58.582Z",
+      "lastSyncedAt": "2025-11-26T00:05:04.580Z",
       "tags": [],
       "tracks": [
         {
@@ -10170,9 +10552,14 @@
     {
       "id": "apps-zappavault-zappalibrary-studio-tan",
       "title": "Studio Tan",
+      "year": 1978,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Studio album featuring material originally intended for the Lather project. Includes complex instrumental compositions and orchestral arrangements.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Studio Tan/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Studio Tan",
-      "lastSyncedAt": "2025-11-25T23:38:59.417Z",
+      "lastSyncedAt": "2025-11-26T00:05:05.359Z",
       "tags": [],
       "tracks": [
         {
@@ -10221,9 +10608,14 @@
     {
       "id": "apps-zappavault-zappalibrary-plays-the-music-of-frank-zappa",
       "title": "Plays The Music Of Frank Zappa",
+      "year": 1991,
+      "era": "Posthumous Release",
+      "genre": "Orchestral",
+      "description": "Album featuring the Ensemble Modern performing Zappa's orchestral compositions. Classical interpretations of Zappa's complex works, recorded with his supervision.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Plays The Music Of Frank Zappa/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Plays The Music Of Frank Zappa",
-      "lastSyncedAt": "2025-11-25T23:39:01.125Z",
+      "lastSyncedAt": "2025-11-26T00:05:06.129Z",
       "tags": [],
       "tracks": [
         {
@@ -10299,9 +10691,14 @@
     {
       "id": "apps-zappavault-zappalibrary-you-can-t-do-that-on-stage-anymore-vol-3",
       "title": "You Can't Do That On Stage Anymore, Vol. 3",
+      "year": 1989,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Third volume in the live series, featuring performances from various tours. Includes material showcasing different eras and musical styles from Zappa's career.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 3/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 3",
-      "lastSyncedAt": "2025-11-25T23:39:01.915Z",
+      "lastSyncedAt": "2025-11-26T00:05:06.925Z",
       "tags": [],
       "tracks": [
         {
@@ -10539,9 +10936,14 @@
     {
       "id": "apps-zappavault-zappalibrary-zappa-vol-2",
       "title": "Zappa, Vol. 2",
+      "year": 2021,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous compilation continuing the series, featuring more previously unreleased material from Zappa's vault. Includes live and studio recordings from various periods.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Zappa, Vol. 2/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Zappa, Vol. 2",
-      "lastSyncedAt": "2025-11-25T23:39:02.632Z",
+      "lastSyncedAt": "2025-11-26T00:05:07.673Z",
       "tags": [],
       "tracks": [
         {
@@ -10590,9 +10992,14 @@
     {
       "id": "apps-zappavault-zappalibrary-the-best-band-you-never-heard-in-your-life",
       "title": "The Best Band You Never Heard In Your Life",
+      "year": 1991,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Live double album from the 1988 tour, featuring covers, original compositions, and complex arrangements. Showcases the final touring band's versatility.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Best Band You Never Heard In Your Life/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Best Band You Never Heard In Your Life",
-      "lastSyncedAt": "2025-11-25T23:39:03.424Z",
+      "lastSyncedAt": "2025-11-26T00:05:08.476Z",
       "tags": [],
       "tracks": [
         {
@@ -10803,9 +11210,14 @@
     {
       "id": "apps-zappavault-zappalibrary-tinseltown-rebellion",
       "title": "TinselTown Rebellion",
+      "year": 1981,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Live album from the 1980 tour, featuring performances with the early 1980s touring band. Includes both new material and reworked older songs.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/TinselTown Rebellion/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/TinselTown Rebellion",
-      "lastSyncedAt": "2025-11-25T23:39:04.165Z",
+      "lastSyncedAt": "2025-11-26T00:05:09.227Z",
       "tags": [],
       "tracks": [
         {
@@ -10953,9 +11365,14 @@
     {
       "id": "apps-zappavault-zappalibrary-frank-zappa-for-president",
       "title": "Frank Zappa for President",
+      "year": 2015,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous compilation featuring political songs and commentary from throughout Zappa's career. Includes material related to his 1992 presidential campaign.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Frank Zappa for President/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Frank Zappa for President",
-      "lastSyncedAt": "2025-11-25T23:39:04.893Z",
+      "lastSyncedAt": "2025-11-26T00:05:10.012Z",
       "tags": [],
       "tracks": [
         {
@@ -11031,9 +11448,14 @@
     {
       "id": "apps-zappavault-zappalibrary-trance-fusion",
       "title": "Trance-Fusion",
+      "year": 2006,
+      "era": "Posthumous Release",
+      "genre": "Synclavier",
+      "description": "Posthumous release featuring Synclavier compositions from Zappa's final years. Electronic music showcasing advanced rhythmic and harmonic concepts.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Trance-Fusion/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Trance-Fusion",
-      "lastSyncedAt": "2025-11-25T23:39:05.680Z",
+      "lastSyncedAt": "2025-11-26T00:05:10.737Z",
       "tags": [],
       "tracks": [
         {
@@ -11190,9 +11612,14 @@
     {
       "id": "apps-zappavault-zappalibrary-zappa-erie",
       "title": "Zappa Erie",
+      "year": 2019,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous live album recorded in Erie, Pennsylvania in 1974. Features performances from the Roxy & Elsewhere era band with extended compositions and improvisations.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Zappa Erie/Cover/Cover.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Zappa Erie",
-      "lastSyncedAt": "2025-11-25T23:39:06.478Z",
+      "lastSyncedAt": "2025-11-26T00:05:11.523Z",
       "tags": [],
       "tracks": [
         {
@@ -11853,9 +12280,14 @@
     {
       "id": "apps-zappavault-zappalibrary-you-can-t-do-that-on-stage-anymore-vol-1",
       "title": "You Can't Do That On Stage Anymore, Vol. 1",
+      "year": 1988,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "First volume in a six-part live series featuring performances from various tours. Showcases different eras and lineups of Zappa's bands across his career.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 1/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 1",
-      "lastSyncedAt": "2025-11-25T23:39:07.210Z",
+      "lastSyncedAt": "2025-11-26T00:05:12.391Z",
       "tags": [],
       "tracks": [
         {
@@ -12111,9 +12543,14 @@
     {
       "id": "apps-zappavault-zappalibrary-wazoo",
       "title": "Wazoo",
+      "year": 2007,
+      "era": "Posthumous Release",
+      "genre": "Jazz Fusion",
+      "description": "Posthumous live album recorded in Boston in 1972 with the Grand Wazoo big band. Features large ensemble jazz fusion performances with complex arrangements.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Wazoo/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Wazoo",
-      "lastSyncedAt": "2025-11-25T23:39:07.947Z",
+      "lastSyncedAt": "2025-11-26T00:05:13.318Z",
       "tags": [],
       "tracks": [
         {
@@ -12225,9 +12662,14 @@
     {
       "id": "apps-zappavault-zappalibrary-funky-nothingness",
       "title": "Funky Nothingness",
+      "year": 2023,
+      "era": "Posthumous Release",
+      "genre": "Jazz Fusion",
+      "description": "Posthumous release featuring unreleased studio sessions from 1970, recorded between Hot Rats and Chunga's Revenge. Focuses on jazz fusion and instrumental jams.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Funky Nothingness/Cover/cover.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Funky Nothingness",
-      "lastSyncedAt": "2025-11-25T23:39:08.841Z",
+      "lastSyncedAt": "2025-11-26T00:05:14.066Z",
       "tags": [],
       "tracks": [
         {
@@ -12465,9 +12907,14 @@
     {
       "id": "apps-zappavault-zappalibrary-understanding-america",
       "title": "Understanding America",
+      "year": 2012,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous compilation featuring songs addressing American culture, politics, and social issues. Curated selections showcasing Zappa's satirical commentary on society.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Understanding America/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Understanding America",
-      "lastSyncedAt": "2025-11-25T23:39:09.694Z",
+      "lastSyncedAt": "2025-11-26T00:05:14.805Z",
       "tags": [],
       "tracks": [
         {
@@ -12759,9 +13206,14 @@
     {
       "id": "apps-zappavault-zappalibrary-imaginary-diseases",
       "title": "Imaginary Diseases",
+      "year": 2006,
+      "era": "Posthumous Release",
+      "genre": "Jazz Fusion",
+      "description": "Posthumous live album featuring performances from the Petit Wazoo tour in 1972. Focuses on jazz fusion and instrumental compositions with large ensemble arrangements.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Imaginary Diseases/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Imaginary Diseases",
-      "lastSyncedAt": "2025-11-25T23:39:10.420Z",
+      "lastSyncedAt": "2025-11-26T00:05:15.563Z",
       "tags": [],
       "tracks": [
         {
@@ -12837,9 +13289,14 @@
     {
       "id": "apps-zappavault-zappalibrary-hot-rats",
       "title": "Hot Rats",
+      "year": 1969,
+      "era": "Mothers Of Invention",
+      "genre": "Jazz Fusion",
+      "description": "Groundbreaking jazz fusion album featuring instrumental compositions and guest appearances. Considered one of Zappa's most influential works, blending rock with jazz improvisation.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Hot Rats/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Hot Rats",
-      "lastSyncedAt": "2025-11-25T23:39:11.163Z",
+      "lastSyncedAt": "2025-11-26T00:05:16.299Z",
       "tags": [],
       "tracks": [
         {
@@ -12906,9 +13363,14 @@
     {
       "id": "apps-zappavault-zappalibrary-jazz-from-hell",
       "title": "Jazz From Hell",
+      "year": 1986,
+      "era": "Solo Career",
+      "genre": "Synclavier",
+      "description": "Grammy Award-winning album featuring entirely Synclavier-composed music. Complex electronic compositions showcasing Zappa's advanced compositional techniques.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Jazz From Hell/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Jazz From Hell",
-      "lastSyncedAt": "2025-11-25T23:39:11.911Z",
+      "lastSyncedAt": "2025-11-26T00:05:17.009Z",
       "tags": [],
       "tracks": [
         {
@@ -12993,9 +13455,14 @@
     {
       "id": "apps-zappavault-zappalibrary-the-lost-episodes",
       "title": "The Lost Episodes",
+      "year": 1996,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous compilation featuring rare and previously unreleased material from 1961-1978. Includes early recordings, outtakes, and live performances from various periods.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Lost Episodes/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Lost Episodes",
-      "lastSyncedAt": "2025-11-25T23:39:12.806Z",
+      "lastSyncedAt": "2025-11-26T00:05:17.769Z",
       "tags": [],
       "tracks": [
         {
@@ -13278,9 +13745,14 @@
     {
       "id": "apps-zappavault-zappalibrary-weasels-ripped-my-flesh",
       "title": "Weasels Ripped My Flesh",
+      "year": 1970,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": "Compilation album featuring live and studio recordings from the late 1960s. Mixes experimental compositions, free jazz, and rock elements from the original Mothers era.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Weasels Ripped My Flesh/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Weasels Ripped My Flesh",
-      "lastSyncedAt": "2025-11-25T23:39:13.491Z",
+      "lastSyncedAt": "2025-11-26T00:05:18.523Z",
       "tags": [],
       "tracks": [
         {
@@ -13374,9 +13846,14 @@
     {
       "id": "apps-zappavault-zappalibrary-playground-psychotics",
       "title": "Playground Psychotics",
+      "year": 1992,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous live album featuring performances with Flo & Eddie from the early 1970s. Includes extended comedic routines and rock compositions.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Playground Psychotics/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Playground Psychotics",
-      "lastSyncedAt": "2025-11-25T23:39:14.651Z",
+      "lastSyncedAt": "2025-11-26T00:05:19.296Z",
       "tags": [],
       "tracks": [
         {
@@ -13902,9 +14379,14 @@
     {
       "id": "apps-zappavault-zappalibrary-hammersmith-odeon",
       "title": "Hammersmith Odeon",
+      "year": 2010,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous live album recorded at the Hammersmith Odeon in London in 1978. Features performances from the late 1970s touring band.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Hammersmith Odeon/Cover/1 Box-Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Hammersmith Odeon",
-      "lastSyncedAt": "2025-11-25T23:39:15.465Z",
+      "lastSyncedAt": "2025-11-26T00:05:20.099Z",
       "tags": [],
       "tracks": [
         {
@@ -14180,7 +14662,7 @@
       "title": "The Old Masters, Box 2",
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Old Masters, Box 2/The Old Masters, Box 2.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Old Masters, Box 2",
-      "lastSyncedAt": "2025-11-25T23:39:16.158Z",
+      "lastSyncedAt": "2025-11-26T00:05:20.952Z",
       "tags": [],
       "tracks": [],
       "formats": [],
@@ -14190,9 +14672,14 @@
     {
       "id": "apps-zappavault-zappalibrary-the-perfect-stranger",
       "title": "The Perfect Stranger",
+      "year": 1984,
+      "era": "Solo Career",
+      "genre": "Orchestral",
+      "description": "Album featuring orchestral compositions performed by the Ensemble InterContemporain conducted by Pierre Boulez, alongside Synclavier pieces. Classical interpretations of Zappa's works.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Perfect Stranger/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Perfect Stranger",
-      "lastSyncedAt": "2025-11-25T23:39:16.881Z",
+      "lastSyncedAt": "2025-11-26T00:05:21.746Z",
       "tags": [],
       "tracks": [
         {
@@ -14268,9 +14755,14 @@
     {
       "id": "apps-zappavault-zappalibrary-roxy-elsewhere",
       "title": "Roxy & Elsewhere",
+      "year": 1974,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Live double album primarily recorded at the Roxy Theatre in Los Angeles. Features the mid-1970s band with George Duke, Ruth Underwood, and Napoleon Murphy Brock.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Roxy & Elsewhere/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Roxy & Elsewhere",
-      "lastSyncedAt": "2025-11-25T23:39:17.611Z",
+      "lastSyncedAt": "2025-11-26T00:05:22.453Z",
       "tags": [],
       "tracks": [
         {
@@ -14373,9 +14865,14 @@
     {
       "id": "apps-zappavault-zappalibrary-over-nite-sensation",
       "title": "Over-Nite Sensation",
+      "year": 1973,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Commercial breakthrough album featuring accessible yet complex compositions. Includes 'Montana', 'Dirty Love', and other popular tracks with sophisticated arrangements.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Over-Nite Sensation/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Over-Nite Sensation",
-      "lastSyncedAt": "2025-11-25T23:39:18.318Z",
+      "lastSyncedAt": "2025-11-26T00:05:23.312Z",
       "tags": [],
       "tracks": [
         {
@@ -14451,9 +14948,14 @@
     {
       "id": "apps-zappavault-zappalibrary-you-can-t-do-that-on-stage-anymore-vol-6",
       "title": "You Can't Do That On Stage Anymore, Vol. 6",
+      "year": 1992,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Final volume in the live series, featuring performances from various tours. Completes the comprehensive documentation of Zappa's live performances across his career.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 6/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/You Can't Do That On Stage Anymore, Vol. 6",
-      "lastSyncedAt": "2025-11-25T23:39:19.064Z",
+      "lastSyncedAt": "2025-11-26T00:05:24.143Z",
       "tags": [],
       "tracks": [
         {
@@ -14799,9 +15301,14 @@
     {
       "id": "apps-zappavault-zappalibrary-zoot-allures",
       "title": "Zoot Allures",
+      "year": 1976,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Studio album featuring a mix of complex instrumental compositions and vocal tracks. Includes the epic 'Black Napkins' and showcases Zappa's guitar work and compositional skills.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Zoot Allures/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Zoot Allures",
-      "lastSyncedAt": "2025-11-25T23:39:19.779Z",
+      "lastSyncedAt": "2025-11-26T00:05:24.884Z",
       "tags": [],
       "tracks": [
         {
@@ -14895,9 +15402,14 @@
     {
       "id": "apps-zappavault-zappalibrary-the-mofo-project-object",
       "title": "The MOFO Project-Object",
+      "year": 2006,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous release featuring outtakes and alternate versions from the We're Only In It For The Money album sessions. Includes material from the original 1967-1968 recording sessions.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The MOFO Project-Object/Cover/1 Original Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The MOFO Project-Object",
-      "lastSyncedAt": "2025-11-25T23:39:20.551Z",
+      "lastSyncedAt": "2025-11-26T00:05:25.751Z",
       "tags": [],
       "tracks": [
         {
@@ -15558,9 +16070,14 @@
     {
       "id": "apps-zappavault-zappalibrary-road-tapes-venue-1",
       "title": "Road Tapes, Venue #1",
+      "year": 2012,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous live album from the Road Tapes series, featuring performances from a specific venue. Part of an ongoing series documenting Zappa's live shows.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Road Tapes, Venue #1/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Road Tapes, Venue #1",
-      "lastSyncedAt": "2025-11-25T23:39:21.256Z",
+      "lastSyncedAt": "2025-11-26T00:05:26.494Z",
       "tags": [],
       "tracks": [
         {
@@ -15690,9 +16207,14 @@
     {
       "id": "apps-zappavault-zappalibrary-joe-s-xmasage",
       "title": "Joe's XMasage",
+      "year": 2014,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous holiday-themed release from the Joe's Garage project, featuring Christmas-related outtakes and studio sessions. Part of the Joe's Garage vault series.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Joe's XMasage/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Joe's XMasage",
-      "lastSyncedAt": "2025-11-25T23:39:22.020Z",
+      "lastSyncedAt": "2025-11-26T00:05:27.246Z",
       "tags": [],
       "tracks": [
         {
@@ -15804,9 +16326,14 @@
     {
       "id": "apps-zappavault-zappalibrary-orchestral-favorites",
       "title": "Orchestral Favorites",
+      "year": 1979,
+      "era": "Solo Career",
+      "genre": "Orchestral",
+      "description": "Live album featuring orchestral compositions performed by the Abnuceals Emuukha Electric Symphony Orchestra in 1975. Classical arrangements of Zappa's music.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Orchestral Favorites/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Orchestral Favorites",
-      "lastSyncedAt": "2025-11-25T23:39:22.739Z",
+      "lastSyncedAt": "2025-11-26T00:05:27.979Z",
       "tags": [],
       "tracks": [
         {
@@ -15864,9 +16391,14 @@
     {
       "id": "apps-zappavault-zappalibrary-zappatite-frank-zappa-s-tastiest-tracks",
       "title": "ZAPPAtite (Frank Zappa's Tastiest Tracks)",
+      "year": 2019,
+      "era": "Posthumous Release",
+      "genre": "Compilation",
+      "description": "Posthumous compilation featuring popular and accessible tracks from throughout Zappa's career. Curated selection designed as an introduction to his music.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/ZAPPAtite (Frank Zappa's Tastiest Tracks)/Cover/cover.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/ZAPPAtite (Frank Zappa's Tastiest Tracks)",
-      "lastSyncedAt": "2025-11-25T23:39:23.442Z",
+      "lastSyncedAt": "2025-11-26T00:05:28.808Z",
       "tags": [],
       "tracks": [
         {
@@ -16041,9 +16573,14 @@
     {
       "id": "apps-zappavault-zappalibrary-sleep-dirt",
       "title": "Sleep Dirt",
+      "year": 1979,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Studio album featuring instrumental compositions originally intended for the Lather project. Includes complex arrangements and showcases Zappa's compositional skills.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Sleep Dirt/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Sleep Dirt",
-      "lastSyncedAt": "2025-11-25T23:39:24.174Z",
+      "lastSyncedAt": "2025-11-26T00:05:29.599Z",
       "tags": [],
       "tracks": [
         {
@@ -16119,9 +16656,14 @@
     {
       "id": "apps-zappavault-zappalibrary-the-yellow-shark",
       "title": "The Yellow Shark",
+      "year": 1993,
+      "era": "Solo Career",
+      "genre": "Orchestral",
+      "description": "Final album released during Zappa's lifetime, featuring the Ensemble Modern performing his orchestral compositions. Classical interpretations recorded in Europe with Zappa's supervision.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Yellow Shark/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Yellow Shark",
-      "lastSyncedAt": "2025-11-25T23:39:24.892Z",
+      "lastSyncedAt": "2025-11-26T00:05:30.376Z",
       "tags": [],
       "tracks": [
         {
@@ -16307,7 +16849,7 @@
       "title": "Läther",
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Läther/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Läther",
-      "lastSyncedAt": "2025-11-25T23:39:25.664Z",
+      "lastSyncedAt": "2025-11-26T00:05:31.143Z",
       "tags": [],
       "tracks": [
         {
@@ -16563,9 +17105,14 @@
     {
       "id": "apps-zappavault-zappalibrary-mothermania",
       "title": "Mothermania",
+      "year": 1969,
+      "era": "Mothers Of Invention",
+      "genre": "Progressive Rock",
+      "description": "Compilation album featuring selections from the first five Mothers of Invention albums. Curated by Zappa to showcase the band's early work.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Mothermania/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Mothermania",
-      "lastSyncedAt": "2025-11-25T23:39:26.378Z",
+      "lastSyncedAt": "2025-11-26T00:05:31.955Z",
       "tags": [],
       "tracks": [
         {
@@ -16677,9 +17224,14 @@
     {
       "id": "apps-zappavault-zappalibrary-the-grand-wazoo",
       "title": "The Grand Wazoo",
+      "year": 1972,
+      "era": "Solo Career",
+      "genre": "Jazz Fusion",
+      "description": "Jazz fusion album featuring large ensemble arrangements. Recorded while Zappa was recovering from an injury, showcasing complex instrumental compositions with big band instrumentation.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Grand Wazoo/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Grand Wazoo",
-      "lastSyncedAt": "2025-11-25T23:39:27.458Z",
+      "lastSyncedAt": "2025-11-26T00:05:32.737Z",
       "tags": [],
       "tracks": [
         {
@@ -16737,9 +17289,14 @@
     {
       "id": "apps-zappavault-zappalibrary-thing-fish",
       "title": "Thing-Fish",
+      "year": 1984,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Triple album rock opera addressing themes of AIDS, censorship, and social issues. Features reworked versions of older songs with new lyrics and arrangements.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Thing-Fish/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Thing-Fish",
-      "lastSyncedAt": "2025-11-25T23:39:28.213Z",
+      "lastSyncedAt": "2025-11-26T00:05:33.544Z",
       "tags": [],
       "tracks": [
         {
@@ -16950,9 +17507,14 @@
     {
       "id": "apps-zappavault-zappalibrary-waka-jawaka",
       "title": "Waka-Jawaka",
+      "year": 1972,
+      "era": "Solo Career",
+      "genre": "Jazz Fusion",
+      "description": "Jazz fusion album featuring large ensemble arrangements. Companion piece to The Grand Wazoo, showcasing complex instrumental compositions with big band instrumentation.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Waka-Jawaka/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Waka-Jawaka",
-      "lastSyncedAt": "2025-11-25T23:39:28.937Z",
+      "lastSyncedAt": "2025-11-26T00:05:34.306Z",
       "tags": [],
       "tracks": [
         {
@@ -17001,9 +17563,14 @@
     {
       "id": "apps-zappavault-zappalibrary-mystery-disc",
       "title": "Mystery Disc",
+      "year": 1998,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous compilation featuring rare and previously unreleased material from various periods. Includes studio outtakes, live recordings, and experimental pieces.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Mystery Disc/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Mystery Disc",
-      "lastSyncedAt": "2025-11-25T23:39:29.663Z",
+      "lastSyncedAt": "2025-11-26T00:05:35.050Z",
       "tags": [],
       "tracks": [
         {
@@ -17331,9 +17898,14 @@
     {
       "id": "apps-zappavault-zappalibrary-joe-s-menage",
       "title": "Joe's Menage",
+      "year": 2015,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous release from the Joe's Garage project, featuring additional outtakes and studio sessions. Part of the ongoing series of Joe's Garage vault releases.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Joe's Menage/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Joe's Menage",
-      "lastSyncedAt": "2025-11-25T23:39:30.384Z",
+      "lastSyncedAt": "2025-11-26T00:05:35.814Z",
       "tags": [],
       "tracks": [
         {
@@ -17418,9 +17990,14 @@
     {
       "id": "apps-zappavault-zappalibrary-the-man-from-utopia",
       "title": "The Man From Utopia",
+      "year": 1983,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Studio album featuring a mix of new compositions and reworked older material. Includes complex arrangements and showcases the early 1980s touring band.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Man From Utopia/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Man From Utopia",
-      "lastSyncedAt": "2025-11-25T23:39:31.183Z",
+      "lastSyncedAt": "2025-11-26T00:05:36.578Z",
       "tags": [],
       "tracks": [
         {
@@ -17532,9 +18109,14 @@
     {
       "id": "apps-zappavault-zappalibrary-have-i-offended-someone",
       "title": "Have I Offended Someone_",
+      "year": 1997,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous compilation featuring songs that were censored or controversial throughout Zappa's career. Includes material addressing free speech and censorship.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Have I Offended Someone_/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Have I Offended Someone_",
-      "lastSyncedAt": "2025-11-25T23:39:31.915Z",
+      "lastSyncedAt": "2025-11-26T00:05:37.323Z",
       "tags": [],
       "tracks": [
         {
@@ -17682,9 +18264,14 @@
     {
       "id": "apps-zappavault-zappalibrary-joe-s-camouflage",
       "title": "Joe's Camouflage",
+      "year": 2016,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous release from the Joe's Garage project, featuring outtakes and alternate versions. Part of the series of Joe's Garage-related vault releases.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Joe's Camouflage/Cover/1 Front.tif",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Joe's Camouflage",
-      "lastSyncedAt": "2025-11-25T23:39:32.604Z",
+      "lastSyncedAt": "2025-11-26T00:05:39.352Z",
       "tags": [],
       "tracks": [
         {
@@ -17832,9 +18419,14 @@
     {
       "id": "apps-zappavault-zappalibrary-guitar",
       "title": "Guitar",
+      "year": 1988,
+      "era": "Solo Career",
+      "genre": "Instrumental",
+      "description": "Double album featuring Zappa's guitar solos extracted from live performances spanning 1979-1984. Showcases his virtuosic and improvisational guitar work.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/Guitar/Cover/1 Front.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/Guitar",
-      "lastSyncedAt": "2025-11-25T23:39:33.360Z",
+      "lastSyncedAt": "2025-11-26T00:05:40.106Z",
       "tags": [],
       "tracks": [
         {
@@ -18135,9 +18727,14 @@
     {
       "id": "apps-zappavault-zappalibrary-the-crux-of-the-biscuit",
       "title": "The Crux Of The Biscuit",
+      "year": 2016,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous release featuring outtakes and alternate versions from the Apostrophe (') album sessions. Includes material from the early 1970s recording sessions.",
+      "subtitle": null,
       "coverUrl": "/Apps/ZappaVault/ZappaLibrary/The Crux Of The Biscuit/Cover/cover.jpg",
       "locationPath": "/Apps/ZappaVault/ZappaLibrary/The Crux Of The Biscuit",
-      "lastSyncedAt": "2025-11-25T23:39:34.058Z",
+      "lastSyncedAt": "2025-11-26T00:05:40.871Z",
       "tags": [],
       "tracks": [
         {
