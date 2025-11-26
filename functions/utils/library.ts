@@ -13,30 +13,39 @@ export interface EnvBindings {
 }
 
 /**
- * Load library snapshot from Function endpoint (library-data.ts)
+ * Load library snapshot from static asset URL
  * Falls back to KV cache, then sample library
  */
-async function loadLibraryFromFunction(request?: Request): Promise<LibrarySnapshot | null> {
+async function loadLibraryFromStaticAsset(request?: Request): Promise<LibrarySnapshot | null> {
   if (!request) {
     return null;
   }
   
   try {
-    // Try to fetch from Function endpoint (more reliable than static assets)
-    const url = new URL('/api/library-data', request.url);
-    const response = await fetch(url, {
+    // Fetch directly from static asset (more reliable than Function endpoint)
+    const url = new URL('/data/library.generated.json', request.url);
+    console.log(`[LIBRARY] Fetching from static asset: ${url.toString()}`);
+    
+    const response = await fetch(url.toString(), {
       cache: 'default',
     });
     
     if (response.ok) {
       const snapshot = await response.json() as LibrarySnapshot;
-      console.log(`[LIBRARY] ✅ Loaded library from Function endpoint: ${snapshot.albumCount} albums, ${snapshot.trackCount} tracks`);
+      console.log(`[LIBRARY] ✅ Loaded library from static asset: ${snapshot.albumCount} albums, ${snapshot.trackCount} tracks`);
+      
+      // Verify durations
+      const tracksWithDurations = snapshot.albums.reduce((sum, album) => 
+        sum + album.tracks.filter(t => t.durationMs > 0).length, 0
+      );
+      console.log(`[LIBRARY] Tracks with durations: ${tracksWithDurations} out of ${snapshot.trackCount}`);
+      
       return snapshot;
     } else {
-      console.warn(`[LIBRARY] ⚠️  Failed to load from Function endpoint: ${response.status} ${response.statusText}`);
+      console.warn(`[LIBRARY] ⚠️  Failed to load from static asset: ${response.status} ${response.statusText}`);
     }
   } catch (error) {
-    console.warn(`[LIBRARY] ⚠️  Error loading from Function endpoint:`, error instanceof Error ? error.message : String(error));
+    console.warn(`[LIBRARY] ⚠️  Error loading from static asset:`, error instanceof Error ? error.message : String(error));
   }
   
   return null;
@@ -46,12 +55,12 @@ export async function loadLibrarySnapshot(
   env: EnvBindings,
   request?: Request,
 ): Promise<LibrarySnapshot> {
-  // First, try loading from Function endpoint (library-data.ts) - most up-to-date
+  // First, try loading from static asset - most up-to-date
   // This ensures we get the latest library with all durations merged in
   if (request) {
-    const functionLibrary = await loadLibraryFromFunction(request);
-    if (functionLibrary) {
-      return functionLibrary;
+    const staticLibrary = await loadLibraryFromStaticAsset(request);
+    if (staticLibrary) {
+      return staticLibrary;
     }
   }
 
