@@ -28,24 +28,27 @@ async function loadLibraryFromStaticAsset(request?: Request): Promise<LibrarySna
     console.log(`[LIBRARY] Fetching comprehensive library from: ${staticAssetUrl}`);
     
     let response = await fetch(staticAssetUrl, {
-      cache: 'default',
+      cache: 'no-store', // Don't use cache - always fetch fresh comprehensive library
       headers: {
         'Accept': 'application/json',
       },
     });
     
+    console.log(`[LIBRARY] Comprehensive library fetch: ${response.status} ${response.statusText}`);
+    
     // Fallback to library.generated.json if comprehensive doesn't exist
     if (!response.ok) {
-      console.log(`[LIBRARY] Comprehensive library not found, trying library.generated.json...`);
+      console.log(`[LIBRARY] Comprehensive library not found (${response.status}), trying library.generated.json...`);
       staticAssetUrl = `${requestUrl.origin}/data/library.generated.json`;
       console.log(`[LIBRARY] Fetching from static asset: ${staticAssetUrl}`);
     
       response = await fetch(staticAssetUrl, {
-        cache: 'default',
+        cache: 'no-store', // Don't use cache
         headers: {
           'Accept': 'application/json',
         },
       });
+      console.log(`[LIBRARY] Fallback fetch: ${response.status} ${response.statusText}`);
     }
     
     console.log(`[LIBRARY] Static asset fetch response: ${response.status} ${response.statusText}`);
