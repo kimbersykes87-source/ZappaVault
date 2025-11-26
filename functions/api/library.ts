@@ -7,6 +7,7 @@ import {
   loadLibrarySnapshot,
 } from '../utils/library.ts';
 import type { EnvBindings } from '../utils/library.ts';
+import { getValidDropboxToken } from '../utils/dropboxToken.ts';
 
 async function getPermanentLink(
   env: EnvBindings,
@@ -65,23 +66,17 @@ async function getPermanentLink(
     }
 
     // If no existing link, create a new permanent shared link using the correct API
-    response = await fetch(
-      'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings',
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${env.DROPBOX_TOKEN}`,
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          path: filePath,
-          settings: {
-            requested_visibility: {
-              '.tag': 'public'
-            }
+    response = await dropboxRequestWithRefresh(
+      'sharing/create_shared_link_with_settings',
+      { 
+        path: filePath,
+        settings: {
+          requested_visibility: {
+            '.tag': 'public'
           }
-        }),
+        }
       },
+      env,
     );
 
     if (!response.ok) {
@@ -91,19 +86,13 @@ async function getPermanentLink(
       // If it's a 409 conflict, the link might already exist - try to get it
       if (response.status === 409) {
         console.log(`[LINK DEBUG] Link already exists for ${filePath}, attempting to retrieve it`);
-        const conflictResponse = await fetch(
-          'https://api.dropboxapi.com/2/sharing/list_shared_links',
-          {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${env.DROPBOX_TOKEN}`,
-              'content-type': 'application/json',
-            },
-            body: JSON.stringify({ 
-              path: filePath,
-              direct_only: false 
-            }),
+        const conflictResponse = await dropboxRequestWithRefresh(
+          'sharing/list_shared_links',
+          { 
+            path: filePath,
+            direct_only: false 
           },
+          env,
         );
         if (conflictResponse.ok) {
           const conflictPayload = (await conflictResponse.json()) as { 
@@ -202,21 +191,16 @@ async function listCoverFolder(
   env: EnvBindings,
   coverFolderPath: string,
 ): Promise<string[]> {
-  if (!env.DROPBOX_TOKEN) {
+  const token = await getValidDropboxToken(env);
+  if (!token) {
     return [];
   }
 
   try {
-    const response = await fetch(
-      'https://api.dropboxapi.com/2/files/list_folder',
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${env.DROPBOX_TOKEN}`,
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({ path: coverFolderPath }),
-      },
+    const response = await dropboxRequestWithRefresh(
+      'files/list_folder',
+      { path: coverFolderPath },
+      env,
     );
 
     if (!response.ok) {
@@ -447,14 +431,17 @@ export const onRequestGet = async (context: {
     }
     
     // Extract extension from original coverUrl if it exists
-    // The copy script preserves the original extension, so we should match it exactly
+    // The copy script preserves the original extension, so we should match it
     let extension = '.jpg'; // default
     if (album.coverUrl) {
       // Extract extension from path like "/Apps/.../file.jpg" or "/Apps/.../file.png"
       const match = album.coverUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i);
       if (match) {
-        // Keep the original extension (don't normalize .jpeg to .jpg)
         extension = `.${match[1].toLowerCase()}`;
+        // Normalize .jpeg to .jpg for consistency
+        if (extension === '.jpeg') {
+          extension = '.jpg';
+        }
       }
     }
     

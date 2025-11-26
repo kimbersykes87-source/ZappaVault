@@ -7,6 +7,9 @@ export interface EnvBindings {
   LIBRARY_KV?: KVNamespace;
   ADMIN_TOKEN?: string;
   DROPBOX_TOKEN?: string;
+  DROPBOX_REFRESH_TOKEN?: string;
+  DROPBOX_APP_KEY?: string;
+  DROPBOX_APP_SECRET?: string;
 }
 
 export async function loadLibrarySnapshot(

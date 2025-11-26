@@ -5,9 +5,18 @@ import path from 'node:path';
 import type { LibrarySnapshot, Album } from '../../shared/library.ts';
 
 // Get paths from environment or use defaults
-const DROPBOX_ROOT = process.env.DROPBOX_LIBRARY_PATH || 
+// DROPBOX_LIBRARY_PATH might be a Dropbox API path (/Apps/...) or a local path
+// If it's an API path, we need to convert it to a local filesystem path
+let DROPBOX_ROOT = process.env.DROPBOX_LIBRARY_PATH || 
   process.env.DROPBOX_ROOT || 
   'C:/Users/kimbe/Dropbox/Apps/ZappaVault/ZappaLibrary';
+
+// If it's a Dropbox API path (starts with /), convert to local path
+if (DROPBOX_ROOT.startsWith('/')) {
+  // Dropbox API path: /Apps/ZappaVault/ZappaLibrary
+  // Local path: C:/Users/kimbe/Dropbox/Apps/ZappaVault/ZappaLibrary
+  DROPBOX_ROOT = path.join('C:/Users/kimbe/Dropbox', DROPBOX_ROOT);
+}
 
 const COVERS_OUTPUT_DIR = path.resolve('public/covers');
 const libraryFile = path.resolve('data/library.generated.json');

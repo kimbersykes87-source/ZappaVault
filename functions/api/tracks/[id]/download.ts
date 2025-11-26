@@ -2,6 +2,7 @@ import {
   loadLibrarySnapshot,
 } from '../../../utils/library.ts';
 import type { EnvBindings } from '../../../utils/library.ts';
+import { getValidDropboxToken } from '../../../utils/dropboxToken.ts';
 
 function convertToDropboxPath(localPath: string): string {
   // Convert Windows path to Dropbox path
@@ -35,7 +36,8 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
     return new Response('Missing track id', { status: 400 });
   }
 
-  if (!env.DROPBOX_TOKEN) {
+  let token = await getValidDropboxToken(env);
+  if (!token) {
     return new Response('Dropbox token not configured', { status: 500 });
   }
 
@@ -58,18 +60,50 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
   // Convert Windows path to Dropbox path
   const dropboxPath = convertToDropboxPath(track.filePath);
 
-  const response = await fetch(
+  let response = await fetch(
     'https://content.dropboxapi.com/2/files/download',
     {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${env.DROPBOX_TOKEN}`,
+        Authorization: `Bearer ${token}`,
         'Dropbox-API-Arg': JSON.stringify({
           path: dropboxPath,
         }),
       },
     },
   );
+
+  // If token expired, refresh and retry once
+  if (!response.ok && response.status === 401) {
+    const text = await response.text();
+    try {
+      const errorData = JSON.parse(text);
+      if (errorData.error?.['.tag'] === 'expired_access_token' && env.DROPBOX_REFRESH_TOKEN) {
+        const { refreshDropboxToken } = await import('../../../utils/dropboxToken.ts');
+        token = await refreshDropboxToken(
+          env.DROPBOX_REFRESH_TOKEN,
+          env.DROPBOX_APP_KEY!,
+          env.DROPBOX_APP_SECRET!,
+        );
+        
+        // Retry with new token
+        response = await fetch(
+          'https://content.dropboxapi.com/2/files/download',
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Dropbox-API-Arg': JSON.stringify({
+                path: dropboxPath,
+              }),
+            },
+          },
+        );
+      }
+    } catch {
+      // If parsing fails, continue with original response
+    }
+  }
 
   if (!response.ok) {
     const errorText = await response.text();
