@@ -1,14 +1,38 @@
-import { config } from 'dotenv';
+import 'dotenv/config';
 import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
-
-config();
 
 const DROPBOX_TOKEN = process.env.DROPBOX_TOKEN;
 
 if (!DROPBOX_TOKEN) {
-  console.error('DROPBOX_TOKEN not found in environment');
+  console.error('❌ DROPBOX_TOKEN not found in environment variables');
   process.exit(1);
+}
+
+// Convert shared link to direct download link
+function convertToDirectLink(sharedUrl: string): string {
+  try {
+    const url = new URL(sharedUrl);
+    
+    // For new Dropbox format with /scl/, preserve rlkey and set dl=1
+    if (url.pathname.includes('/scl/')) {
+      url.searchParams.set('dl', '1');
+      // Convert domain
+      url.hostname = 'dl.dropboxusercontent.com';
+      return url.toString();
+    }
+    
+    // Old format: convert dropbox.com to dl.dropboxusercontent.com and set dl=1
+    url.hostname = 'dl.dropboxusercontent.com';
+    url.searchParams.set('dl', '1');
+    return url.toString();
+  } catch (error) {
+    // Fallback: simple string replacement
+    return sharedUrl
+      .replace(/^https?:\/\/(www\.)?dropbox\.com/, 'https://dl.dropboxusercontent.com')
+      .replace(/[?&]dl=[01]/, '')
+      .replace(/\?/, '?')
+      .replace(/\?$/, '') + (sharedUrl.includes('?') ? '&' : '?') + 'dl=1';
+  }
 }
 
 async function getPermanentLink(filePath: string): Promise<string | undefined> {
@@ -34,25 +58,23 @@ async function getPermanentLink(filePath: string): Promise<string | undefined> {
         links: Array<{ url: string }> 
       };
       if (listPayload.links && listPayload.links.length > 0) {
-        // Get the shared link
         const sharedUrl = listPayload.links[0].url;
-        console.log(`📋 Original shared link: ${sharedUrl}`);
+        console.log(`   Original shared URL: ${sharedUrl}`);
         
-        // For scl/fo links, we need to preserve the rlkey parameter and add raw=1
-        if (sharedUrl.includes('scl/fo/')) {
-          // For scl/fo links, replace dl=0 or dl=1 with raw=1, preserving other params
-          const url = new URL(sharedUrl);
-          url.searchParams.delete('dl');
-          url.searchParams.set('raw', '1');
-          const directLink = url.toString();
-          console.log(`✅ Using scl/fo format with ?raw=1: ${directLink}`);
-          return directLink;
-        } else {
-          // For regular links, convert to direct download link
-          const directLink = convertToDirectLink(sharedUrl);
-          console.log(`✅ Converted to direct link: ${directLink}`);
-          return directLink;
-        }
+        // For images, use the raw parameter format which works better
+        // Remove existing dl parameter and add raw=1
+        const url = new URL(sharedUrl);
+        url.searchParams.delete('dl');
+        url.searchParams.set('raw', '1');
+        const rawLink = url.toString();
+        console.log(`   Raw parameter link: ${rawLink}`);
+        
+        // Also try the direct link format
+        const directLink = convertToDirectLink(sharedUrl);
+        console.log(`   Converted direct link: ${directLink}`);
+        
+        // Return the raw link as it's more reliable for images
+        return rawLink;
       }
     }
 
@@ -78,10 +100,8 @@ async function getPermanentLink(filePath: string): Promise<string | undefined> {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`❌ Failed to create link: ${response.status} ${errorText}`);
-      
-      // If it's a 409 conflict, try to get existing link
       if (response.status === 409) {
+        // Link already exists, try to get it
         const conflictResponse = await fetch(
           'https://api.dropboxapi.com/2/sharing/list_shared_links',
           {
@@ -103,95 +123,92 @@ async function getPermanentLink(filePath: string): Promise<string | undefined> {
           if (conflictPayload.links && conflictPayload.links.length > 0) {
             const sharedUrl = conflictPayload.links[0].url;
             const directLink = convertToDirectLink(sharedUrl);
-            console.log(`✅ Retrieved existing link after conflict: ${directLink}`);
+            console.log(`✅ Retrieved existing link after conflict`);
             return directLink;
           }
         }
       }
-      
+      console.error(`❌ Failed to create link: ${response.status} ${errorText}`);
       return undefined;
     }
 
     const payload = (await response.json()) as { url: string };
     const directLink = convertToDirectLink(payload.url);
-    console.log(`✅ Created new link: ${directLink}`);
+    console.log(`✅ Created new permanent link`);
     return directLink;
   } catch (error) {
-    console.error(`❌ Error getting permanent link:`, error);
+    console.error(`❌ Error:`, error);
     return undefined;
   }
 }
 
-function convertToDirectLink(sharedUrl: string): string {
-  // Convert Dropbox shared link to direct download link
-  // Handle both formats:
-  // - https://www.dropbox.com/s/abc123/file.jpg?dl=0 -> https://dl.dropboxusercontent.com/s/abc123/file.jpg
-  // - https://www.dropbox.com/scl/fo/abc123/file.jpg -> https://dl.dropboxusercontent.com/scl/fo/abc123/file.jpg
-  
-  // First, try to extract the path after dropbox.com
-  const match = sharedUrl.match(/dropbox\.com\/([^?]+)/);
-  if (match) {
-    const path = match[1];
-    // Remove ?dl=0 or ?dl=1 if present
-    const cleanPath = path.split('?')[0];
-    return `https://dl.dropboxusercontent.com/${cleanPath}`;
-  }
-  
-  // Fallback to original logic
-  let directUrl = sharedUrl
-    .replace(/^https?:\/\/(www\.)?dropbox\.com/, 'https://dl.dropboxusercontent.com')
-    .replace(/\?dl=[01]/, '')
-    .split('?')[0];
-  
-  return directUrl;
-}
-
 async function main() {
-  // Load the library file to get the first album
-  // Script runs from webapp directory, so data is in ./data
-  const libraryPath = join(process.cwd(), 'data', 'library.generated.json');
+  // Load the library file
+  const libraryPath = 'data/library.generated.json';
   const libraryContent = await readFile(libraryPath, 'utf-8');
   const library = JSON.parse(libraryContent);
   
-  // Get first album (sorted by title)
+  // Get the first album (sorted by title)
   const firstAlbum = library.albums.sort((a: any, b: any) => 
     a.title.localeCompare(b.title)
   )[0];
   
-  console.log(`\n🎵 First Album: ${firstAlbum.title}`);
-  console.log(`📁 Cover Path: ${firstAlbum.coverUrl}`);
-  console.log(`\n🔄 Converting Dropbox path to HTTP URL...\n`);
+  console.log('🎵 First Album:');
+  console.log(`   Title: ${firstAlbum.title}`);
+  console.log(`   Cover Path: ${firstAlbum.coverUrl}`);
+  console.log('');
   
   if (!firstAlbum.coverUrl) {
     console.error('❌ No cover URL found for this album');
     process.exit(1);
   }
   
-  const httpUrl = await getPermanentLink(firstAlbum.coverUrl);
+  console.log('🔗 Getting permanent link for cover art...');
+  const coverUrl = await getPermanentLink(firstAlbum.coverUrl);
   
-  if (httpUrl) {
-    console.log(`\n✅ SUCCESS! Cover art HTTP URL:`);
-    console.log(`\n${httpUrl}\n`);
-    console.log(`📸 You can view this image in your browser or use it in the app.\n`);
+  if (coverUrl) {
+    console.log('');
+    console.log('✅ Cover Art URL:');
+    console.log(`   ${coverUrl}`);
     
-    // Save to file for easy access
-    const output = {
-      album: firstAlbum.title,
-      dropboxPath: firstAlbum.coverUrl,
-      httpUrl: httpUrl,
-    };
-    
-    const fs = await import('node:fs/promises');
-    await fs.writeFile(
-      join(process.cwd(), 'cover-art-test.json'),
-      JSON.stringify(output, null, 2)
+    // Also try getting the raw shared link
+    const response = await fetch(
+      'https://api.dropboxapi.com/2/sharing/list_shared_links',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${DROPBOX_TOKEN}`,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          path: firstAlbum.coverUrl,
+          direct_only: false 
+        }),
+      },
     );
-    console.log(`💾 Saved to: cover-art-test.json\n`);
+    
+    if (response.ok) {
+      const listPayload = (await response.json()) as { 
+        links: Array<{ url: string }> 
+      };
+      if (listPayload.links && listPayload.links.length > 0) {
+        const sharedUrl = listPayload.links[0].url;
+        const rawLink = sharedUrl.replace(/\?dl=[01]/, '') + '?raw=1';
+        console.log('');
+        console.log('🖼️  Alternative URLs to try:');
+        console.log(`   Direct link: ${coverUrl}`);
+        console.log(`   Raw parameter: ${rawLink}`);
+        console.log(`   Original shared: ${sharedUrl}`);
+        console.log('');
+        console.log('📋 HTML to display (try both):');
+        console.log(`   <img src="${coverUrl}" alt="${firstAlbum.title}" />`);
+        console.log(`   <img src="${rawLink}" alt="${firstAlbum.title}" />`);
+      }
+    }
   } else {
-    console.error('\n❌ Failed to get HTTP URL for cover art');
+    console.error('❌ Failed to get cover art URL');
     process.exit(1);
   }
 }
 
 main().catch(console.error);
-
