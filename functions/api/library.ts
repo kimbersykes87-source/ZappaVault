@@ -127,9 +127,28 @@ async function getPermanentLink(
 
 function convertToDirectLink(sharedUrl: string): string {
   // Convert Dropbox shared link to direct download link
-  // https://www.dropbox.com/s/abc123/file.jpg?dl=0
-  // -> https://dl.dropboxusercontent.com/s/abc123/file.jpg
-  // Also handles dropbox.com (without www)
+  // Handles two formats:
+  // 1. Regular links: https://www.dropbox.com/s/abc123/file.jpg?dl=0
+  //    -> https://dl.dropboxusercontent.com/s/abc123/file.jpg
+  // 2. scl/fo links: https://www.dropbox.com/scl/fo/abc123/file.jpg?rlkey=xyz&dl=0
+  //    -> https://www.dropbox.com/scl/fo/abc123/file.jpg?rlkey=xyz&raw=1
+  
+  // Check if it's an scl/fo link (newer Dropbox format)
+  if (sharedUrl.includes('scl/fo/')) {
+    // For scl/fo links, use the shared link with ?raw=1 instead of converting
+    // Preserve the rlkey parameter and replace dl=0/1 with raw=1
+    try {
+      const url = new URL(sharedUrl);
+      url.searchParams.delete('dl');
+      url.searchParams.set('raw', '1');
+      return url.toString();
+    } catch {
+      // If URL parsing fails, try string replacement
+      return sharedUrl.replace(/\?dl=[01]/, '').split('?')[0] + '?raw=1';
+    }
+  }
+  
+  // For regular links, convert to direct download link
   let directUrl = sharedUrl
     .replace(/^https?:\/\/(www\.)?dropbox\.com/, 'https://dl.dropboxusercontent.com')
     .replace(/\?dl=[01]/, '')
