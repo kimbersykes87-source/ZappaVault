@@ -680,12 +680,17 @@ async function attachSignedLinks(
   
   // Process streaming links first (critical) - in parallel batches to avoid timeout
   // Duration extraction can happen in parallel but is non-blocking
-  const CONCURRENT_LINKS = 5; // Process 5 links at a time
+  // Use larger batch size for albums with many tracks (e.g., The Roxy Performances has 84 tracks)
+  // Cloudflare Workers timeout is ~30-50 seconds, so we need to be efficient
+  const CONCURRENT_LINKS = Math.min(10, Math.max(5, Math.ceil(album.tracks.length / 10))); // Scale with album size, max 10
+  console.log(`[LINK DEBUG] Processing ${album.tracks.length} tracks in batches of ${CONCURRENT_LINKS}`);
+  
   const trackResults: Array<{ track: typeof album.tracks[0]; link: string | undefined; durationMs: number; error?: string }> = [];
   
   // Process tracks in batches for links (critical path)
   for (let i = 0; i < album.tracks.length; i += CONCURRENT_LINKS) {
     const batch = album.tracks.slice(i, i + CONCURRENT_LINKS);
+    console.log(`[LINK DEBUG] Processing batch ${Math.floor(i / CONCURRENT_LINKS) + 1}/${Math.ceil(album.tracks.length / CONCURRENT_LINKS)} (tracks ${i + 1}-${Math.min(i + CONCURRENT_LINKS, album.tracks.length)})`);
     
     const linkPromises = batch.map(async (track) => {
       const dropboxFilePath = convertToDropboxPath(track.filePath);
@@ -709,33 +714,52 @@ async function attachSignedLinks(
     trackResults.push(...linkResults);
   }
   
+  console.log(`[LINK DEBUG] Completed link generation for all ${trackResults.length} tracks`);
+  
   // Extract durations in parallel (non-blocking, can fail gracefully)
   // Only extract if duration is 0 and we have a link (so we know the file is accessible)
-  const durationPromises = trackResults.map(async (result) => {
+  // Process in smaller batches to avoid overwhelming the API
+  const CONCURRENT_DURATIONS = 5; // Smaller batch for duration extraction (more API calls per track)
+  const tracksNeedingDuration = trackResults.filter(r => r.track.durationMs === 0 && r.link);
+  
+  console.log(`[DURATION] Extracting durations for ${tracksNeedingDuration.length} tracks (${trackResults.length - tracksNeedingDuration.length} already have durations)`);
+  
+  const durationMap = new Map<string, number>();
+  
+  // Process duration extraction in batches
+  for (let i = 0; i < tracksNeedingDuration.length; i += CONCURRENT_DURATIONS) {
+    const batch = tracksNeedingDuration.slice(i, i + CONCURRENT_DURATIONS);
+    
+    const durationPromises = batch.map(async (result) => {
+      try {
+        const dropboxFilePath = convertToDropboxPath(result.track.filePath);
+        console.log(`[DURATION] Extracting duration for: ${result.track.title}`);
+        const durationMs = await extractDurationFromDropboxFile(dropboxFilePath, env);
+        if (durationMs > 0) {
+          console.log(`[DURATION] Extracted ${Math.round(durationMs / 1000)}s from ${result.track.title}`);
+        }
+        return { trackId: result.track.id, durationMs };
+      } catch (error) {
+        console.warn(`[DURATION] Failed to extract duration for ${result.track.title}:`, error);
+        return { trackId: result.track.id, durationMs: 0 };
+      }
+    });
+    
+    const durationResults = await Promise.allSettled(durationPromises);
+    durationResults.forEach((result) => {
+      if (result.status === 'fulfilled') {
+        durationMap.set(result.value.trackId, result.value.durationMs);
+      }
+    });
+  }
+  
+  // Combine durations with track results
+  const durations = trackResults.map((result) => {
     if (result.track.durationMs > 0) {
       return result.track.durationMs; // Use existing duration
     }
-    
-    if (!result.link) {
-      return 0; // Can't extract duration if we don't have a link
-    }
-    
-    try {
-      const dropboxFilePath = convertToDropboxPath(result.track.filePath);
-      console.log(`[DURATION] Extracting duration for: ${result.track.title}`);
-      const durationMs = await extractDurationFromDropboxFile(dropboxFilePath, env);
-      if (durationMs > 0) {
-        console.log(`[DURATION] Extracted ${Math.round(durationMs / 1000)}s from ${result.track.title}`);
-      }
-      return durationMs;
-    } catch (error) {
-      console.warn(`[DURATION] Failed to extract duration for ${result.track.title}:`, error);
-      return 0; // Fail gracefully
-    }
+    return durationMap.get(result.track.id) || 0; // Use extracted duration or 0
   });
-  
-  // Wait for all duration extractions (with timeout protection)
-  const durations = await Promise.allSettled(durationPromises);
   
   // Combine results
   const finalResults = trackResults.map((result, index) => {
