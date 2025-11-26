@@ -18,24 +18,38 @@ async function loadTrackDurations(request: Request): Promise<Map<string, number>
   }
   
   try {
-    // Fetch from the deployed static file
+    // Fetch from the deployed static file using the absolute URL
     // The file is at webapp/data/track_durations.json, which becomes /data/track_durations.json when deployed
     const url = new URL('/data/track_durations.json', request.url);
-    const response = await fetch(url);
+    console.log(`[DURATION] Attempting to fetch from: ${url.toString()}`);
+    
+    const response = await fetch(url, {
+      // Add cache headers to avoid re-fetching
+      cache: 'default',
+    });
+    
+    console.log(`[DURATION] Fetch response status: ${response.status} ${response.statusText}`);
     
     if (response.ok) {
       const durations = await response.json() as Record<string, number>;
       trackDurationsCache = new Map(Object.entries(durations));
-      console.log(`[DURATION] ✅ Loaded ${trackDurationsCache.size / 2} track durations from JSON`);
+      const uniqueCount = trackDurationsCache.size / 2; // We store both original and lowercase
+      console.log(`[DURATION] ✅ Loaded ${uniqueCount} track durations from JSON`);
       return trackDurationsCache;
     } else {
+      const errorText = await response.text().catch(() => 'Unable to read error');
       console.warn(`[DURATION] ⚠️  Failed to load track_durations.json: ${response.status} ${response.statusText}`);
+      console.warn(`[DURATION] Error details: ${errorText.substring(0, 200)}`);
     }
   } catch (error) {
     console.warn(`[DURATION] ⚠️  Error loading track durations:`, error instanceof Error ? error.message : String(error));
+    if (error instanceof Error && error.stack) {
+      console.warn(`[DURATION] Stack: ${error.stack.substring(0, 300)}`);
+    }
   }
   
   // Return empty map as fallback
+  console.warn(`[DURATION] ⚠️  Returning empty duration map - durations will default to 0`);
   trackDurationsCache = new Map();
   return trackDurationsCache;
 }
@@ -829,6 +843,11 @@ async function attachSignedLinks(
         result.durationMs = dbDuration;
         dbDurationCount++;
         console.log(`[DURATION] ✅ Found in database: ${result.track.title} (${Math.round(dbDuration / 1000)}s)`);
+      } else {
+        // Debug: log when we can't find a duration
+        console.log(`[DURATION] ⚠️  No duration found for: ${result.track.title}`);
+        console.log(`[DURATION]    Looking for path: ${dropboxFilePath}`);
+        console.log(`[DURATION]    Database has ${dbDurations.size / 2} entries`);
       }
     }
   });
