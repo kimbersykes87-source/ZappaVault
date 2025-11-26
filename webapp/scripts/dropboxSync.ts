@@ -382,6 +382,20 @@ async function loadMetadataDatabase(): Promise<MetadataDatabase | null> {
   }
 }
 
+function normalizeForMatching(text: string): string {
+  // Normalize text for better matching by:
+  // 1. Converting to lowercase
+  // 2. Removing special Unicode characters that might cause issues
+  // 3. Normalizing whitespace
+  return text
+    .toLowerCase()
+    .normalize('NFD') // Decompose characters (e.g., ä -> a + ̈)
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+    .replace(/[：／]/g, ' ') // Replace special Unicode punctuation with space
+    .replace(/\s+/g, ' ') // Normalize whitespace
+    .trim();
+}
+
 function matchAlbumMetadata(
   albumName: string,
   albumPath: string,
@@ -391,26 +405,43 @@ function matchAlbumMetadata(
     return undefined;
   }
 
-  // Try exact match first
+  const normalizedAlbumName = normalizeForMatching(albumName);
+  const normalizedPath = normalizeForMatching(albumPath);
+
+  // Try exact match first (case-insensitive)
   let match = metadataDb.albums.find(
-    (meta) => meta.match.toLowerCase() === albumName.toLowerCase(),
+    (meta) => normalizeForMatching(meta.match) === normalizedAlbumName,
   );
 
-  // Try partial match (contains)
+  // Try partial match (contains) - check if metadata match is contained in album name
   if (!match) {
-    match = metadataDb.albums.find(
-      (meta) =>
-        albumName.toLowerCase().includes(meta.match.toLowerCase()) ||
-        meta.match.toLowerCase().includes(albumName.toLowerCase()),
-    );
+    match = metadataDb.albums.find((meta) => {
+      const normalizedMatch = normalizeForMatching(meta.match);
+      return normalizedAlbumName.includes(normalizedMatch) ||
+             normalizedMatch.includes(normalizedAlbumName);
+    });
   }
 
   // Try path-based match
   if (!match) {
-    const pathLower = albumPath.toLowerCase();
-    match = metadataDb.albums.find((meta) =>
-      pathLower.includes(meta.match.toLowerCase()),
-    );
+    match = metadataDb.albums.find((meta) => {
+      const normalizedMatch = normalizeForMatching(meta.match);
+      return normalizedPath.includes(normalizedMatch) ||
+             normalizedMatch.includes(normalizedPath);
+    });
+  }
+
+  // Special handling for albums with special characters
+  // Try matching just the base name (before special characters)
+  if (!match) {
+    // Extract base name (e.g., "Zappa '75" from "Zappa '75： Zagreb／Ljubljana")
+    const baseNameMatch = albumName.match(/^([^：／]+)/);
+    if (baseNameMatch) {
+      const baseName = normalizeForMatching(baseNameMatch[1].trim());
+      match = metadataDb.albums.find(
+        (meta) => normalizeForMatching(meta.match) === baseName,
+      );
+    }
   }
 
   return match;
