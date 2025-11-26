@@ -425,37 +425,37 @@ async function attachSignedLinks(
     }),
   );
 
-  // Generate cover URL - convert Dropbox path to HTTP URL if needed
+  // Generate static cover URL (same logic as library endpoint)
+  // Static covers are served from /covers/ directory in Cloudflare Pages
   let coverUrl = album.coverUrl;
   if (coverUrl && coverUrl.startsWith('http')) {
-    // Already an HTTP URL, keep it
+    // Already an HTTP URL (Dropbox link), keep it as fallback
     console.log(`[LINK DEBUG] Cover URL already HTTP: ${coverUrl}`);
-  } else if (coverUrl && coverUrl.startsWith('/')) {
-    // Cover URL is a Dropbox path, convert it to a permanent link
-    console.log(`[LINK DEBUG] Converting cover path to HTTP URL: ${coverUrl}`);
-    const coverLink = await getPermanentLink(env, coverUrl, errors);
-    if (coverLink) {
-      console.log(`[LINK DEBUG] ✅ Converted cover to HTTP URL: ${coverLink}`);
-      coverUrl = coverLink;
-    } else {
-      console.log(`[LINK DEBUG] ❌ Failed to convert cover path to HTTP URL: ${coverUrl}`);
-      // Try finding cover art as fallback
-      const foundCover = await findCoverArt(env, album);
-      if (foundCover) {
-        console.log(`[LINK DEBUG] ✅ Found cover art via search: ${foundCover}`);
-        coverUrl = foundCover;
+  } else {
+    // Use static URL from /covers/ directory
+    // Extract extension from original coverUrl if it exists
+    let extension = '.jpg'; // default
+    if (coverUrl && coverUrl.startsWith('/')) {
+      // Extract extension from path like "/Apps/.../file.jpg" or "/Apps/.../file.png"
+      const match = coverUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+      if (match) {
+        extension = `.${match[1].toLowerCase()}`;
+        // Normalize .jpeg to .jpg for consistency
+        if (extension === '.jpeg') {
+          extension = '.jpg';
+        }
       }
     }
-  } else if (!coverUrl) {
-    // No cover URL, try to find it
-    console.log(`[LINK DEBUG] Finding cover art for: ${album.title}`);
-    const foundCover = await findCoverArt(env, album);
-    if (foundCover) {
-      console.log(`[LINK DEBUG] ✅ Found cover art: ${foundCover}`);
-      coverUrl = foundCover;
-    } else {
-      console.log(`[LINK DEBUG] ❌ No cover art found for: ${album.title}`);
+    
+    // Special case: quAUDIOPHILIAc - the copy script used cover.png from Cover folder
+    // but library data says 1 DVD-Front.jpg. Try .png first for this album.
+    if (album.id === 'apps-zappavault-zappalibrary-quaudiophiliac') {
+      extension = '.png';
     }
+    
+    // Use static URL with the correct extension
+    coverUrl = `/covers/${album.id}${extension}`;
+    console.log(`[LINK DEBUG] Using static cover URL: ${coverUrl}`);
   }
 
   const tracksWithLinks = updatedTracks.filter(t => t.streamingUrl).length;

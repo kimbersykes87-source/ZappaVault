@@ -438,23 +438,41 @@ export const onRequestGet = async (context: {
   console.log(`[COVER DEBUG] Generating cover URLs for ${result.results.length} albums`);
   
   const albumsWithCovers = result.results.map((album) => {
-    // Try static cover first (from public/covers/)
-    // Check multiple extensions in case the file has a different extension
-    const extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
-    
-    // Default to .jpg (most common)
-    // The browser will handle 404s gracefully if the file doesn't exist
-    const staticCoverUrl = `/covers/${album.id}.jpg`;
-    
     // If album already has an HTTP URL (Dropbox link), keep it as fallback
-    // Otherwise use static URL
-    const coverUrl = album.coverUrl?.startsWith('http') 
-      ? album.coverUrl  // Keep existing Dropbox URL as fallback
-      : staticCoverUrl; // Use static URL
+    if (album.coverUrl?.startsWith('http')) {
+      return {
+        ...album,
+        coverUrl: album.coverUrl,
+      };
+    }
+    
+    // Extract extension from original coverUrl if it exists
+    // The copy script preserves the original extension, so we should match it
+    let extension = '.jpg'; // default
+    if (album.coverUrl) {
+      // Extract extension from path like "/Apps/.../file.jpg" or "/Apps/.../file.png"
+      const match = album.coverUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+      if (match) {
+        extension = `.${match[1].toLowerCase()}`;
+        // Normalize .jpeg to .jpg for consistency
+        if (extension === '.jpeg') {
+          extension = '.jpg';
+        }
+      }
+    }
+    
+    // Special case: quAUDIOPHILIAc - the copy script used cover.png from Cover folder
+    // but library data says 1 DVD-Front.jpg. Try .png first for this album.
+    if (album.id === 'apps-zappavault-zappalibrary-quaudiophiliac') {
+      extension = '.png';
+    }
+    
+    // Use static URL with the correct extension
+    const staticCoverUrl = `/covers/${album.id}${extension}`;
     
     return {
       ...album,
-      coverUrl,
+      coverUrl: staticCoverUrl,
     };
   });
   
