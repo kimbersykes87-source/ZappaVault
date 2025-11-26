@@ -743,40 +743,62 @@ async function attachSignedLinks(
   
   // Extract durations in parallel (non-blocking, can fail gracefully)
   // Only extract if duration is 0 and we have a link (so we know the file is accessible)
-  // Process in smaller batches to avoid overwhelming the API
-  const CONCURRENT_DURATIONS = 5; // Smaller batch for duration extraction (more API calls per track)
+  // Process in larger batches to be more efficient - duration extraction is fast (just header reads)
+  const CONCURRENT_DURATIONS = Math.min(10, Math.max(5, Math.ceil(trackResults.length / 5))); // Scale with album size, max 10
   const tracksNeedingDuration = trackResults.filter(r => r.track.durationMs === 0 && r.link);
   
-  console.log(`[DURATION] Extracting durations for ${tracksNeedingDuration.length} tracks (${trackResults.length - tracksNeedingDuration.length} already have durations)`);
+  console.log(`[DURATION] Extracting durations for ${tracksNeedingDuration.length} tracks (${trackResults.length - tracksNeedingDuration.length} already have durations) in batches of ${CONCURRENT_DURATIONS}`);
   
   const durationMap = new Map<string, number>();
   
-  // Process duration extraction in batches
+  // Process duration extraction in batches with better error handling
   for (let i = 0; i < tracksNeedingDuration.length; i += CONCURRENT_DURATIONS) {
     const batch = tracksNeedingDuration.slice(i, i + CONCURRENT_DURATIONS);
+    const batchNum = Math.floor(i / CONCURRENT_DURATIONS) + 1;
+    const totalBatches = Math.ceil(tracksNeedingDuration.length / CONCURRENT_DURATIONS);
     
-    const durationPromises = batch.map(async (result) => {
-      try {
-        const dropboxFilePath = convertToDropboxPath(result.track.filePath);
-        console.log(`[DURATION] Extracting duration for: ${result.track.title}`);
-        const durationMs = await extractDurationFromDropboxFile(dropboxFilePath, env);
-        if (durationMs > 0) {
-          console.log(`[DURATION] Extracted ${Math.round(durationMs / 1000)}s from ${result.track.title}`);
+    try {
+      console.log(`[DURATION] Processing duration batch ${batchNum}/${totalBatches} (${batch.length} tracks)`);
+      
+      const durationPromises = batch.map(async (result) => {
+        try {
+          const dropboxFilePath = convertToDropboxPath(result.track.filePath);
+          console.log(`[DURATION] Extracting duration for: ${result.track.title}`);
+          const durationMs = await extractDurationFromDropboxFile(dropboxFilePath, env);
+          if (durationMs > 0) {
+            console.log(`[DURATION] ✅ Extracted ${Math.round(durationMs / 1000)}s from ${result.track.title}`);
+          } else {
+            console.log(`[DURATION] ⚠️ No duration extracted for ${result.track.title} (returned 0)`);
+          }
+          return { trackId: result.track.id, durationMs };
+        } catch (error) {
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          console.warn(`[DURATION] ❌ Failed to extract duration for ${result.track.title}: ${errorMsg}`);
+          return { trackId: result.track.id, durationMs: 0 };
         }
-        return { trackId: result.track.id, durationMs };
-      } catch (error) {
-        console.warn(`[DURATION] Failed to extract duration for ${result.track.title}:`, error);
-        return { trackId: result.track.id, durationMs: 0 };
-      }
-    });
-    
-    const durationResults = await Promise.allSettled(durationPromises);
-    durationResults.forEach((result) => {
-      if (result.status === 'fulfilled') {
-        durationMap.set(result.value.trackId, result.value.durationMs);
-      }
-    });
+      });
+      
+      const durationResults = await Promise.allSettled(durationPromises);
+      let successCount = 0;
+      durationResults.forEach((result) => {
+        if (result.status === 'fulfilled') {
+          durationMap.set(result.value.trackId, result.value.durationMs);
+          if (result.value.durationMs > 0) {
+            successCount++;
+          }
+        } else {
+          console.error(`[DURATION] Promise rejected unexpectedly:`, result.reason);
+        }
+      });
+      
+      console.log(`[DURATION] Completed batch ${batchNum}/${totalBatches} (${successCount}/${batch.length} extracted durations > 0)`);
+    } catch (error) {
+      console.error(`[DURATION] Batch ${batchNum} failed completely:`, error);
+      // Continue to next batch even if this one fails
+    }
   }
+  
+  console.log(`[DURATION] Duration extraction complete. Extracted ${durationMap.size} durations, ${Array.from(durationMap.values()).filter(d => d > 0).length} > 0`);
   
   // Combine durations with track results
   const finalResults = trackResults.map((result) => {
