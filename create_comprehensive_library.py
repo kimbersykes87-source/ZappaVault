@@ -48,15 +48,16 @@ def load_durations_from_db(db_path):
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        # Get all tracks with their file paths and durations
+        # Get all tracks with their file paths and durations (convert seconds to milliseconds)
         cursor.execute("""
-            SELECT file_path, duration_ms
+            SELECT file_path, duration_seconds
             FROM tracks
-            WHERE duration_ms > 0
+            WHERE duration_seconds > 0
         """)
         
         for row in cursor.fetchall():
-            file_path, duration_ms = row
+            file_path, duration_seconds = row
+            duration_ms = int(duration_seconds * 1000)  # Convert seconds to milliseconds
             # Normalize path for lookup
             normalized = normalize_path_for_lookup(file_path)
             durations[normalized] = duration_ms
@@ -64,10 +65,10 @@ def load_durations_from_db(db_path):
             durations[normalized.lower()] = duration_ms
         
         conn.close()
-        print(f"✅ Loaded {len(durations) // 2} unique track durations from database")
+        print(f"SUCCESS: Loaded {len(durations) // 2} unique track durations from database")
         return durations
     except Exception as e:
-        print(f"❌ Error loading durations from database: {e}")
+        print(f"ERROR: Error loading durations from database: {e}")
         return durations
 
 def get_duration_for_track(track, durations):
@@ -100,14 +101,14 @@ def get_duration_for_track(track, durations):
 
 def create_comprehensive_library(library_path, db_path, output_path):
     """Create comprehensive library file with all metadata including durations"""
-    print(f"📖 Loading library from: {library_path}")
+    print(f"Loading library from: {library_path}")
     with open(library_path, 'r', encoding='utf-8') as f:
         library = json.load(f)
     
-    print(f"📊 Loading durations from: {db_path}")
+    print(f"Loading durations from: {db_path}")
     durations = load_durations_from_db(db_path)
     
-    print(f"🔄 Merging durations into library...")
+    print(f"Merging durations into library...")
     updated_count = 0
     total_tracks = 0
     
@@ -122,13 +123,13 @@ def create_comprehensive_library(library_path, db_path, output_path):
                 if old_duration == 0:
                     updated_count += 1
     
-    print(f"✅ Updated {updated_count} tracks with durations (out of {total_tracks} total)")
+    print(f"SUCCESS: Updated {updated_count} tracks with durations (out of {total_tracks} total)")
     
     # Update metadata
     library['generatedAt'] = __import__('datetime').datetime.utcnow().isoformat() + 'Z'
     library['hasDurations'] = updated_count > 0
     
-    print(f"💾 Writing comprehensive library to: {output_path}")
+    print(f"Writing comprehensive library to: {output_path}")
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(library, f, indent=2, ensure_ascii=False)
     
@@ -137,7 +138,7 @@ def create_comprehensive_library(library_path, db_path, output_path):
         sum(1 for track in album.get('tracks', []) if track.get('durationMs', 0) > 0)
         for album in library.get('albums', [])
     )
-    print(f"✅ Comprehensive library created: {tracks_with_durations}/{total_tracks} tracks have durations")
+    print(f"SUCCESS: Comprehensive library created: {tracks_with_durations}/{total_tracks} tracks have durations")
     
     return library
 
