@@ -40,7 +40,9 @@ async function getPermanentLink(
       if (listPayload.links && listPayload.links.length > 0) {
         // Convert shared link to direct download link
         const sharedUrl = listPayload.links[0].url;
-        const directLink = convertToDirectLink(sharedUrl);
+        // Determine if this is an image based on file extension
+        const isImage = /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(filePath);
+        const directLink = convertToDirectLink(sharedUrl, isImage);
         console.log(`[LINK DEBUG] Found existing link for ${filePath}: ${directLink}`);
         return directLink;
       } else {
@@ -111,7 +113,9 @@ async function getPermanentLink(
           };
           if (conflictPayload.links && conflictPayload.links.length > 0) {
             const sharedUrl = conflictPayload.links[0].url;
-            const directLink = convertToDirectLink(sharedUrl);
+            // Determine if this is an image based on file extension
+            const isImage = /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(filePath);
+            const directLink = convertToDirectLink(sharedUrl, isImage);
             console.log(`[LINK DEBUG] Retrieved existing link after conflict: ${directLink}`);
             return directLink;
           }
@@ -141,7 +145,9 @@ async function getPermanentLink(
 
     const payload = (await response.json()) as { url: string };
     // Convert shared link to direct download link
-    const directLink = convertToDirectLink(payload.url);
+    // Determine if this is an image based on file extension
+    const isImage = /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(filePath);
+    const directLink = convertToDirectLink(payload.url, isImage);
     console.log(`[LINK DEBUG] Created new link for ${filePath}: ${directLink}`);
     return directLink;
   } catch (error) {
@@ -150,26 +156,37 @@ async function getPermanentLink(
   }
 }
 
-function convertToDirectLink(sharedUrl: string): string {
+function convertToDirectLink(sharedUrl: string, isImage = false): string {
   // Convert Dropbox shared link to direct download link
   // Handles two formats:
   // 1. Regular links: https://www.dropbox.com/s/abc123/file.jpg?dl=0
   //    -> https://dl.dropboxusercontent.com/s/abc123/file.jpg
   // 2. scl/fo links: https://www.dropbox.com/scl/fo/abc123/file.jpg?rlkey=xyz&dl=0
-  //    -> https://www.dropbox.com/scl/fo/abc123/file.jpg?rlkey=xyz&raw=1
+  //    -> For images: https://www.dropbox.com/scl/fo/abc123/file.jpg?rlkey=xyz&raw=1
+  //    -> For audio: https://www.dropbox.com/scl/fo/abc123/file.jpg?rlkey=xyz&dl=1
   
   // Check if it's an scl/fo link (newer Dropbox format)
   if (sharedUrl.includes('scl/fo/')) {
-    // For scl/fo links, use the shared link with ?raw=1 instead of converting
-    // Preserve the rlkey parameter and replace dl=0/1 with raw=1
+    // For scl/fo links, preserve the rlkey parameter
+    // Use ?raw=1 for images, ?dl=1 for audio files
     try {
       const url = new URL(sharedUrl);
       url.searchParams.delete('dl');
-      url.searchParams.set('raw', '1');
+      if (isImage) {
+        url.searchParams.set('raw', '1');
+      } else {
+        url.searchParams.set('dl', '1');
+      }
       return url.toString();
     } catch {
       // If URL parsing fails, try string replacement
-      return sharedUrl.replace(/\?dl=[01]/, '').split('?')[0] + '?raw=1';
+      const baseUrl = sharedUrl.split('?')[0];
+      const rlkeyMatch = sharedUrl.match(/[?&]rlkey=([^&]+)/);
+      const rlkey = rlkeyMatch ? rlkeyMatch[1] : '';
+      if (rlkey) {
+        return `${baseUrl}?rlkey=${rlkey}&${isImage ? 'raw=1' : 'dl=1'}`;
+      }
+      return `${baseUrl}?${isImage ? 'raw=1' : 'dl=1'}`;
     }
   }
   
