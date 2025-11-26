@@ -41,14 +41,20 @@ export function AlbumCard({ album, onPlay }: AlbumCardProps) {
             src={album.coverUrl} 
             alt={album.title} 
             loading="lazy"
+            crossOrigin="anonymous"
             onError={(e) => {
               // Hide broken image and show placeholder instead
               const target = e.target as HTMLImageElement;
+              console.error('Cover art failed to load:', album.coverUrl);
+              console.error('Error details:', target.error);
               target.style.display = 'none';
               const placeholder = target.parentElement?.querySelector('.album-cover-placeholder') as HTMLElement;
               if (placeholder) {
                 placeholder.style.display = 'grid';
               }
+            }}
+            onLoad={() => {
+              console.log('Cover art loaded successfully:', album.coverUrl);
             }}
           />
         ) : null}

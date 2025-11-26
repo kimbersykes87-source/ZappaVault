@@ -44,13 +44,28 @@ export function PlayerBar() {
     
     // Set crossOrigin to handle CORS
     audio.crossOrigin = 'anonymous';
+    // Set preload to help with streaming
+    audio.preload = 'auto';
     audio.src = currentTrack.streamingUrl;
     
+    // Load the audio source
+    audio.load();
+    
     if (isPlaying) {
-      void audio.play().catch((err) => {
-        console.error('Audio play failed:', err);
-        console.error('URL:', currentTrack.streamingUrl);
-      });
+      // Use a small delay to ensure the audio element is ready
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.error('Audio play failed:', err);
+          console.error('URL:', currentTrack.streamingUrl);
+          console.error('Error name:', err.name);
+          console.error('Error message:', err.message);
+          // If autoplay was prevented, try to play on user interaction
+          if (err.name === 'NotAllowedError') {
+            console.warn('Autoplay prevented. User interaction required.');
+          }
+        });
+      }
     }
     
     return () => {
