@@ -81,6 +81,15 @@ jobs:
             echo "⚠️  Library file not found - skipping conversion"
           fi
 
+      - name: Upload library with durations to Cloudflare KV
+        working-directory: .
+        run: |
+          if [ -f "webapp/data/library.generated.json" ] && [ -n "$CF_ACCOUNT_ID" ] && [ -n "$CF_KV_NAMESPACE_ID" ] && [ -n "$CLOUDFLARE_API_TOKEN" ]; then
+            node upload_library_to_kv.js webapp/data/library.generated.json
+          else
+            echo "⚠️  Skipping KV upload (missing library file or credentials)"
+          fi
+
       - name: Configure Git
         run: |
           git config --global user.name "github-actions[bot]"
