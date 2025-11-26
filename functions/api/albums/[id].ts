@@ -897,10 +897,25 @@ async function attachSignedLinks(
         console.log(`[DURATION] ✅ Found in database: ${result.track.title} (${Math.round(dbDuration / 1000)}s)`);
       }
     } else if (result.track.durationMs === 0) {
-      // Only log missing durations if they're actually 0 (to reduce noise)
-      // Commented out to reduce log spam - uncomment for debugging
-      // console.log(`[DURATION] ⚠️  No duration found for: ${result.track.title}`);
-      // console.log(`[DURATION]    Looking for path: ${dropboxFilePath}`);
+      // Log first few missing durations for debugging
+      if (dbDurationCount < 5) {
+        console.log(`[DURATION] ⚠️  No duration found for: ${result.track.title}`);
+        console.log(`[DURATION]    Looking for path: ${dropboxFilePath}`);
+        console.log(`[DURATION]    Path length: ${dropboxFilePath.length}, Database entries: ${dbDurations.size / 2}`);
+        // Try to find similar paths
+        const fileName = dropboxFilePath.split('/').pop() || '';
+        let foundSimilar = false;
+        for (const [dbPath] of dbDurations.entries()) {
+          if (dbPath.toLowerCase().includes(fileName.toLowerCase().substring(0, 10))) {
+            console.log(`[DURATION]    Similar path in DB: ${dbPath.substring(0, 100)}`);
+            foundSimilar = true;
+            break;
+          }
+        }
+        if (!foundSimilar) {
+          console.log(`[DURATION]    No similar paths found in database`);
+        }
+      }
     }
   });
   
