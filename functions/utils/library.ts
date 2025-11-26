@@ -107,7 +107,9 @@ export async function loadLibrarySnapshot(
   }
 
   // Second, try KV cache (fastest, but may be stale)
-  // Only use if Function endpoint failed
+  // Only use if static asset fetch failed
+  // Skip KV cache if static asset fetch failed - it might have old data without durations
+  // We want to prioritize the comprehensive library file which always has durations
   if (env.LIBRARY_KV) {
     const cached = await env.LIBRARY_KV.get(LIBRARY_CACHE_KEY, 'json');
     if (cached) {
@@ -117,10 +119,10 @@ export async function loadLibrarySnapshot(
         album.tracks.some(track => track.durationMs > 0)
       );
       if (hasDurations) {
-        console.log(`[LIBRARY] ✅ Loaded library from KV cache: ${cachedSnapshot.albumCount} albums (has durations)`);
+        console.log(`[LIBRARY] Loaded library from KV cache: ${cachedSnapshot.albumCount} albums (has durations)`);
         return cachedSnapshot;
       } else {
-        console.log(`[LIBRARY] ⚠️  KV cache exists but lacks durations, skipping cache`);
+        console.log(`[LIBRARY] KV cache exists but lacks durations, skipping cache to force static asset load`);
       }
     }
   }
