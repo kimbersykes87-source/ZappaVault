@@ -17,18 +17,23 @@ export function LibraryPage() {
     setRequest((prev) => ({ ...prev, q: value, page: 1 }));
   };
 
+  const setLoading = usePlayerStore((state) => state.setLoading);
+  
   const handlePlay = async (albumId: string) => {
     setBusyAlbum(albumId);
+    setLoading(true);
     try {
       const album = await fetchAlbum(albumId, true);
       const playable = album.tracks.filter((track) => track.streamingUrl);
       if (playable.length === 0) {
         alert('Streaming links are not available for this album yet.');
+        setLoading(false);
         return;
       }
       setQueue(playable, album.title, album.coverUrl);
     } catch (err) {
       alert((err as Error).message);
+      setLoading(false);
     } finally {
       setBusyAlbum(null);
     }
@@ -37,11 +42,19 @@ export function LibraryPage() {
   return (
     <div className="library-page">
       <header className="library-header">
-        <div>
-          <p className="meta">Vault size</p>
-          <h2>{total} albums indexed</h2>
-        </div>
         <SearchBar value={request.q ?? ''} onSearch={handleSearch} />
+        <select
+          className="sort-dropdown"
+          value={request.sort ?? 'title'}
+          onChange={(e) => {
+            const sortValue = e.target.value as 'title' | 'year' | 'year-asc';
+            setRequest((prev) => ({ ...prev, sort: sortValue, page: 1 }));
+          }}
+        >
+          <option value="title">Alphabetically (A-Z)</option>
+          <option value="year">Newest to Oldest</option>
+          <option value="year-asc">Oldest to Newest</option>
+        </select>
       </header>
 
       {loading && <LoadingState />}

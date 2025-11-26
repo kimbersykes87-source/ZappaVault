@@ -7,12 +7,14 @@ export function PlayerBar() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentTrack = usePlayerStore(selectCurrentTrack);
   const isPlaying = usePlayerStore((state) => state.isPlaying);
+  const isLoading = usePlayerStore((state) => state.isLoading);
   const nowPlayingAlbum = usePlayerStore((state) => state.nowPlayingAlbum);
   const nowPlayingCoverUrl = usePlayerStore((state) => state.nowPlayingCoverUrl);
   const play = usePlayerStore((state) => state.play);
   const pause = usePlayerStore((state) => state.pause);
   const next = usePlayerStore((state) => state.next);
   const previous = usePlayerStore((state) => state.previous);
+  const setLoading = usePlayerStore((state) => state.setLoading);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -29,19 +31,28 @@ export function PlayerBar() {
         console.error('Audio error message:', error.message);
         console.error('Streaming URL:', currentTrack.streamingUrl);
       }
+      setLoading(false);
     };
     
     const handleCanPlay = () => {
       console.log('Audio can play:', currentTrack.streamingUrl);
+      setLoading(false);
     };
     
     const handleLoadStart = () => {
       console.log('Audio loading started:', currentTrack.streamingUrl);
+      setLoading(true);
+    };
+    
+    const handleLoadedData = () => {
+      console.log('Audio data loaded:', currentTrack.streamingUrl);
+      setLoading(false);
     };
     
     audio.addEventListener('error', handleError);
     audio.addEventListener('canplay', handleCanPlay);
     audio.addEventListener('loadstart', handleLoadStart);
+    audio.addEventListener('loadeddata', handleLoadedData);
     
     // Proxy the URL through our API to avoid CORS issues
     const proxiedUrl = currentTrack.streamingUrl?.startsWith('http') 
@@ -78,8 +89,9 @@ export function PlayerBar() {
       audio.removeEventListener('error', handleError);
       audio.removeEventListener('canplay', handleCanPlay);
       audio.removeEventListener('loadstart', handleLoadStart);
+      audio.removeEventListener('loadeddata', handleLoadedData);
     };
-  }, [currentTrack, isPlaying]);
+  }, [currentTrack, isPlaying, setLoading]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -142,8 +154,10 @@ export function PlayerBar() {
         <button type="button" onClick={previous} title="Previous track">
           ⏮
         </button>
-        <button type="button" onClick={handleToggle} title="Toggle play">
-          {isPlaying ? '⏸' : '▶'}
+        <button type="button" onClick={handleToggle} title="Toggle play" disabled={isLoading}>
+          {isLoading ? (
+            <span className="loading-spinner-small">⟳</span>
+          ) : isPlaying ? '⏸' : '▶'}
         </button>
         <button type="button" onClick={next} title="Next track">
           ⏭

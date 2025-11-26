@@ -76,7 +76,6 @@ export function AlbumCard({ album, onPlay }: AlbumCardProps) {
         <div className="album-metadata">
           <span>{trackCount} tracks</span>
           <span>{album.formats.join(' / ')}</span>
-          <span>{fileSize}</span>
         </div>
       </div>
 

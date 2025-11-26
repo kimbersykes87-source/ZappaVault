@@ -13,15 +13,19 @@
   background: radial-gradient(circle at top, #1f1f32 0%, #050505 55%);
   backdrop-filter: blur(10px);
   padding: 1.5rem 0;
-  margin: 0 -1.5rem 2rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  margin-bottom: 2rem;
+  padding-left: calc(50vw - 50% + 1.5rem);
+  padding-right: calc(50vw - 50% + 1.5rem);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  width: 100vw;
 }
 
 .app-header-brand {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 1rem;
 }
 
@@ -62,8 +66,8 @@
 
 .library-header {
   display: flex;
-  justify-content: space-between;
-  gap: 2rem;
+  justify-content: flex-start;
+  gap: 1rem;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -72,12 +76,38 @@
   flex: 1;
 }
 
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1.2rem;
+  width: 20px;
+  height: 20px;
+  color: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  z-index: 1;
+}
+
 .search-input {
   width: 100%;
+  padding: 0.85rem 1.2rem 0.85rem 3.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sort-dropdown {
   padding: 0.85rem 1.2rem;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.05);
+  color: inherit;
+  cursor: pointer;
+  min-width: 180px;
 }
 
 
@@ -333,6 +363,13 @@ button {
   width: 80px;
   height: 80px;
   animation: spin 2s linear infinite;
+}
+
+.loading-spinner-small {
+  display: inline-block;
+  font-size: 1.2rem;
+  animation: spin 1s linear infinite;
+  line-height: 1;
 }
 
 @keyframes spin {

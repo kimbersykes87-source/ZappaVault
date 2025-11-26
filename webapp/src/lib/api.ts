@@ -12,7 +12,7 @@ export interface LibraryRequest {
   formats?: string[];
   era?: string;
   year?: number;
-  sort?: 'title' | 'year' | 'recent';
+  sort?: 'title' | 'year' | 'year-asc' | 'recent';
   page?: number;
   pageSize?: number;
 }
@@ -162,5 +162,34 @@ export function getTrackDownloadUrl(trackId: string): string {
 
 export function getProxyUrl(targetUrl: string): string {
   return buildUrl('/api/proxy', { url: targetUrl });
+}
+
+/**
+ * Try alternative image extensions if the primary one fails to load
+ * Returns an array of URLs to try in order
+ */
+export function getCoverImageUrls(coverUrl: string | undefined, albumId: string): string[] {
+  if (!coverUrl) {
+    return [];
+  }
+
+  // If it's already an HTTP URL (Dropbox), return as-is
+  if (coverUrl.startsWith('http')) {
+    return [getProxyUrl(coverUrl)];
+  }
+
+  // If it's a static URL, try alternative extensions
+  if (coverUrl.startsWith('/covers/')) {
+    const basePath = `/covers/${albumId}`;
+    const currentExt = coverUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i)?.[1]?.toLowerCase() || 'jpg';
+    
+    // Try current extension first, then alternatives
+    const extensions = [currentExt, 'jpg', 'jpeg', 'png', 'gif', 'webp'];
+    const uniqueExtensions = [...new Set(extensions)]; // Remove duplicates
+    
+    return uniqueExtensions.map(ext => `${basePath}.${ext}`);
+  }
+
+  return [coverUrl];
 }
 

@@ -43,7 +43,7 @@ export interface LibraryQuery {
   formats?: AudioFormat[];
   era?: string;
   year?: number;
-  sort?: 'title' | 'year' | 'recent';
+  sort?: 'title' | 'year' | 'year-asc' | 'recent';
   page?: number;
   pageSize?: number;
 }
@@ -125,6 +125,8 @@ export function applyLibraryQuery(
     switch (sort) {
       case 'year':
         return (b.year ?? 0) - (a.year ?? 0);
+      case 'year-asc':
+        return (a.year ?? 0) - (b.year ?? 0);
       case 'recent':
         return (
           Date.parse(b.lastSyncedAt ?? '1970-01-01') -
