@@ -1,9 +1,8 @@
 import type { EnvBindings } from '../../utils/library.ts';
 import type { LibrarySnapshot } from '../../shared/library.ts';
 
-// Import the JSON file directly from the functions/data directory
-// This is the most reliable way to serve it in Cloudflare Workers
-import libraryData from '../data/library.generated.json';
+// Import the library data from TypeScript file (more reliable than JSON import in CF Workers)
+import { libraryData } from '../data/library.generated.ts';
 
 /**
  * Serve library.generated.json file
