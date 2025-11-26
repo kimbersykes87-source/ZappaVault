@@ -191,6 +191,7 @@ function convertToDirectLink(sharedUrl: string, isImage = false): string {
   }
   
   // For regular links, convert to direct download link
+  // For audio files, we need to ensure the URL works with HTML5 audio
   let directUrl = sharedUrl
     .replace(/^https?:\/\/(www\.)?dropbox\.com/, 'https://dl.dropboxusercontent.com')
     .replace(/\?dl=[01]/, '')
@@ -203,6 +204,14 @@ function convertToDirectLink(sharedUrl: string, isImage = false): string {
     if (match) {
       directUrl = `https://dl.dropboxusercontent.com/${match[1]}`;
     }
+  }
+  
+  // For audio files (not images), ensure we're using the direct download format
+  // HTML5 audio elements need direct download URLs, not shared links
+  if (!isImage) {
+    // Make sure it's a direct download URL (dl.dropboxusercontent.com)
+    // This format works better for streaming audio
+    return directUrl;
   }
   
   return directUrl;

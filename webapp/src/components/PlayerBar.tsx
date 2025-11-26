@@ -18,10 +18,46 @@ export function PlayerBar() {
     if (!audio || !currentTrack?.streamingUrl) {
       return;
     }
+    
+    // Set up error handling for audio loading
+    const handleError = (e: Event) => {
+      console.error('Audio playback error:', e);
+      const error = (e.target as HTMLAudioElement)?.error;
+      if (error) {
+        console.error('Audio error code:', error.code);
+        console.error('Audio error message:', error.message);
+        console.error('Streaming URL:', currentTrack.streamingUrl);
+      }
+    };
+    
+    const handleCanPlay = () => {
+      console.log('Audio can play:', currentTrack.streamingUrl);
+    };
+    
+    const handleLoadStart = () => {
+      console.log('Audio loading started:', currentTrack.streamingUrl);
+    };
+    
+    audio.addEventListener('error', handleError);
+    audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('loadstart', handleLoadStart);
+    
+    // Set crossOrigin to handle CORS
+    audio.crossOrigin = 'anonymous';
     audio.src = currentTrack.streamingUrl;
+    
     if (isPlaying) {
-      void audio.play().catch(() => undefined);
+      void audio.play().catch((err) => {
+        console.error('Audio play failed:', err);
+        console.error('URL:', currentTrack.streamingUrl);
+      });
     }
+    
+    return () => {
+      audio.removeEventListener('error', handleError);
+      audio.removeEventListener('canplay', handleCanPlay);
+      audio.removeEventListener('loadstart', handleLoadStart);
+    };
   }, [currentTrack, isPlaying]);
 
   useEffect(() => {
