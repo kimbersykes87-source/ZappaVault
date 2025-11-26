@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { selectCurrentTrack, usePlayerStore } from '../store/player.ts';
 import { formatDuration } from '../utils/format.ts';
+import { getProxyUrl } from '../lib/api.ts';
 
 export function PlayerBar() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -42,11 +43,16 @@ export function PlayerBar() {
     audio.addEventListener('canplay', handleCanPlay);
     audio.addEventListener('loadstart', handleLoadStart);
     
-    // Set crossOrigin to handle CORS
+    // Proxy the URL through our API to avoid CORS issues
+    const proxiedUrl = currentTrack.streamingUrl?.startsWith('http') 
+      ? getProxyUrl(currentTrack.streamingUrl)
+      : currentTrack.streamingUrl;
+    
+    // Set crossOrigin to handle CORS (for proxied content)
     audio.crossOrigin = 'anonymous';
     // Set preload to help with streaming
     audio.preload = 'auto';
-    audio.src = currentTrack.streamingUrl;
+    audio.src = proxiedUrl;
     
     // Load the audio source
     audio.load();
@@ -121,7 +127,10 @@ export function PlayerBar() {
       <audio ref={audioRef} hidden />
       {nowPlayingCoverUrl && (
         <div className="player-cover">
-          <img src={nowPlayingCoverUrl} alt={nowPlayingAlbum ?? 'Album cover'} />
+          <img 
+            src={nowPlayingCoverUrl.startsWith('http') ? getProxyUrl(nowPlayingCoverUrl) : nowPlayingCoverUrl} 
+            alt={nowPlayingAlbum ?? 'Album cover'} 
+          />
         </div>
       )}
       <div className="player-track">

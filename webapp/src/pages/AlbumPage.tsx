@@ -3,7 +3,7 @@ import { useAlbum } from '../hooks/useAlbum.ts';
 import { LoadingState } from '../components/LoadingState.tsx';
 import { ErrorState } from '../components/ErrorState.tsx';
 import { formatDuration, formatFileSize } from '../utils/format.ts';
-import { getAlbumDownloadUrl, getTrackDownloadUrl } from '../lib/api.ts';
+import { getAlbumDownloadUrl, getTrackDownloadUrl, getProxyUrl } from '../lib/api.ts';
 import { usePlayerStore } from '../store/player.ts';
 
 export function AlbumPage() {
@@ -51,7 +51,7 @@ export function AlbumPage() {
         <div className="album-page-cover">
           {album.coverUrl && album.coverUrl.startsWith('http') ? (
             <img 
-              src={album.coverUrl} 
+              src={getProxyUrl(album.coverUrl)} 
               alt={album.title} 
               loading="eager"
               onError={(e) => {

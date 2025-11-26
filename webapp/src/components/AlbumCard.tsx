@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { Album } from '../../../shared/library.ts';
 import { formatFileSize } from '../utils/format.ts';
-import { getAlbumDownloadUrl } from '../lib/api.ts';
+import { getAlbumDownloadUrl, getProxyUrl } from '../lib/api.ts';
 
 interface AlbumCardProps {
   album: Album;
@@ -38,10 +38,9 @@ export function AlbumCard({ album, onPlay }: AlbumCardProps) {
       <div className="album-cover">
         {album.coverUrl && album.coverUrl.startsWith('http') ? (
           <img 
-            src={album.coverUrl} 
+            src={getProxyUrl(album.coverUrl)} 
             alt={album.title} 
             loading="lazy"
-            crossOrigin="anonymous"
             onError={(e) => {
               // Hide broken image and show placeholder instead
               const target = e.target as HTMLImageElement;

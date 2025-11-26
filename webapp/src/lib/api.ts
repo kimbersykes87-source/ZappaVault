@@ -160,3 +160,7 @@ export function getTrackDownloadUrl(trackId: string): string {
   return buildUrl(`/api/tracks/${trackId}/download`);
 }
 
+export function getProxyUrl(targetUrl: string): string {
+  return buildUrl('/api/proxy', { url: targetUrl });
+}
+
