@@ -3,7 +3,7 @@ import { useAlbum } from '../hooks/useAlbum.ts';
 import { LoadingState } from '../components/LoadingState.tsx';
 import { ErrorState } from '../components/ErrorState.tsx';
 import { formatDuration, formatFileSize } from '../utils/format.ts';
-import { getAlbumDownloadUrl, getTrackDownloadUrl, getProxyUrl } from '../lib/api.ts';
+import { getAlbumDownloadUrl, getProxyUrl } from '../lib/api.ts';
 import { usePlayerStore } from '../store/player.ts';
 
 export function AlbumPage() {
