@@ -476,26 +476,37 @@ async function attachSignedLinks(
   console.log(`[LINK DEBUG] Token available: ${!!token}, Token length: ${token?.length || 0} chars`);
 
   const errors: string[] = [];
-  const updatedTracks = await Promise.all(
-    album.tracks.map(async (track) => {
-      // Convert Windows path to Dropbox path before getting permanent link
-      const dropboxFilePath = convertToDropboxPath(track.filePath);
-      console.log(`[LINK DEBUG] Getting link for track: ${track.title}`);
-      console.log(`[LINK DEBUG]   Original path: ${track.filePath}`);
-      console.log(`[LINK DEBUG]   Dropbox path: ${dropboxFilePath}`);
-      const link = await getPermanentLink(env, dropboxFilePath, errors);
-      if (!link) {
-        console.log(`[LINK DEBUG]   ❌ Failed to get link for: ${dropboxFilePath}`);
-      } else {
-        console.log(`[LINK DEBUG]   ✅ Got link: ${link.substring(0, 50)}...`);
-      }
-      return {
-        ...track,
-        streamingUrl: link,
-        downloadUrl: link,
-      };
-    }),
-  );
+  const trackResults: Array<{ track: typeof album.tracks[0]; link: string | undefined; error?: string }> = [];
+  
+  // Process tracks sequentially to avoid overwhelming the API and get better error tracking
+  for (const track of album.tracks) {
+    // Convert Windows path to Dropbox path before getting permanent link
+    const dropboxFilePath = convertToDropboxPath(track.filePath);
+    console.log(`[LINK DEBUG] Getting link for track: ${track.title} (${track.trackNumber})`);
+    console.log(`[LINK DEBUG]   Original path: ${track.filePath}`);
+    console.log(`[LINK DEBUG]   Dropbox path: ${dropboxFilePath}`);
+    
+    const link = await getPermanentLink(env, dropboxFilePath, errors);
+    if (!link) {
+      const errorMsg = `Failed to get link for track "${track.title}": ${dropboxFilePath}`;
+      console.log(`[LINK DEBUG]   ❌ ${errorMsg}`);
+      trackResults.push({ track, link: undefined, error: errorMsg });
+    } else {
+      console.log(`[LINK DEBUG]   ✅ Got link: ${link.substring(0, 50)}...`);
+      trackResults.push({ track, link });
+    }
+  }
+  
+  const updatedTracks = trackResults.map(({ track, link, error }) => {
+    if (error) {
+      console.error(`[LINK ERROR] Track "${track.title}": ${error}`);
+    }
+    return {
+      ...track,
+      streamingUrl: link,
+      downloadUrl: link,
+    };
+  });
 
   // Generate static cover URL (same logic as library endpoint)
   // Static covers are served from /covers/ directory in Cloudflare Pages
@@ -531,12 +542,29 @@ async function attachSignedLinks(
   }
 
   const tracksWithLinks = updatedTracks.filter(t => t.streamingUrl).length;
+  const tracksWithoutLinks = updatedTracks.filter(t => !t.streamingUrl);
   console.log(`[LINK DEBUG] Album ${album.title}: ${tracksWithLinks}/${updatedTracks.length} tracks have links`);
+  
+  if (tracksWithoutLinks.length > 0) {
+    console.error(`[LINK ERROR] Album ${album.title}: ${tracksWithoutLinks.length} tracks failed to get links:`);
+    tracksWithoutLinks.forEach((track, idx) => {
+      const result = trackResults.find(r => r.track.id === track.id);
+      console.error(`[LINK ERROR]   ${idx + 1}. Track ${track.trackNumber}: "${track.title}"`);
+      console.error(`[LINK ERROR]      Path: ${track.filePath}`);
+      console.error(`[LINK ERROR]      Dropbox path: ${convertToDropboxPath(track.filePath)}`);
+      if (result?.error) {
+        console.error(`[LINK ERROR]      Error: ${result.error}`);
+      }
+    });
+  }
   
   // Collect unique errors
   const uniqueErrors = [...new Set(errors)];
   if (uniqueErrors.length > 0) {
-    console.error(`[ERROR] Collected ${uniqueErrors.length} unique errors during link generation`);
+    console.error(`[ERROR] Collected ${uniqueErrors.length} unique errors during link generation:`);
+    uniqueErrors.forEach((error, idx) => {
+      console.error(`[ERROR]   ${idx + 1}. ${error}`);
+    });
   }
 
   return {
