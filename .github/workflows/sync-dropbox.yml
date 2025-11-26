@@ -36,12 +36,32 @@ jobs:
           cache: npm
           cache-dependency-path: webapp/package-lock.json
 
-      - name: Install
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          pip install mutagen
+
+      - name: Install Node dependencies
         run: npm ci
 
       - name: Sync Dropbox snapshot
         run: npm run sync:dropbox -- --out data/library.generated.json
         continue-on-error: false
+
+      - name: Export track durations to JSON
+        working-directory: .
+        run: |
+          # Check if database exists (might be committed to repo or created locally)
+          if [ -f "zappa_tracks.db" ]; then
+            python export_track_durations.py zappa_tracks.db webapp/data/track_durations.json
+          else
+            echo "⚠️  Database file not found - skipping export"
+            echo "   Run 'python create_track_database.py ZappaLibrary' locally first"
+          fi
 
       - name: Configure Git
         run: |
@@ -61,15 +81,18 @@ jobs:
           git status
           git branch -a
           
-          echo "Adding file to git..."
+          echo "Adding files to git..."
           git add webapp/data/library.generated.json
+          if [ -f "webapp/data/track_durations.json" ]; then
+            git add webapp/data/track_durations.json
+          fi
           
           echo "Checking for changes..."
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
             echo "Committing changes..."
-            git commit -m "chore: update library snapshot from Dropbox"
+            git commit -m "chore: update library snapshot and track durations from Dropbox"
             
             echo "Pushing to repository..."
             git remote -v

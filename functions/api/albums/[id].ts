@@ -5,6 +5,80 @@ import {
 import type { EnvBindings } from '../../utils/library.ts';
 import { getValidDropboxToken } from '../../utils/dropboxToken.ts';
 
+// Cache for track durations loaded from JSON
+let trackDurationsCache: Map<string, number> | null = null;
+
+/**
+ * Load track durations from JSON file (deployed as static asset)
+ * Falls back to empty map if file not found
+ */
+async function loadTrackDurations(request: Request): Promise<Map<string, number>> {
+  if (trackDurationsCache) {
+    return trackDurationsCache;
+  }
+  
+  try {
+    // Fetch from the deployed static file
+    // The file is at webapp/data/track_durations.json, which becomes /data/track_durations.json when deployed
+    const url = new URL('/data/track_durations.json', request.url);
+    const response = await fetch(url);
+    
+    if (response.ok) {
+      const durations = await response.json() as Record<string, number>;
+      trackDurationsCache = new Map(Object.entries(durations));
+      console.log(`[DURATION] ✅ Loaded ${trackDurationsCache.size / 2} track durations from JSON`);
+      return trackDurationsCache;
+    } else {
+      console.warn(`[DURATION] ⚠️  Failed to load track_durations.json: ${response.status} ${response.statusText}`);
+    }
+  } catch (error) {
+    console.warn(`[DURATION] ⚠️  Error loading track durations:`, error instanceof Error ? error.message : String(error));
+  }
+  
+  // Return empty map as fallback
+  trackDurationsCache = new Map();
+  return trackDurationsCache;
+}
+
+/**
+ * Get duration for a track from the database JSON
+ * Tries multiple path matching strategies
+ */
+function getDurationFromDatabase(
+  filePath: string,
+  durations: Map<string, number>,
+): number {
+  // Normalize path
+  let normalizedPath = filePath.replace(/\\/g, '/');
+  if (!normalizedPath.startsWith('/')) {
+    normalizedPath = '/' + normalizedPath;
+  }
+  
+  // Try exact match first
+  let duration = durations.get(normalizedPath);
+  if (duration) {
+    return duration;
+  }
+  
+  // Try lowercase match
+  duration = durations.get(normalizedPath.toLowerCase());
+  if (duration) {
+    return duration;
+  }
+  
+  // Try matching by filename (in case paths differ slightly)
+  const fileName = normalizedPath.split('/').pop() || '';
+  if (fileName) {
+    for (const [dbPath, dbDuration] of durations.entries()) {
+      if (dbPath.toLowerCase().endsWith(fileName.toLowerCase())) {
+        return dbDuration;
+      }
+    }
+  }
+  
+  return 0;
+}
+
 /**
  * Make a Dropbox API request with automatic token refresh on expiration
  */
@@ -664,6 +738,7 @@ async function extractDurationFromDropboxFile(
 async function attachSignedLinks(
   album: Album,
   env: EnvBindings,
+  request: Request,
 ): Promise<Album> {
   // Check if we have any way to get a token (refresh token credentials)
   const token = await getValidDropboxToken(env);
@@ -741,11 +816,30 @@ async function attachSignedLinks(
   
   console.log(`[LINK DEBUG] Completed link generation for all ${trackResults.length} tracks`);
   
+  // Load track durations from database JSON first
+  const dbDurations = await loadTrackDurations(request);
+  let dbDurationCount = 0;
+  
+  // Try to get durations from database for all tracks
+  trackResults.forEach((result) => {
+    if (result.track.durationMs === 0) {
+      const dropboxFilePath = convertToDropboxPath(result.track.filePath);
+      const dbDuration = getDurationFromDatabase(dropboxFilePath, dbDurations);
+      if (dbDuration > 0) {
+        result.durationMs = dbDuration;
+        dbDurationCount++;
+        console.log(`[DURATION] ✅ Found in database: ${result.track.title} (${Math.round(dbDuration / 1000)}s)`);
+      }
+    }
+  });
+  
+  console.log(`[DURATION] Found ${dbDurationCount} durations from database, ${trackResults.length - dbDurationCount} still need extraction`);
+  
   // Extract durations in parallel (non-blocking, can fail gracefully)
   // Only extract if duration is 0 and we have a link (so we know the file is accessible)
   // Process in larger batches to be more efficient - duration extraction is fast (just header reads)
   const CONCURRENT_DURATIONS = Math.min(10, Math.max(5, Math.ceil(trackResults.length / 5))); // Scale with album size, max 10
-  const tracksNeedingDuration = trackResults.filter(r => r.track.durationMs === 0 && r.link);
+  const tracksNeedingDuration = trackResults.filter(r => r.track.durationMs === 0 && r.durationMs === 0 && r.link);
   
   console.log(`[DURATION] Extracting durations for ${tracksNeedingDuration.length} tracks (${trackResults.length - tracksNeedingDuration.length} already have durations) in batches of ${CONCURRENT_DURATIONS}`);
   
@@ -802,18 +896,17 @@ async function attachSignedLinks(
   
   // Combine durations with track results
   const finalResults = trackResults.map((result) => {
-    let durationMs = result.track.durationMs;
+    let durationMs = result.durationMs; // This may have been set from database
     
-    // Use existing duration if available
-    if (durationMs > 0) {
-      return {
-        ...result,
-        durationMs,
-      };
+    // Use existing track duration if database didn't find it
+    if (durationMs === 0) {
+      durationMs = result.track.durationMs;
     }
     
-    // Use extracted duration from map
-    durationMs = durationMap.get(result.track.id) || 0;
+    // Use extracted duration from map as final fallback
+    if (durationMs === 0) {
+      durationMs = durationMap.get(result.track.id) || 0;
+    }
     
     return {
       ...result,
@@ -934,7 +1027,7 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
   if (includeLinks) {
     try {
       console.log(`[API DEBUG] Generating links for album: ${album.title}`);
-      payload = await attachSignedLinks(album, env);
+      payload = await attachSignedLinks(album, env, request);
       console.log(`[API DEBUG] Links generated successfully for: ${album.title}`);
       // Add debug info to response if no links were generated
       const tracksWithLinks = payload.tracks.filter(t => t.streamingUrl).length;
