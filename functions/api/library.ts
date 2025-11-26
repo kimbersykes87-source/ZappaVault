@@ -140,19 +140,25 @@ async function getPermanentLink(
 
 function convertToDirectLink(sharedUrl: string, isImage = false): string {
   // Convert Dropbox shared link to direct download link
-  // Handles two formats:
+  // Handles multiple formats:
   // 1. Regular links: https://www.dropbox.com/s/abc123/file.jpg?dl=0
   //    -> https://dl.dropboxusercontent.com/s/abc123/file.jpg
-  // 2. scl/fo links: https://www.dropbox.com/scl/fo/abc123/file.jpg?rlkey=xyz&dl=0
+  // 2. scl/fo or scl/fi links: https://www.dropbox.com/scl/fo/abc123/file.jpg?rlkey=xyz&dl=0
   //    -> For images: https://www.dropbox.com/scl/fo/abc123/file.jpg?rlkey=xyz&raw=1
   //    -> For audio: https://www.dropbox.com/scl/fo/abc123/file.jpg?rlkey=xyz&dl=1
+  //    NOTE: scl/fo and scl/fi links MUST stay on www.dropbox.com, NOT converted to dl.dropboxusercontent.com
   
-  // Check if it's an scl/fo link (newer Dropbox format)
-  if (sharedUrl.includes('scl/fo/')) {
-    // For scl/fo links, preserve the rlkey parameter
-    // Use ?raw=1 for images, ?dl=1 for audio files
+  // Check if it's an scl/fo or scl/fi link (newer Dropbox format)
+  if (sharedUrl.includes('scl/fo/') || sharedUrl.includes('scl/fi/')) {
+    // For scl/fo and scl/fi links, MUST keep them on www.dropbox.com
+    // Do NOT convert to dl.dropboxusercontent.com - it won't work!
+    // Preserve the rlkey parameter and use ?raw=1 for images, ?dl=1 for audio files
     try {
       const url = new URL(sharedUrl);
+      // Ensure we're using www.dropbox.com, not dl.dropboxusercontent.com
+      if (url.hostname === 'dl.dropboxusercontent.com') {
+        url.hostname = 'www.dropbox.com';
+      }
       url.searchParams.delete('dl');
       if (isImage) {
         url.searchParams.set('raw', '1');
@@ -162,7 +168,9 @@ function convertToDirectLink(sharedUrl: string, isImage = false): string {
       return url.toString();
     } catch {
       // If URL parsing fails, try string replacement
-      const baseUrl = sharedUrl.split('?')[0];
+      let baseUrl = sharedUrl.split('?')[0];
+      // Fix if already converted to dl.dropboxusercontent.com
+      baseUrl = baseUrl.replace('dl.dropboxusercontent.com', 'www.dropbox.com');
       const rlkeyMatch = sharedUrl.match(/[?&]rlkey=([^&]+)/);
       const rlkey = rlkeyMatch ? rlkeyMatch[1] : '';
       if (rlkey) {
