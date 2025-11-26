@@ -65,7 +65,7 @@ jobs:
             echo "No changes to commit"
           else
             echo "Committing changes..."
-            git commit -m "chore: update library snapshot from Dropbox [skip ci]"
+            git commit -m "chore: update library snapshot from Dropbox"
             
             echo "Pushing to repository..."
             git remote -v
