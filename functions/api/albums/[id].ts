@@ -3,14 +3,77 @@ import {
   loadLibrarySnapshot,
 } from '../../utils/library.ts';
 import type { EnvBindings } from '../../utils/library.ts';
+import { getValidDropboxToken } from '../../utils/dropboxToken.ts';
+
+/**
+ * Make a Dropbox API request with automatic token refresh on expiration
+ */
+async function dropboxRequestWithRefresh<T>(
+  endpoint: string,
+  body: Record<string, unknown>,
+  env: EnvBindings,
+): Promise<Response> {
+  let token = await getValidDropboxToken(env);
+  
+  if (!token) {
+    throw new Error('No Dropbox token available. Please configure DROPBOX_TOKEN or refresh token credentials.');
+  }
+
+  let response = await fetch(`https://api.dropboxapi.com/2/${endpoint}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  // If token expired, refresh and retry once
+  if (!response.ok && response.status === 401) {
+    const text = await response.text();
+    try {
+      const errorData = JSON.parse(text);
+      
+      if (errorData.error?.['.tag'] === 'expired_access_token' && env.DROPBOX_REFRESH_TOKEN) {
+        console.log('[LINK DEBUG] Access token expired, refreshing...');
+        try {
+          const { refreshDropboxToken } = await import('../../utils/dropboxToken.ts');
+          token = await refreshDropboxToken(
+            env.DROPBOX_REFRESH_TOKEN,
+            env.DROPBOX_APP_KEY!,
+            env.DROPBOX_APP_SECRET!,
+          );
+          console.log('[LINK DEBUG] Successfully refreshed access token, retrying request...');
+          
+          // Retry the request with new token
+          response = await fetch(`https://api.dropboxapi.com/2/${endpoint}`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'content-type': 'application/json',
+            },
+            body: JSON.stringify(body),
+          });
+        } catch (refreshError) {
+          console.error('[LINK DEBUG] Failed to refresh token:', refreshError);
+        }
+      }
+    } catch {
+      // If parsing fails, continue with original response
+    }
+  }
+
+  return response;
+}
 
 async function getPermanentLink(
   env: EnvBindings,
   filePath: string,
   errors?: string[],
 ): Promise<string | undefined> {
-  if (!env.DROPBOX_TOKEN) {
-    const msg = `No DROPBOX_TOKEN for ${filePath}`;
+  const token = await getValidDropboxToken(env);
+  if (!token) {
+    const msg = `No DROPBOX_TOKEN or refresh token credentials for ${filePath}`;
     console.log(`[LINK DEBUG] ${msg}`);
     if (errors) errors.push(msg);
     return undefined;
@@ -18,19 +81,13 @@ async function getPermanentLink(
 
   try {
     // First, try to get existing shared link
-    let response = await fetch(
-      'https://api.dropboxapi.com/2/sharing/list_shared_links',
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${env.DROPBOX_TOKEN}`,
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          path: filePath,
-          direct_only: false 
-        }),
+    let response = await dropboxRequestWithRefresh(
+      'sharing/list_shared_links',
+      { 
+        path: filePath,
+        direct_only: false 
       },
+      env,
     );
 
     if (response.ok) {
@@ -65,23 +122,17 @@ async function getPermanentLink(
     }
 
     // If no existing link, create a new permanent shared link using the correct API
-    response = await fetch(
-      'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings',
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${env.DROPBOX_TOKEN}`,
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          path: filePath,
-          settings: {
-            requested_visibility: {
-              '.tag': 'public'
-            }
+    response = await dropboxRequestWithRefresh(
+      'sharing/create_shared_link_with_settings',
+      { 
+        path: filePath,
+        settings: {
+          requested_visibility: {
+            '.tag': 'public'
           }
-        }),
+        }
       },
+      env,
     );
 
     if (!response.ok) {
@@ -93,19 +144,13 @@ async function getPermanentLink(
       // If it's a 409 conflict, the link might already exist - try to get it
       if (response.status === 409) {
         console.log(`[LINK DEBUG] Link already exists for ${filePath}, attempting to retrieve it`);
-        const conflictResponse = await fetch(
-          'https://api.dropboxapi.com/2/sharing/list_shared_links',
-          {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${env.DROPBOX_TOKEN}`,
-              'content-type': 'application/json',
-            },
-            body: JSON.stringify({ 
-              path: filePath,
-              direct_only: false 
-            }),
+        const conflictResponse = await dropboxRequestWithRefresh(
+          'sharing/list_shared_links',
+          { 
+            path: filePath,
+            direct_only: false 
           },
+          env,
         );
         if (conflictResponse.ok) {
           const conflictPayload = (await conflictResponse.json()) as { 
@@ -262,21 +307,16 @@ async function listCoverFolder(
   env: EnvBindings,
   coverFolderPath: string,
 ): Promise<string[]> {
-  if (!env.DROPBOX_TOKEN) {
+  const token = await getValidDropboxToken(env);
+  if (!token) {
     return [];
   }
 
   try {
-    const response = await fetch(
-      'https://api.dropboxapi.com/2/files/list_folder',
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${env.DROPBOX_TOKEN}`,
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({ path: coverFolderPath }),
-      },
+    const response = await dropboxRequestWithRefresh(
+      'files/list_folder',
+      { path: coverFolderPath },
+      env,
     );
 
     if (!response.ok) {
@@ -302,7 +342,9 @@ async function findCoverArt(
   env: EnvBindings,
   album: Album,
 ): Promise<string | undefined> {
-  if (!env.DROPBOX_TOKEN) {
+  // Check if we have any way to get a token
+  const hasToken = !!(env.DROPBOX_TOKEN || (env.DROPBOX_REFRESH_TOKEN && env.DROPBOX_APP_KEY && env.DROPBOX_APP_SECRET));
+  if (!hasToken) {
     return undefined;
   }
 
@@ -394,9 +436,11 @@ async function attachSignedLinks(
   album: Album,
   env: EnvBindings,
 ): Promise<Album> {
-  if (!env.DROPBOX_TOKEN) {
-    console.log(`[LINK DEBUG] No DROPBOX_TOKEN available for album: ${album.title}`);
-    console.error(`[ERROR] DROPBOX_TOKEN is missing in environment variables`);
+  // Check if we have any way to get a token (either DROPBOX_TOKEN or refresh token credentials)
+  const hasToken = !!(env.DROPBOX_TOKEN || (env.DROPBOX_REFRESH_TOKEN && env.DROPBOX_APP_KEY && env.DROPBOX_APP_SECRET));
+  if (!hasToken) {
+    console.log(`[LINK DEBUG] No Dropbox token available for album: ${album.title}`);
+    console.error(`[ERROR] DROPBOX_TOKEN or refresh token credentials are missing in environment variables`);
     return album;
   }
 
@@ -434,14 +478,16 @@ async function attachSignedLinks(
   } else {
     // Use static URL from /covers/ directory
     // Extract extension from original coverUrl if it exists
-    // The copy script preserves the original extension, so we should match it exactly
     let extension = '.jpg'; // default
     if (coverUrl && coverUrl.startsWith('/')) {
       // Extract extension from path like "/Apps/.../file.jpg" or "/Apps/.../file.png"
       const match = coverUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i);
       if (match) {
-        // Keep the original extension (don't normalize .jpeg to .jpg)
         extension = `.${match[1].toLowerCase()}`;
+        // Normalize .jpeg to .jpg for consistency
+        if (extension === '.jpeg') {
+          extension = '.jpg';
+        }
       }
     }
     
