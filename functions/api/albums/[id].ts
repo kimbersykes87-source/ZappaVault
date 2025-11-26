@@ -4,6 +4,7 @@ import {
 } from '../../utils/library.ts';
 import type { EnvBindings } from '../../utils/library.ts';
 import { getValidDropboxToken } from '../../utils/dropboxToken.ts';
+import { parseBuffer } from 'music-metadata';
 
 /**
  * Make a Dropbox API request with automatic token refresh on expiration
@@ -464,6 +465,54 @@ function prioritizeCoverFiles(imageFiles: string[]): string[] {
   });
 }
 
+/**
+ * Extract duration from audio file header using HTTP range request
+ * Only downloads first 2MB where duration metadata is stored
+ */
+async function extractDurationFromDropboxFile(
+  filePath: string,
+  env: EnvBindings,
+): Promise<number> {
+  const token = await getValidDropboxToken(env);
+  if (!token) {
+    return 0;
+  }
+
+  try {
+    // Download only the first 2MB (headers contain duration for MP3/FLAC)
+    const response = await fetch(`https://content.dropboxapi.com/2/files/download`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Dropbox-API-Arg': JSON.stringify({ path: filePath }),
+        Range: 'bytes=0-2097151', // First 2MB
+      },
+    });
+
+    if (!response.ok) {
+      console.warn(`[DURATION] Failed to download header for ${filePath}: ${response.statusText}`);
+      return 0;
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Parse metadata from buffer
+    const metadata = await parseBuffer(buffer);
+    const durationSeconds = metadata.format.duration || 0;
+    const durationMs = Math.round(durationSeconds * 1000);
+    
+    if (durationMs > 0) {
+      console.log(`[DURATION] Extracted ${Math.round(durationMs / 1000)}s from ${filePath}`);
+    }
+    
+    return durationMs;
+  } catch (error) {
+    console.warn(`[DURATION] Failed to extract duration from ${filePath}:`, error instanceof Error ? error.message : String(error));
+    return 0;
+  }
+}
+
 async function attachSignedLinks(
   album: Album,
   env: EnvBindings,
@@ -480,7 +529,7 @@ async function attachSignedLinks(
   console.log(`[LINK DEBUG] Token available: ${!!token}, Token length: ${token?.length || 0} chars`);
 
   const errors: string[] = [];
-  const trackResults: Array<{ track: typeof album.tracks[0]; link: string | undefined; error?: string }> = [];
+  const trackResults: Array<{ track: typeof album.tracks[0]; link: string | undefined; durationMs: number; error?: string }> = [];
   
   // Process tracks sequentially to avoid overwhelming the API and get better error tracking
   for (const track of album.tracks) {
@@ -490,27 +539,42 @@ async function attachSignedLinks(
     console.log(`[LINK DEBUG]   Original path: ${track.filePath}`);
     console.log(`[LINK DEBUG]   Dropbox path: ${dropboxFilePath}`);
     
+    // Get streaming link
     const link = await getPermanentLink(env, dropboxFilePath, errors);
+    
+    // Extract duration if not already set
+    let durationMs = track.durationMs;
+    if (durationMs === 0) {
+      console.log(`[DURATION] Extracting duration for: ${track.title}`);
+      durationMs = await extractDurationFromDropboxFile(dropboxFilePath, env);
+    } else {
+      console.log(`[DURATION] Using existing duration ${Math.round(durationMs / 1000)}s for: ${track.title}`);
+    }
+    
     if (!link) {
       const errorMsg = `Failed to get link for track "${track.title}": ${dropboxFilePath}`;
       console.log(`[LINK DEBUG]   ❌ ${errorMsg}`);
-      trackResults.push({ track, link: undefined, error: errorMsg });
+      trackResults.push({ track, link: undefined, durationMs, error: errorMsg });
     } else {
       console.log(`[LINK DEBUG]   ✅ Got link: ${link.substring(0, 50)}...`);
-      trackResults.push({ track, link });
+      trackResults.push({ track, link, durationMs });
     }
   }
   
-  const updatedTracks = trackResults.map(({ track, link, error }) => {
+  const updatedTracks = trackResults.map(({ track, link, durationMs, error }) => {
     if (error) {
       console.error(`[LINK ERROR] Track "${track.title}": ${error}`);
     }
     return {
       ...track,
+      durationMs, // Use extracted or existing duration
       streamingUrl: link,
       downloadUrl: link,
     };
   });
+  
+  // Calculate total duration
+  const totalDurationMs = updatedTracks.reduce((sum, track) => sum + track.durationMs, 0);
 
   // Generate static cover URL (same logic as library endpoint)
   // Static covers are served from /covers/ directory in Cloudflare Pages
@@ -574,6 +638,7 @@ async function attachSignedLinks(
   return {
     ...album,
     tracks: updatedTracks,
+    totalDurationMs, // Update total duration
     coverUrl,
     __linkErrors: uniqueErrors.slice(0, 5), // Return first 5 errors
   } as Album & { __linkErrors?: string[] };
