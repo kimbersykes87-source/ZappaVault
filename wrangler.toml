@@ -2,10 +2,6 @@ name = "frank-zappa-vault"
 compatibility_date = "2025-02-10"
 pages_build_output_dir = "./webapp/dist"
 
-# Build command override to handle optional dependencies
-[build]
-command = "cd webapp && npm install && npm run build"
-
 # KV namespace binding for Pages Functions
 [[kv_namespaces]]
 binding = "LIBRARY_KV"
