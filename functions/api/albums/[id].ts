@@ -968,17 +968,24 @@ async function attachSignedLinks(
   console.log(`[DURATION] Duration extraction complete. Extracted ${durationMap.size} durations, ${Array.from(durationMap.values()).filter(d => d > 0).length} > 0`);
   
   // Combine durations with track results
+  // Priority: 1) Library file duration (result.durationMs set from library), 2) Database lookup, 3) File extraction
   const finalResults = trackResults.map((result) => {
-    let durationMs = result.durationMs; // This may have been set from database
+    let durationMs = result.durationMs; // This should already be set from library file (line 890)
     
-    // Use existing track duration if database didn't find it
-    if (durationMs === 0) {
+    // If durationMs is still 0, it means library didn't have it, try track's original duration
+    // (This shouldn't happen if library is loaded correctly, but handle it anyway)
+    if (durationMs === 0 && result.track.durationMs > 0) {
       durationMs = result.track.durationMs;
+      console.log(`[DURATION] Using track.durationMs for ${result.track.title}: ${Math.round(durationMs / 1000)}s`);
     }
     
-    // Use extracted duration from map as final fallback
+    // Use extracted duration from map as final fallback (only if library and track both have 0)
     if (durationMs === 0) {
-      durationMs = durationMap.get(result.track.id) || 0;
+      const extractedDuration = durationMap.get(result.track.id) || 0;
+      if (extractedDuration > 0) {
+        durationMs = extractedDuration;
+        console.log(`[DURATION] Using extracted duration for ${result.track.title}: ${Math.round(durationMs / 1000)}s`);
+      }
     }
     
     return {
@@ -1087,9 +1094,13 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
   console.log(`[API DEBUG] Looking for album: ${albumId}`);
   const album = snapshot.albums.find((entry) => entry.id === albumId);
   
-  // Debug: Log first track's duration to verify library data
+  // Debug: Log first few tracks' durations to verify library data
   if (album && album.tracks.length > 0) {
-    console.log(`[API DEBUG] Album found: ${album.title}, first track duration: ${album.tracks[0].durationMs}ms`);
+    console.log(`[API DEBUG] Album found: ${album.title}`);
+    console.log(`[API DEBUG] First 3 tracks from library:`);
+    album.tracks.slice(0, 3).forEach(track => {
+      console.log(`[API DEBUG]   Track ${track.trackNumber}: ${track.title} - ${track.durationMs}ms`);
+    });
   }
 
   if (!album) {
