@@ -280,16 +280,26 @@ function prioritizeCoverFiles(imageFiles: string[]): string[] {
     const aLower = a.toLowerCase();
     const bLower = b.toLowerCase();
     
+    // Extract base name (without extension) for exact matching
+    const aBase = aLower.replace(/\.[^.]+$/, '');
+    const bBase = bLower.replace(/\.[^.]+$/, '');
+    
     const aHas1 = aLower.startsWith('1') || aLower.includes(' 1 ') || aLower.includes('_1_') || aLower.includes('-1-');
     const bHas1 = bLower.startsWith('1') || bLower.includes(' 1 ') || bLower.includes('_1_') || bLower.includes('-1-');
-    const aHasFront = aLower.includes('front') || aLower.includes('cover');
-    const bHasFront = bLower.includes('front') || bLower.includes('cover');
-
-    // Files starting with "1" have highest priority
+    const aHasFront = aLower.includes('front') || aLower.includes('cover') || aLower.includes('folder');
+    const bHasFront = bLower.includes('front') || bLower.includes('cover') || bLower.includes('folder');
+    
+    // Exact match for "folder" has highest priority (as per user's note that some covers are named "folder")
+    const aIsFolder = aBase === 'folder';
+    const bIsFolder = bBase === 'folder';
+    if (aIsFolder && !bIsFolder) return -1;
+    if (!aIsFolder && bIsFolder) return 1;
+    
+    // Files starting with "1" have second priority
     if (aHas1 && !bHas1) return -1;
     if (!aHas1 && bHas1) return 1;
     
-    // Files with "front" or "cover" have second priority
+    // Files with "front", "cover", or "folder" have third priority
     if (aHasFront && !bHasFront) return -1;
     if (!aHasFront && bHasFront) return 1;
     
@@ -302,29 +312,44 @@ async function getCoverUrl(
   env: EnvBindings,
 ): Promise<string | undefined> {
   if (!env.DROPBOX_TOKEN) {
-    return album.coverUrl;
+    console.log(`[COVER DEBUG] No DROPBOX_TOKEN for ${album.title}`);
+    return undefined;
   }
 
   // If coverUrl is already an HTTP URL, return it
   if (album.coverUrl?.startsWith('http')) {
+    console.log(`[COVER DEBUG] ${album.title}: Cover URL already HTTP`);
     return album.coverUrl;
   }
 
   // If coverUrl is a Dropbox path, convert it to an HTTP URL
   if (album.coverUrl && album.coverUrl.startsWith('/')) {
-    console.log(`[COVER DEBUG] Converting existing cover path to HTTP URL: ${album.coverUrl}`);
+    console.log(`[COVER DEBUG] ${album.title}: Converting Dropbox path to HTTP URL: ${album.coverUrl}`);
     const coverLink = await getPermanentLink(env, album.coverUrl);
     if (coverLink) {
-      console.log(`[COVER DEBUG] ✅ Converted cover to HTTP URL: ${coverLink}`);
+      console.log(`[COVER DEBUG] ${album.title}: ✅ Converted to HTTP URL`);
       return coverLink;
     } else {
-      console.log(`[COVER DEBUG] ❌ Failed to convert cover path: ${album.coverUrl}`);
+      console.log(`[COVER DEBUG] ${album.title}: ❌ Failed to convert, trying fallback search`);
+      // Fallback: Try to find cover art if conversion failed
+      const foundCover = await findCoverArt(env, album);
+      if (foundCover) {
+        console.log(`[COVER DEBUG] ${album.title}: ✅ Found via fallback search`);
+        return foundCover;
+      }
     }
   }
 
   // Fallback: Find cover art in the Cover folder if no coverUrl exists
   if (!album.coverUrl) {
-    return await findCoverArt(env, album);
+    console.log(`[COVER DEBUG] ${album.title}: No coverUrl, searching for cover art`);
+    const foundCover = await findCoverArt(env, album);
+    if (foundCover) {
+      console.log(`[COVER DEBUG] ${album.title}: ✅ Found via search`);
+      return foundCover;
+    } else {
+      console.log(`[COVER DEBUG] ${album.title}: ❌ No cover art found`);
+    }
   }
 
   return undefined;
