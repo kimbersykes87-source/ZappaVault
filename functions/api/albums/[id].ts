@@ -18,15 +18,23 @@ async function loadTrackDurations(request: Request): Promise<Map<string, number>
   }
   
   try {
-    // Fetch from the deployed static file using the absolute URL
-    // The file is at webapp/data/track_durations.json, which becomes /data/track_durations.json when deployed
-    const url = new URL('/data/track_durations.json', request.url);
-    console.log(`[DURATION] Attempting to fetch from: ${url.toString()}`);
+    // Try fetching from the Function endpoint first (more reliable)
+    const functionUrl = new URL('/api/track-durations', request.url);
+    console.log(`[DURATION] Attempting to fetch from Function endpoint: ${functionUrl.toString()}`);
     
-    const response = await fetch(url, {
-      // Add cache headers to avoid re-fetching
+    let response = await fetch(functionUrl, {
       cache: 'default',
     });
+    
+    // If Function endpoint fails, try static asset directly
+    if (!response.ok) {
+      console.log(`[DURATION] Function endpoint failed (${response.status}), trying static asset...`);
+      const staticUrl = new URL('/data/track_durations.json', request.url);
+      console.log(`[DURATION] Attempting to fetch from static asset: ${staticUrl.toString()}`);
+      response = await fetch(staticUrl, {
+        cache: 'default',
+      });
+    }
     
     console.log(`[DURATION] Fetch response status: ${response.status} ${response.statusText}`);
     
