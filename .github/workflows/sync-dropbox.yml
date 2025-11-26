@@ -63,31 +63,26 @@ jobs:
             echo "   Run 'python create_track_database.py ZappaLibrary' locally first"
           fi
 
-      - name: Merge durations into library file
+      - name: Create comprehensive library file
         working-directory: .
         run: |
-          if [ -f "webapp/data/library.generated.json" ] && [ -f "webapp/data/track_durations.json" ]; then
-            python update_library_durations.py webapp/data/library.generated.json webapp/data/track_durations.json
+          if [ -f "webapp/data/library.generated.json" ] && [ -f "zappa_tracks.db" ]; then
+            python create_comprehensive_library.py webapp/data/library.generated.json zappa_tracks.db webapp/data/library.comprehensive.json
           else
-            echo "⚠️  Library or durations file not found - skipping merge"
+            echo "⚠️  Library or database not found - skipping comprehensive library creation"
+            # Fallback: use library.generated.json as-is
+            if [ -f "webapp/data/library.generated.json" ]; then
+              cp webapp/data/library.generated.json webapp/data/library.comprehensive.json
+            fi
           fi
 
-      - name: Convert library JSON to TypeScript
+      - name: Upload comprehensive library to Cloudflare KV
         working-directory: .
         run: |
-          if [ -f "webapp/data/library.generated.json" ]; then
-            python convert_library_to_ts.py webapp/data/library.generated.json functions/data/library.generated.ts
+          if [ -f "webapp/data/library.comprehensive.json" ] && [ -n "$CF_ACCOUNT_ID" ] && [ -n "$CF_KV_NAMESPACE_ID" ] && [ -n "$CLOUDFLARE_API_TOKEN" ]; then
+            node upload_library_to_kv.js webapp/data/library.comprehensive.json
           else
-            echo "⚠️  Library file not found - skipping conversion"
-          fi
-
-      - name: Upload library with durations to Cloudflare KV
-        working-directory: .
-        run: |
-          if [ -f "webapp/data/library.generated.json" ] && [ -n "$CF_ACCOUNT_ID" ] && [ -n "$CF_KV_NAMESPACE_ID" ] && [ -n "$CLOUDFLARE_API_TOKEN" ]; then
-            node upload_library_to_kv.js webapp/data/library.generated.json
-          else
-            echo "⚠️  Skipping KV upload (missing library file or credentials)"
+            echo "⚠️  Skipping KV upload (missing comprehensive library file or credentials)"
           fi
 
       - name: Configure Git
@@ -110,11 +105,11 @@ jobs:
           
           echo "Adding files to git..."
           git add webapp/data/library.generated.json
+          if [ -f "webapp/data/library.comprehensive.json" ]; then
+            git add webapp/data/library.comprehensive.json
+          fi
           if [ -f "webapp/data/track_durations.json" ]; then
             git add webapp/data/track_durations.json
-          fi
-          if [ -f "functions/data/library.generated.ts" ]; then
-            git add functions/data/library.generated.ts
           fi
           
           echo "Checking for changes..."

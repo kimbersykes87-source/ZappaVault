@@ -22,19 +22,31 @@ async function loadLibraryFromStaticAsset(request?: Request): Promise<LibrarySna
   }
   
   try {
-    // Fetch directly from static asset
-    // Use the origin from the request URL to construct absolute URL
+    // Try comprehensive library first (single source of truth with all metadata)
     const requestUrl = new URL(request.url);
-    const staticAssetUrl = `${requestUrl.origin}/data/library.generated.json`;
-    console.log(`[LIBRARY] Fetching from static asset: ${staticAssetUrl}`);
+    let staticAssetUrl = `${requestUrl.origin}/data/library.comprehensive.json`;
+    console.log(`[LIBRARY] Fetching comprehensive library from: ${staticAssetUrl}`);
     
-    const response = await fetch(staticAssetUrl, {
+    let response = await fetch(staticAssetUrl, {
       cache: 'default',
-      // Add headers to ensure we get the file
       headers: {
         'Accept': 'application/json',
       },
     });
+    
+    // Fallback to library.generated.json if comprehensive doesn't exist
+    if (!response.ok) {
+      console.log(`[LIBRARY] Comprehensive library not found, trying library.generated.json...`);
+      staticAssetUrl = `${requestUrl.origin}/data/library.generated.json`;
+      console.log(`[LIBRARY] Fetching from static asset: ${staticAssetUrl}`);
+    
+      response = await fetch(staticAssetUrl, {
+        cache: 'default',
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+    }
     
     console.log(`[LIBRARY] Static asset fetch response: ${response.status} ${response.statusText}`);
     

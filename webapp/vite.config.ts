@@ -32,6 +32,14 @@ export default defineConfig({
             copyFileSync(librarySrc, libraryDest)
             console.log('✅ Copied library.generated.json to dist/data/')
           }
+          
+          // Copy library.comprehensive.json (single source of truth with all metadata)
+          const comprehensiveSrc = join(dataDir, 'library.comprehensive.json')
+          const comprehensiveDest = join(distDataDir, 'library.comprehensive.json')
+          if (existsSync(comprehensiveSrc)) {
+            copyFileSync(comprehensiveSrc, comprehensiveDest)
+            console.log('✅ Copied library.comprehensive.json to dist/data/')
+          }
         }
       },
     },
