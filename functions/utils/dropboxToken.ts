@@ -78,7 +78,7 @@ export async function dropboxRequestWithRefresh<T>(
   let token = await getValidDropboxToken(env);
   
   if (!token) {
-    throw new Error('No Dropbox token available. Please configure DROPBOX_TOKEN or refresh token credentials.');
+    throw new Error('No Dropbox token available. Please configure refresh token credentials (DROPBOX_REFRESH_TOKEN, DROPBOX_APP_KEY, DROPBOX_APP_SECRET).');
   }
 
   let response = await fetch(`https://api.dropboxapi.com/2/${endpoint}`, {

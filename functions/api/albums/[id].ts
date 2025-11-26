@@ -73,7 +73,7 @@ async function getPermanentLink(
 ): Promise<string | undefined> {
   const token = await getValidDropboxToken(env);
   if (!token) {
-    const msg = `No DROPBOX_TOKEN or refresh token credentials for ${filePath}`;
+    const msg = `No refresh token credentials (DROPBOX_REFRESH_TOKEN, DROPBOX_APP_KEY, DROPBOX_APP_SECRET) for ${filePath}`;
     console.log(`[LINK DEBUG] ${msg}`);
     if (errors) errors.push(msg);
     return undefined;
@@ -343,8 +343,8 @@ async function findCoverArt(
   album: Album,
 ): Promise<string | undefined> {
   // Check if we have any way to get a token
-  const hasToken = !!(env.DROPBOX_TOKEN || (env.DROPBOX_REFRESH_TOKEN && env.DROPBOX_APP_KEY && env.DROPBOX_APP_SECRET));
-  if (!hasToken) {
+  const token = await getValidDropboxToken(env);
+  if (!token) {
     return undefined;
   }
 
@@ -436,16 +436,15 @@ async function attachSignedLinks(
   album: Album,
   env: EnvBindings,
 ): Promise<Album> {
-  // Check if we have any way to get a token (either DROPBOX_TOKEN or refresh token credentials)
-  const hasToken = !!(env.DROPBOX_TOKEN || (env.DROPBOX_REFRESH_TOKEN && env.DROPBOX_APP_KEY && env.DROPBOX_APP_SECRET));
-  if (!hasToken) {
+  // Check if we have any way to get a token (refresh token credentials)
+  const token = await getValidDropboxToken(env);
+  if (!token) {
     console.log(`[LINK DEBUG] No Dropbox token available for album: ${album.title}`);
-    console.error(`[ERROR] DROPBOX_TOKEN or refresh token credentials are missing in environment variables`);
+    console.error(`[ERROR] Refresh token credentials (DROPBOX_REFRESH_TOKEN, DROPBOX_APP_KEY, DROPBOX_APP_SECRET) are missing in environment variables`);
     return album;
   }
 
   console.log(`[LINK DEBUG] Processing album: ${album.title} (${album.tracks.length} tracks)`);
-  const token = await getValidDropboxToken(env);
   console.log(`[LINK DEBUG] Token available: ${!!token}, Token length: ${token?.length || 0} chars`);
 
   const errors: string[] = [];
@@ -523,7 +522,8 @@ async function attachSignedLinks(
 export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
   const { request, env, params } = context;
   console.log(`[API DEBUG] Album API called: ${request.url}`);
-  console.log(`[API DEBUG] DROPBOX_TOKEN present: ${!!env.DROPBOX_TOKEN}`);
+  const hasRefreshToken = !!(env.DROPBOX_REFRESH_TOKEN && env.DROPBOX_APP_KEY && env.DROPBOX_APP_SECRET);
+  console.log(`[API DEBUG] Refresh token credentials present: ${hasRefreshToken}`);
   
   const snapshot = await loadLibrarySnapshot(env);
   const albumId = params?.id;
@@ -559,8 +559,7 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
         // Get errors from attachSignedLinks - we need to pass them through
         // For now, add a debug field to help diagnose
         (payload as any).__debug = {
-          tokenPresent: !!env.DROPBOX_TOKEN,
-          tokenLength: env.DROPBOX_TOKEN?.length || 0,
+          hasRefreshToken: !!(env.DROPBOX_REFRESH_TOKEN && env.DROPBOX_APP_KEY && env.DROPBOX_APP_SECRET),
           tracksProcessed: payload.tracks.length,
           tracksWithLinks: 0,
           errors: (payload as any).__linkErrors || [],

@@ -14,6 +14,7 @@ jobs:
       run:
         working-directory: webapp
     env:
+      # DROPBOX_TOKEN is optional if refresh token credentials are provided
       DROPBOX_TOKEN: ${{ secrets.DROPBOX_TOKEN }}
       DROPBOX_REFRESH_TOKEN: ${{ secrets.DROPBOX_REFRESH_TOKEN }}
       DROPBOX_APP_KEY: ${{ secrets.DROPBOX_APP_KEY }}

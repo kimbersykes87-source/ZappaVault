@@ -13,8 +13,9 @@ async function getPermanentLink(
   env: EnvBindings,
   filePath: string,
 ): Promise<string | undefined> {
-  if (!env.DROPBOX_TOKEN) {
-    console.log(`[COVER DEBUG] No DROPBOX_TOKEN for ${filePath}`);
+  const token = await getValidDropboxToken(env);
+  if (!token) {
+    console.log(`[COVER DEBUG] No Dropbox token available for ${filePath}`);
     return undefined;
   }
 
@@ -25,7 +26,7 @@ async function getPermanentLink(
       {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${env.DROPBOX_TOKEN}`,
+          Authorization: `Bearer ${token}`,
           'content-type': 'application/json',
         },
         body: JSON.stringify({ 
@@ -251,7 +252,8 @@ async function findCoverArt(
   env: EnvBindings,
   album: Album,
 ): Promise<string | undefined> {
-  if (!env.DROPBOX_TOKEN) {
+  const token = await getValidDropboxToken(env);
+  if (!token) {
     return undefined;
   }
 
@@ -346,8 +348,9 @@ async function getCoverUrl(
   album: Album,
   env: EnvBindings,
 ): Promise<string | undefined> {
-  if (!env.DROPBOX_TOKEN) {
-    console.log(`[COVER DEBUG] No DROPBOX_TOKEN for ${album.title}`);
+  const token = await getValidDropboxToken(env);
+  if (!token) {
+    console.log(`[COVER DEBUG] No Dropbox token available for ${album.title}`);
     return undefined;
   }
 

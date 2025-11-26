@@ -52,7 +52,7 @@ function parseArgs(argv: string[]): ArgMap {
 }
 
 const args = parseArgs(process.argv.slice(2));
-let dropboxToken = process.env.DROPBOX_TOKEN;
+let dropboxToken: string | undefined = process.env.DROPBOX_TOKEN;
 const rootFolder = (args.path as string) ?? process.env.DROPBOX_LIBRARY_PATH ?? '/ZappaLibrary';
 const outputFile = (args.out as string) ?? path.resolve('data/library.generated.json');
 const metadataFile = path.resolve('data/album-metadata.json');
@@ -62,23 +62,25 @@ const metadataFile = path.resolve('data/album-metadata.json');
  */
 async function getValidToken(): Promise<string> {
   // If we have a refresh token setup, prefer using it to get a fresh token
-  // This ensures we always have a valid token even if DROPBOX_TOKEN is expired
   if (process.env.DROPBOX_REFRESH_TOKEN && process.env.DROPBOX_APP_KEY && process.env.DROPBOX_APP_SECRET) {
-    // Always refresh to get a fresh token when refresh token is available
-    // This avoids using potentially expired DROPBOX_TOKEN
     try {
       dropboxToken = await refreshAccessToken();
       console.log('✅ Successfully obtained fresh access token from refresh token');
       return dropboxToken;
     } catch (error) {
-      console.warn('⚠️  Failed to refresh token, falling back to DROPBOX_TOKEN:', error instanceof Error ? error.message : error);
-      // Fall through to use DROPBOX_TOKEN if refresh fails
+      console.error('❌ Failed to refresh token:', error instanceof Error ? error.message : error);
+      // If refresh fails and we have DROPBOX_TOKEN as fallback, use it
+      if (dropboxToken) {
+        console.warn('⚠️  Falling back to DROPBOX_TOKEN (if provided)');
+        return dropboxToken;
+      }
+      throw new Error('Failed to refresh token and no DROPBOX_TOKEN fallback available. Please check your refresh token credentials.');
     }
   }
   
   // Fallback to DROPBOX_TOKEN if no refresh token setup
   if (!dropboxToken) {
-    throw new Error('DROPBOX_TOKEN missing. Add it to your .env file or set up refresh token (DROPBOX_REFRESH_TOKEN, DROPBOX_APP_KEY, DROPBOX_APP_SECRET).');
+    throw new Error('No Dropbox token available. Please set up refresh token credentials (DROPBOX_REFRESH_TOKEN, DROPBOX_APP_KEY, DROPBOX_APP_SECRET) or provide DROPBOX_TOKEN.');
   }
   
   return dropboxToken;
@@ -138,14 +140,14 @@ async function dropboxRequest<T>(endpoint: string, body: Record<string, unknown>
         errorMessage = `❌ Dropbox access token has expired!\n\n` +
           `To fix this:\n` +
           `1. Set up refresh token flow (recommended) - see docs/DROPBOX_TOKEN_SETUP.md\n` +
-          `2. Or generate a new token at: https://www.dropbox.com/developers/apps\n` +
-          `3. Update the DROPBOX_TOKEN secret in GitHub Actions\n` +
+          `   Configure DROPBOX_REFRESH_TOKEN, DROPBOX_APP_KEY, and DROPBOX_APP_SECRET\n` +
+          `2. Update the secrets in GitHub Actions\n` +
           `   (Settings → Secrets and variables → Actions)\n` +
-          `4. Re-run the sync workflow\n\n` +
+          `3. Re-run the sync workflow\n\n` +
           `Original error: ${text}`;
       } else if (errorData.error?.['.tag'] === 'invalid_access_token') {
         errorMessage = `❌ Invalid Dropbox access token!\n\n` +
-          `Please check that DROPBOX_TOKEN is set correctly.\n\n` +
+          `Please check that refresh token credentials (DROPBOX_REFRESH_TOKEN, DROPBOX_APP_KEY, DROPBOX_APP_SECRET) are set correctly.\n\n` +
           `Original error: ${text}`;
       }
     } catch {
