@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "postinstall": "npm install --no-save @rollup/rollup-linux-x64-gnu@4.53.3 || true",
     "build": "tsc -b tsconfig.app.json && vite build",
     "build:skip-check": "vite build",
     "lint": "eslint .",
