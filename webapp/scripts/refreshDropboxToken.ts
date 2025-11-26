@@ -1,21 +1,21 @@
 import 'dotenv/config';
 
-const DROPBOX_APP_KEY = process.env.DROPBOX_APP_KEY;
-const DROPBOX_APP_SECRET = process.env.DROPBOX_APP_SECRET;
-const DROPBOX_REFRESH_TOKEN = process.env.DROPBOX_REFRESH_TOKEN;
-
-if (!DROPBOX_APP_KEY || !DROPBOX_APP_SECRET || !DROPBOX_REFRESH_TOKEN) {
-  console.error('Missing required environment variables:');
-  if (!DROPBOX_APP_KEY) console.error('  DROPBOX_APP_KEY');
-  if (!DROPBOX_APP_SECRET) console.error('  DROPBOX_APP_SECRET');
-  if (!DROPBOX_REFRESH_TOKEN) console.error('  DROPBOX_REFRESH_TOKEN');
-  process.exit(1);
-}
-
 /**
  * Refresh a Dropbox access token using a refresh token
  */
 export async function refreshAccessToken(): Promise<string> {
+  const DROPBOX_APP_KEY = process.env.DROPBOX_APP_KEY;
+  const DROPBOX_APP_SECRET = process.env.DROPBOX_APP_SECRET;
+  const DROPBOX_REFRESH_TOKEN = process.env.DROPBOX_REFRESH_TOKEN;
+
+  if (!DROPBOX_APP_KEY || !DROPBOX_APP_SECRET || !DROPBOX_REFRESH_TOKEN) {
+    const missing = [];
+    if (!DROPBOX_APP_KEY) missing.push('DROPBOX_APP_KEY');
+    if (!DROPBOX_APP_SECRET) missing.push('DROPBOX_APP_SECRET');
+    if (!DROPBOX_REFRESH_TOKEN) missing.push('DROPBOX_REFRESH_TOKEN');
+    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+  }
+
   const credentials = Buffer.from(`${DROPBOX_APP_KEY}:${DROPBOX_APP_SECRET}`).toString('base64');
   
   const response = await fetch('https://api.dropbox.com/oauth2/token', {
