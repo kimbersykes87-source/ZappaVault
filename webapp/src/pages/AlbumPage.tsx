@@ -117,7 +117,7 @@ export function AlbumPage() {
                 </div>
               </div>
               <div className="track-actions">
-                <span>{formatDuration(track.durationMs)}</span>
+                <span className="track-duration">{formatDuration(track.durationMs)}</span>
                 {track.streamingUrl ? (
                   <button type="button" onClick={() => handlePlayTrack(index)}>
                     ▶
