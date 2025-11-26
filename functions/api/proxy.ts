@@ -1,4 +1,5 @@
 import type { EnvBindings } from '../utils/library.ts';
+import type { PagesFunction } from '@cloudflare/workers-types';
 
 export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
   const { request, env } = context;
