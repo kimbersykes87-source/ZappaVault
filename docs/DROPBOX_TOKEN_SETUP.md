@@ -35,11 +35,25 @@ Your Dropbox access token has expired and needs to be regenerated.
 
 ### Step 3: Verify Required Permissions
 
-Make sure your Dropbox app has these permissions:
-- `files.content.read` - Read files
-- `files.metadata.read` - Read file metadata
-- `sharing.read` - Read shared links
-- `sharing.write` - Create shared links
+**CRITICAL**: Make sure your Dropbox app has ALL of these permissions enabled:
+
+- ✅ `files.content.read` - Read files (required for streaming)
+- ✅ `files.metadata.read` - Read file metadata (required for library sync)
+- ✅ `files.content.write` - Write files (if needed)
+- ✅ `files.metadata.write` - Write metadata (if needed)
+- ✅ `sharing.read` - **REQUIRED** - Read shared links (for cover art and existing links)
+- ✅ `sharing.write` - **REQUIRED** - Create shared links (for streaming and cover art)
+
+**⚠️ Without `sharing.read`, cover art will NOT load!**
+
+The app needs `sharing.read` to:
+- List existing shared links before creating new ones
+- Find cover art images that already have shared links
+- Avoid creating duplicate links
+
+Without `sharing.write`, the app cannot:
+- Create new shared links for streaming
+- Generate cover art URLs
 
 ### Step 4: Test the Sync
 
