@@ -8,7 +8,7 @@ import { usePlayerStore } from '../store/player.ts';
 import { fetchAlbum } from '../lib/api.ts';
 
 export function LibraryPage() {
-  const { request, setRequest, albums, loading, error, refresh, total } =
+  const { request, setRequest, albums, loading, error, refresh } =
     useLibraryQuery();
   const setQueue = usePlayerStore((state) => state.setQueue);
   const [busyAlbum, setBusyAlbum] = useState<string | null>(null);
