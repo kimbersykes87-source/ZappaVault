@@ -97,24 +97,33 @@ export async function loadLibrarySnapshot(
   env: EnvBindings,
   request?: Request,
 ): Promise<LibrarySnapshot> {
-  // First, try loading from static asset - most up-to-date
-  // This ensures we get the latest library with all durations merged in
+  // ALWAYS try loading from static asset first - comprehensive library has all durations
+  // This is the single source of truth with all metadata including durations
   if (request) {
     const staticLibrary = await loadLibraryFromStaticAsset(request);
     if (staticLibrary) {
-      return staticLibrary;
+      // Verify it has durations before using it
+      const hasDurations = staticLibrary.albums.some(album => 
+        album.tracks.some(track => track.durationMs > 0)
+      );
+      if (hasDurations) {
+        console.log(`[LIBRARY] Using comprehensive library from static asset (has durations)`);
+        return staticLibrary;
+      } else {
+        console.warn(`[LIBRARY] Static asset loaded but lacks durations, will try KV cache`);
+      }
+    } else {
+      console.warn(`[LIBRARY] Failed to load from static asset, will try KV cache`);
     }
   }
 
   // Second, try KV cache (fastest, but may be stale)
   // Only use if static asset fetch failed
-  // Skip KV cache if static asset fetch failed - it might have old data without durations
-  // We want to prioritize the comprehensive library file which always has durations
   if (env.LIBRARY_KV) {
     const cached = await env.LIBRARY_KV.get(LIBRARY_CACHE_KEY, 'json');
     if (cached) {
       const cachedSnapshot = cached as LibrarySnapshot;
-      // Check if cached data has durations (sample library won't have real durations)
+      // Check if cached data has durations
       const hasDurations = cachedSnapshot.albums.some(album => 
         album.tracks.some(track => track.durationMs > 0)
       );
@@ -122,13 +131,13 @@ export async function loadLibrarySnapshot(
         console.log(`[LIBRARY] Loaded library from KV cache: ${cachedSnapshot.albumCount} albums (has durations)`);
         return cachedSnapshot;
       } else {
-        console.log(`[LIBRARY] KV cache exists but lacks durations, skipping cache to force static asset load`);
+        console.log(`[LIBRARY] KV cache exists but lacks durations, will use sample library`);
       }
     }
   }
 
   // Fallback to sample library (for development/testing)
-  console.warn(`[LIBRARY] ⚠️  Using sample library as fallback`);
+  console.warn(`[LIBRARY] Using sample library as fallback`);
   return sampleLibrary;
 }
 
