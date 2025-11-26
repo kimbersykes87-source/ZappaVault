@@ -703,10 +703,10 @@ async function attachSignedLinks(
       if (!link) {
         const errorMsg = `Failed to get link for track "${track.title}": ${dropboxFilePath}`;
         console.log(`[LINK DEBUG]   ❌ ${errorMsg}`);
-        return { track, link: undefined, error: errorMsg };
+        return { track, link: undefined, durationMs: track.durationMs, error: errorMsg };
       } else {
         console.log(`[LINK DEBUG]   ✅ Got link: ${link.substring(0, 50)}...`);
-        return { track, link };
+        return { track, link, durationMs: track.durationMs };
       }
     });
     
