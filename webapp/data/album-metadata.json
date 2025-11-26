@@ -424,7 +424,7 @@
       "subtitle": null
     },
     {
-      "match": "LÃ¤ther",
+      "match": "Läther",
       "year": 1996,
       "coverArt": null,
       "era": "Posthumous Release",
@@ -924,7 +924,7 @@
       "subtitle": null
     },
     {
-      "match": "Zappa '75: Zagreb/Ljubljana",
+      "match": "Zappa '75",
       "year": 2022,
       "coverArt": null,
       "era": "Posthumous Release",
@@ -991,6 +991,76 @@
       "genre": "Progressive Rock",
       "description": "Studio album featuring a mix of complex instrumental compositions and vocal tracks. Includes the epic 'Black Napkins' and showcases Zappa's guitar work and compositional skills.",
       "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "AAAFNRAA",
+      "year": 1991,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Compilation",
+      "description": "Posthumous compilation album featuring selections from throughout Zappa's career. The title stands for 'Any Way The Wind Blows' and includes material from various eras and musical styles.",
+      "tags": ["compilation"],
+      "subtitle": null
+    },
+    {
+      "match": "Philly '76",
+      "year": 2009,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Progressive Rock",
+      "description": "Posthumous live album recorded in Philadelphia in 1976. Features performances from the late 1970s touring band with complex arrangements and extended improvisations.",
+      "tags": ["live"],
+      "subtitle": null
+    },
+    {
+      "match": "quAUDIOPHILIAc",
+      "year": 2004,
+      "coverArt": null,
+      "era": "Posthumous Release",
+      "genre": "Synclavier",
+      "description": "Posthumous release featuring Synclavier compositions from Zappa's vault. Electronic music showcasing advanced compositional techniques and rhythmic complexity.",
+      "tags": [],
+      "subtitle": null
+    },
+    {
+      "match": "The Dub Room Special",
+      "year": 1982,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Progressive Rock",
+      "description": "Compilation album featuring live performances and studio recordings. Includes material from various periods, showcasing Zappa's diverse musical output and production techniques.",
+      "tags": ["compilation", "live"],
+      "subtitle": null
+    },
+    {
+      "match": "The Old Masters, Box 1",
+      "year": 1985,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Compilation",
+      "description": "First volume in The Old Masters box set series, featuring remastered versions of early Mothers of Invention albums. Includes Freak Out!, Absolutely Free, and We're Only In It For The Money.",
+      "tags": ["compilation", "box set"],
+      "subtitle": null
+    },
+    {
+      "match": "The Old Masters, Box 2",
+      "year": 1986,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Compilation",
+      "description": "Second volume in The Old Masters box set series, featuring remastered versions of albums from the late 1960s and early 1970s. Includes Cruising with Ruben & The Jets, Uncle Meat, and Hot Rats.",
+      "tags": ["compilation", "box set"],
+      "subtitle": null
+    },
+    {
+      "match": "The Old Masters, Box 3",
+      "year": 1987,
+      "coverArt": null,
+      "era": "Solo Career",
+      "genre": "Compilation",
+      "description": "Third volume in The Old Masters box set series, featuring remastered versions of albums from the 1970s. Includes material from various periods showcasing Zappa's evolving musical style.",
+      "tags": ["compilation", "box set"],
       "subtitle": null
     }
   ],
