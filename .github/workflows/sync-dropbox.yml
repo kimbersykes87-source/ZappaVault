@@ -37,6 +37,7 @@ jobs:
 
       - name: Sync Dropbox snapshot
         run: npm run sync:dropbox -- --out data/library.generated.json
+        continue-on-error: false
 
       - name: Configure Git
         run: |

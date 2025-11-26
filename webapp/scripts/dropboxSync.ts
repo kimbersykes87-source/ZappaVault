@@ -532,28 +532,51 @@ async function uploadToCloudflare(snapshot: LibrarySnapshot): Promise<void> {
   const apiToken = process.env.CLOUDFLARE_API_TOKEN;
 
   if (!namespaceId || !accountId || !apiToken) {
+    console.warn('⚠️  Cloudflare KV credentials not provided. Skipping KV upload.');
+    console.warn('   Missing:', {
+      namespaceId: !namespaceId ? 'CF_KV_NAMESPACE_ID' : undefined,
+      accountId: !accountId ? 'CF_ACCOUNT_ID' : undefined,
+      apiToken: !apiToken ? 'CLOUDFLARE_API_TOKEN' : undefined,
+    });
     return;
   }
 
-  const response = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${accountId}/storage/kv/namespaces/${namespaceId}/bulk`,
-    {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${apiToken}`,
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify([
-        {
-          key: 'library-snapshot',
-          value: JSON.stringify(snapshot),
-        },
-      ]),
-    },
-  );
+  console.log('📤 Uploading library snapshot to Cloudflare KV...');
+  console.log(`   Account ID: ${accountId.substring(0, 8)}...`);
+  console.log(`   Namespace ID: ${namespaceId.substring(0, 8)}...`);
+  console.log(`   Albums: ${snapshot.albums.length}`);
+  console.log(`   Tracks: ${snapshot.trackCount}`);
 
-  if (!response.ok) {
-    throw new Error(`Cloudflare KV bulk write failed: ${await response.text()}`);
+  try {
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/storage/kv/namespaces/${namespaceId}/bulk`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${apiToken}`,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify([
+          {
+            key: 'library-snapshot',
+            value: JSON.stringify(snapshot),
+          },
+        ]),
+      },
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Cloudflare KV upload failed:');
+      console.error(`   Status: ${response.status} ${response.statusText}`);
+      console.error(`   Error: ${errorText}`);
+      throw new Error(`Cloudflare KV bulk write failed: ${response.status} ${errorText}`);
+    }
+
+    console.log('✅ Cloudflare KV updated successfully!');
+  } catch (error) {
+    console.error('❌ Error uploading to Cloudflare KV:', error);
+    throw error;
   }
 }
 
@@ -569,9 +592,11 @@ async function run(): Promise<void> {
 
   try {
     await uploadToCloudflare(snapshot);
-    console.log('Cloudflare KV updated (if credentials provided).');
   } catch (error) {
-    console.warn('Cloudflare KV update failed (non-blocking):', error);
+    console.error('❌ Cloudflare KV update failed:', error);
+    console.error('   This is non-blocking - the library file was still generated.');
+    console.error('   Check your Cloudflare credentials and try again.');
+    // Don't exit - the file generation was successful
   }
 }
 
