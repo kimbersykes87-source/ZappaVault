@@ -1077,7 +1077,7 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
   const hasRefreshToken = !!(env.DROPBOX_REFRESH_TOKEN && env.DROPBOX_APP_KEY && env.DROPBOX_APP_SECRET);
   console.log(`[API DEBUG] Refresh token credentials present: ${hasRefreshToken}`);
   
-  const snapshot = await loadLibrarySnapshot(env);
+  const snapshot = await loadLibrarySnapshot(env, request);
   const albumId = params?.id;
 
   if (!albumId) {

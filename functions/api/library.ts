@@ -398,7 +398,7 @@ export const onRequestGet = async (context: {
   env: EnvBindings;
 }) => {
   const { request, env } = context;
-  const snapshot = await loadLibrarySnapshot(env);
+  const snapshot = await loadLibrarySnapshot(env, request);
   const url = new URL(request.url);
 
   const query: LibraryQuery = {

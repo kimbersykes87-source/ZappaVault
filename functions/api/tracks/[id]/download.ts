@@ -41,7 +41,7 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
     return new Response('Dropbox token not configured', { status: 500 });
   }
 
-  const snapshot = await loadLibrarySnapshot(env);
+  const snapshot = await loadLibrarySnapshot(env, request);
   
   // Find the track by searching through all albums
   let track = null;

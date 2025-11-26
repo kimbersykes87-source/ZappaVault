@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cloudflare Environment Variables Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+    .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+    button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    .success { color: green; }
+    .error { color: red; }
+    .info { color: blue; }
+    pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>Cloudflare Pages Environment Variables Test</h1>
+  
+  <div class="test-section">
+    <h2>Test 1: Check API Endpoint</h2>
+    <p>This will test if the API is accessible and can generate streaming links.</p>
+    <button onclick="testAPI()">Test API</button>
+    <div id="api-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>Test 2: Test Specific Album</h2>
+    <p>Enter an album ID to test (e.g., "apps-zappavault-zappalibrary-absolutely-free"):</p>
+    <input type="text" id="album-id" placeholder="album-id" style="width: 400px; padding: 5px;">
+    <button onclick="testAlbum()">Test Album</button>
+    <div id="album-result"></div>
+  </div>
+
+  <script>
+    async function testAPI() {
+      const resultDiv = document.getElementById('api-result');
+      resultDiv.innerHTML = '<p class="info">Testing API endpoint...</p>';
+      
+      try {
+        const response = await fetch('/api/albums/apps-zappavault-zappalibrary-absolutely-free?links=1');
+        const data = await response.json();
+        
+        if (data.album && data.album.tracks) {
+          const tracksWithLinks = data.album.tracks.filter(t => t.streamingUrl).length;
+          const totalTracks = data.album.tracks.length;
+          
+          if (tracksWithLinks > 0) {
+            resultDiv.innerHTML = `
+              <p class="success">✅ SUCCESS: ${tracksWithLinks}/${totalTracks} tracks have streaming URLs</p>
+              <p>Environment variables are configured correctly!</p>
+            `;
+          } else {
+            resultDiv.innerHTML = `
+              <p class="error">❌ ERROR: No streaming URLs generated</p>
+              <p>This means environment variables are missing or not working.</p>
+              <p><strong>Check:</strong></p>
+              <ul>
+                <li>Cloudflare Pages → Settings → Environment Variables</li>
+                <li>Ensure DROPBOX_REFRESH_TOKEN, DROPBOX_APP_KEY, and DROPBOX_APP_SECRET are set</li>
+                <li>Trigger a new deployment after adding variables</li>
+              </ul>
+              <pre>${JSON.stringify(data, null, 2).substring(0, 500)}...</pre>
+            `;
+          }
+        } else {
+          resultDiv.innerHTML = `<p class="error">❌ Unexpected API response format</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+      }
+    }
+
+    async function testAlbum() {
+      const albumId = document.getElementById('album-id').value;
+      const resultDiv = document.getElementById('album-result');
+      
+      if (!albumId) {
+        resultDiv.innerHTML = '<p class="error">Please enter an album ID</p>';
+        return;
+      }
+      
+      resultDiv.innerHTML = '<p class="info">Testing album...</p>';
+      
+      try {
+        const response = await fetch(`/api/albums/${albumId}?links=1`);
+        const data = await response.json();
+        
+        if (data.album && data.album.tracks) {
+          const tracksWithLinks = data.album.tracks.filter(t => t.streamingUrl).length;
+          const totalTracks = data.album.tracks.length;
+          
+          resultDiv.innerHTML = `
+            <p><strong>Album:</strong> ${data.album.title}</p>
+            <p class="${tracksWithLinks > 0 ? 'success' : 'error'}">
+              ${tracksWithLinks > 0 ? '✅' : '❌'} ${tracksWithLinks}/${totalTracks} tracks have streaming URLs
+            </p>
+            ${tracksWithLinks > 0 ? '' : '<p>Check Cloudflare Pages environment variables</p>'}
+            <details>
+              <summary>View Response</summary>
+              <pre>${JSON.stringify(data, null, 2)}</pre>
+            </details>
+          `;
+        } else {
+          resultDiv.innerHTML = `<p class="error">Album not found or invalid response</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
+
+

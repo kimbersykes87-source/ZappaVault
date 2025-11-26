@@ -24,6 +24,14 @@ export default defineConfig({
             copyFileSync(trackDurationsSrc, trackDurationsDest)
             console.log('✅ Copied track_durations.json to dist/data/')
           }
+          
+          // Copy library.generated.json
+          const librarySrc = join(dataDir, 'library.generated.json')
+          const libraryDest = join(distDataDir, 'library.generated.json')
+          if (existsSync(librarySrc)) {
+            copyFileSync(librarySrc, libraryDest)
+            console.log('✅ Copied library.generated.json to dist/data/')
+          }
         }
       },
     },
