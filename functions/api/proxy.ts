@@ -1,7 +1,9 @@
 import type { EnvBindings } from '../utils/library.ts';
-import type { PagesFunction } from '@cloudflare/workers-types';
 
-export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
+export const onRequestGet = async (context: {
+  request: Request;
+  env: EnvBindings;
+}) => {
   const { request, env } = context;
   const url = new URL(request.url);
   
