@@ -86,18 +86,22 @@ async function getPermanentLink(
 
   try {
     // First, try to get existing shared link
+    // Ensure path is properly formatted for Dropbox API
+    const normalizedPath = filePath.startsWith('/') ? filePath : `/${filePath}`;
+    console.log(`[LINK DEBUG] Requesting shared link for path: ${normalizedPath}`);
+    
     let response: Response;
     try {
       response = await dropboxRequestWithRefresh(
         'sharing/list_shared_links',
         { 
-          path: filePath,
+          path: normalizedPath,
           direct_only: false 
         },
         env,
       );
     } catch (requestError) {
-      const errorMsg = `Failed to request shared links for ${filePath}: ${requestError instanceof Error ? requestError.message : String(requestError)}`;
+      const errorMsg = `Failed to request shared links for ${normalizedPath}: ${requestError instanceof Error ? requestError.message : String(requestError)}`;
       console.error(`[LINK DEBUG] ${errorMsg}`);
       if (errors) errors.push(errorMsg);
       return undefined;
@@ -139,7 +143,7 @@ async function getPermanentLink(
       response = await dropboxRequestWithRefresh(
         'sharing/create_shared_link_with_settings',
         { 
-          path: filePath,
+          path: normalizedPath,
           settings: {
             requested_visibility: {
               '.tag': 'public'
@@ -149,7 +153,7 @@ async function getPermanentLink(
         env,
       );
     } catch (requestError) {
-      const errorMsg = `Failed to create shared link for ${filePath}: ${requestError instanceof Error ? requestError.message : String(requestError)}`;
+      const errorMsg = `Failed to create shared link for ${normalizedPath}: ${requestError instanceof Error ? requestError.message : String(requestError)}`;
       console.error(`[LINK DEBUG] ${errorMsg}`);
       if (errors) errors.push(errorMsg);
       return undefined;
@@ -169,13 +173,13 @@ async function getPermanentLink(
           conflictResponse = await dropboxRequestWithRefresh(
             'sharing/list_shared_links',
             { 
-              path: filePath,
+              path: normalizedPath,
               direct_only: false 
             },
             env,
           );
         } catch (requestError) {
-          const errorMsg = `Failed to retrieve existing link after conflict for ${filePath}: ${requestError instanceof Error ? requestError.message : String(requestError)}`;
+          const errorMsg = `Failed to retrieve existing link after conflict for ${normalizedPath}: ${requestError instanceof Error ? requestError.message : String(requestError)}`;
           console.error(`[LINK DEBUG] ${errorMsg}`);
           if (errors) errors.push(errorMsg);
           return undefined;
