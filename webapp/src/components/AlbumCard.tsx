@@ -35,32 +35,34 @@ export function AlbumCard({ album, onPlay }: AlbumCardProps) {
 
   return (
     <article className="album-card">
-      <div className="album-cover">
-        {album.coverUrl ? (
-          <img 
-            src={album.coverUrl.startsWith('/') ? album.coverUrl : getProxyUrl(album.coverUrl)} 
-            alt={album.title} 
-            loading="lazy"
-            onError={(e) => {
-              // Hide broken image and show placeholder instead
-              const target = e.target as HTMLImageElement;
-              console.error('Cover art failed to load:', album.coverUrl);
-              console.error('Image source:', target.src);
-              target.style.display = 'none';
-              const placeholder = target.parentElement?.querySelector('.album-cover-placeholder') as HTMLElement;
-              if (placeholder) {
-                placeholder.style.display = 'grid';
-              }
-            }}
-            onLoad={() => {
-              console.log('Cover art loaded successfully:', album.coverUrl);
-            }}
-          />
-        ) : null}
-        <div className="album-cover-placeholder" style={{ display: album.coverUrl ? 'none' : 'grid' }}>
-          <span>{album.title.slice(0, 2).toUpperCase()}</span>
+      <Link to={`/album/${album.id}`} className="album-cover-link">
+        <div className="album-cover">
+          {album.coverUrl ? (
+            <img 
+              src={album.coverUrl.startsWith('/') ? album.coverUrl : getProxyUrl(album.coverUrl)} 
+              alt={album.title} 
+              loading="lazy"
+              onError={(e) => {
+                // Hide broken image and show placeholder instead
+                const target = e.target as HTMLImageElement;
+                console.error('Cover art failed to load:', album.coverUrl);
+                console.error('Image source:', target.src);
+                target.style.display = 'none';
+                const placeholder = target.parentElement?.querySelector('.album-cover-placeholder') as HTMLElement;
+                if (placeholder) {
+                  placeholder.style.display = 'grid';
+                }
+              }}
+              onLoad={() => {
+                console.log('Cover art loaded successfully:', album.coverUrl);
+              }}
+            />
+          ) : null}
+          <div className="album-cover-placeholder" style={{ display: album.coverUrl ? 'none' : 'grid' }}>
+            <span>{album.title.slice(0, 2).toUpperCase()}</span>
+          </div>
         </div>
-      </div>
+      </Link>
 
       <div className="album-content">
         <header>

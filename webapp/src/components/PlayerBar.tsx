@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { selectCurrentTrack, usePlayerStore } from '../store/player.ts';
 import { formatDuration } from '../utils/format.ts';
 import { getProxyUrl } from '../lib/api.ts';
@@ -15,6 +15,7 @@ export function PlayerBar() {
   const next = usePlayerStore((state) => state.next);
   const previous = usePlayerStore((state) => state.previous);
   const setLoading = usePlayerStore((state) => state.setLoading);
+  const [timeRemaining, setTimeRemaining] = useState<number>(0);
 
   // Load audio source when track changes (but don't play yet)
   useEffect(() => {
@@ -140,6 +141,43 @@ export function PlayerBar() {
     };
   }, [next]);
 
+  // Track time remaining for countdown
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !currentTrack) {
+      return;
+    }
+
+    const updateTimeRemaining = () => {
+      if (audio.duration && !isNaN(audio.duration)) {
+        const remaining = Math.max(0, (audio.duration * 1000) - (audio.currentTime * 1000));
+        setTimeRemaining(remaining);
+      } else {
+        // If duration not loaded yet, use track duration
+        setTimeRemaining(currentTrack.durationMs || 0);
+      }
+    };
+
+    const handleTimeUpdate = () => {
+      updateTimeRemaining();
+    };
+
+    const handleLoadedMetadata = () => {
+      updateTimeRemaining();
+    };
+
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    
+    // Initial update
+    updateTimeRemaining();
+
+    return () => {
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    };
+  }, [currentTrack]);
+
   if (!currentTrack) {
     return (
       <footer className="player-bar">
@@ -188,7 +226,7 @@ export function PlayerBar() {
       </div>
       <div className="player-meta">
         <span>{currentTrack.format}</span>
-        <span>{formatDuration(currentTrack.durationMs)}</span>
+        <span>-{formatDuration(timeRemaining)}</span>
       </div>
     </footer>
   );

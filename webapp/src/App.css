@@ -134,6 +134,19 @@
   height: 100%;
 }
 
+.album-cover-link {
+  display: block;
+  width: 100%;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.album-cover-link:hover {
+  transform: scale(1.02);
+  opacity: 0.9;
+}
+
 .album-cover {
   width: 100%;
   aspect-ratio: 1 / 1;

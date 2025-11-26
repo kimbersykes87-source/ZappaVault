@@ -125,9 +125,6 @@ export function AlbumPage() {
                 ) : (
                   <span className="badge">No stream</span>
                 )}
-                <a href={getTrackDownloadUrl(track.id)} target="_blank" rel="noreferrer">
-                  ⬇
-                </a>
               </div>
             </li>
           ))}
