@@ -445,7 +445,8 @@ async function attachSignedLinks(
   }
 
   console.log(`[LINK DEBUG] Processing album: ${album.title} (${album.tracks.length} tracks)`);
-  console.log(`[LINK DEBUG] Token length: ${env.DROPBOX_TOKEN.length} chars`);
+  const token = await getValidDropboxToken(env);
+  console.log(`[LINK DEBUG] Token available: ${!!token}, Token length: ${token?.length || 0} chars`);
 
   const errors: string[] = [];
   const updatedTracks = await Promise.all(
