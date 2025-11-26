@@ -1087,6 +1087,11 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
 
   console.log(`[API DEBUG] Looking for album: ${albumId}`);
   const album = snapshot.albums.find((entry) => entry.id === albumId);
+  
+  // Debug: Log first track's duration to verify library data
+  if (album && album.tracks.length > 0) {
+    console.log(`[API DEBUG] Album found: ${album.title}, first track duration: ${album.tracks[0].durationMs}ms`);
+  }
 
   if (!album) {
     console.log(`[API DEBUG] Album not found: ${albumId}`);
