@@ -16,6 +16,7 @@ export function PlayerBar() {
   const previous = usePlayerStore((state) => state.previous);
   const setLoading = usePlayerStore((state) => state.setLoading);
 
+  // Load audio source when track changes (but don't play yet)
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !currentTrack?.streamingUrl) {
@@ -63,26 +64,12 @@ export function PlayerBar() {
     audio.crossOrigin = 'anonymous';
     // Set preload to help with streaming
     audio.preload = 'auto';
-    audio.src = proxiedUrl;
     
-    // Load the audio source
-    audio.load();
-    
-    if (isPlaying) {
-      // Use a small delay to ensure the audio element is ready
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((err) => {
-          console.error('Audio play failed:', err);
-          console.error('URL:', currentTrack.streamingUrl);
-          console.error('Error name:', err.name);
-          console.error('Error message:', err.message);
-          // If autoplay was prevented, try to play on user interaction
-          if (err.name === 'NotAllowedError') {
-            console.warn('Autoplay prevented. User interaction required.');
-          }
-        });
-      }
+    // Only update src if it's different to avoid unnecessary reloads
+    if (audio.src !== proxiedUrl) {
+      audio.src = proxiedUrl;
+      // Load the audio source
+      audio.load();
     }
     
     return () => {
@@ -91,19 +78,55 @@ export function PlayerBar() {
       audio.removeEventListener('loadstart', handleLoadStart);
       audio.removeEventListener('loadeddata', handleLoadedData);
     };
-  }, [currentTrack, isPlaying, setLoading]);
+  }, [currentTrack, setLoading]);
 
+  // Control play/pause when isPlaying changes
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) {
+    if (!audio || !currentTrack?.streamingUrl) {
       return;
     }
+    
+    // Only control play/pause, don't load audio here
     if (isPlaying) {
-      void audio.play().catch(() => undefined);
+      // Wait a bit to ensure audio is loaded, then play
+      const playWhenReady = () => {
+        if (audio.readyState >= audio.HAVE_FUTURE_DATA) {
+          const playPromise = audio.play();
+          if (playPromise !== undefined) {
+            playPromise.catch((err) => {
+              // Ignore AbortError - it's expected when switching tracks quickly
+              if (err.name !== 'AbortError') {
+                console.error('Audio play failed:', err);
+              }
+            });
+          }
+        } else {
+          // Wait for audio to be ready
+          const handleCanPlay = () => {
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+              playPromise.catch((err) => {
+                if (err.name !== 'AbortError') {
+                  console.error('Audio play failed:', err);
+                }
+              });
+            }
+          };
+          audio.addEventListener('canplay', handleCanPlay, { once: true });
+          return () => {
+            audio.removeEventListener('canplay', handleCanPlay);
+          };
+        }
+      };
+      
+      // Small delay to avoid race condition with audio loading
+      const timeoutId = setTimeout(playWhenReady, 100);
+      return () => clearTimeout(timeoutId);
     } else {
       audio.pause();
     }
-  }, [isPlaying]);
+  }, [isPlaying, currentTrack]);
 
   useEffect(() => {
     const audio = audioRef.current;
