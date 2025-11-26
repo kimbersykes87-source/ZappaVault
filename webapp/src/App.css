@@ -106,7 +106,7 @@
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.05);
-  color: inherit;
+  color: #fdf9ef;
   cursor: pointer;
   min-width: 180px;
   appearance: none;
@@ -114,6 +114,17 @@
   background-repeat: no-repeat;
   background-position: right 1.2rem center;
   background-size: 12px;
+}
+
+.sort-dropdown option {
+  background: #1f1f32;
+  color: #fdf9ef;
+  padding: 0.5rem;
+}
+
+.sort-dropdown:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 
