@@ -26,12 +26,21 @@ export function LibraryPage() {
       const album = await fetchAlbum(albumId, true);
       const playable = album.tracks.filter((track) => track.streamingUrl);
       if (playable.length === 0) {
-        alert('Streaming links are not available for this album yet.');
+        console.error(`No streaming links available for album: ${album.title}`);
+        console.error(`Total tracks: ${album.tracks.length}`);
+        // Check if there are any tracks at all
+        if (album.tracks.length === 0) {
+          alert('This album has no tracks.');
+        } else {
+          alert(`Streaming links are not available for this album yet. ${album.tracks.length} tracks found but no streaming URLs generated.`);
+        }
         setLoading(false);
         return;
       }
+      console.log(`Playing album: ${album.title} with ${playable.length} playable tracks out of ${album.tracks.length} total`);
       setQueue(playable, album.title, album.coverUrl);
     } catch (err) {
+      console.error('Error loading album:', err);
       alert((err as Error).message);
       setLoading(false);
     } finally {
