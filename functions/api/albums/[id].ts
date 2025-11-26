@@ -4,7 +4,6 @@ import {
 } from '../../utils/library.ts';
 import type { EnvBindings } from '../../utils/library.ts';
 import { getValidDropboxToken } from '../../utils/dropboxToken.ts';
-import { parseBuffer } from 'music-metadata';
 
 /**
  * Make a Dropbox API request with automatic token refresh on expiration
@@ -466,8 +465,133 @@ function prioritizeCoverFiles(imageFiles: string[]): string[] {
 }
 
 /**
+ * Parse MP3 duration from ID3v2/Xing header or frame headers
+ * This is a simplified parser that works in Cloudflare Workers
+ */
+function parseMP3Duration(buffer: Uint8Array, fileSize: number): number {
+  try {
+    // Check for ID3v2 tag at the beginning
+    let offset = 0;
+    if (buffer.length >= 10 && 
+        buffer[0] === 0x49 && buffer[1] === 0x44 && buffer[2] === 0x33) {
+      // ID3v2 tag present, skip it
+      const id3Size = (buffer[6] << 21) | (buffer[7] << 14) | (buffer[8] << 7) | buffer[9];
+      offset = 10 + id3Size;
+    }
+
+    // Look for MPEG frame sync (11 bits set to 1)
+    // MP3 frame header: 0xFF 0xE0-0xFF (sync + version/layer)
+    for (let i = offset; i < Math.min(offset + 4096, buffer.length - 4); i++) {
+      if (buffer[i] === 0xFF && (buffer[i + 1] & 0xE0) === 0xE0) {
+        // Found potential MP3 frame header
+        const version = (buffer[i + 1] & 0x18) >> 3; // MPEG version
+        const layer = (buffer[i + 1] & 0x06) >> 1; // Layer
+        const bitrateIndex = (buffer[i + 2] & 0xF0) >> 4;
+        const sampleRateIndex = (buffer[i + 2] & 0x0C) >> 2;
+        const padding = (buffer[i + 2] & 0x02) >> 1;
+
+        if (version === 1 || layer === 1) continue; // Invalid or reserved
+
+        // MPEG bitrate table (kbps)
+        const bitrates = [
+          [0, 0, 0, 0, 0], // reserved
+          [32, 32, 32, 32, 8], // Layer III
+          [64, 48, 40, 48, 16],
+          [96, 56, 48, 56, 24],
+          [128, 64, 56, 64, 32],
+          [160, 80, 64, 80, 40],
+          [192, 96, 80, 96, 48],
+          [224, 112, 96, 112, 56],
+          [256, 128, 112, 128, 64],
+          [288, 160, 128, 144, 80],
+          [320, 192, 160, 160, 96],
+          [352, 224, 192, 176, 112],
+          [384, 256, 224, 192, 128],
+          [416, 320, 256, 224, 144],
+          [448, 384, 320, 256, 160],
+        ];
+
+        // Sample rates (Hz)
+        const sampleRates = [
+          [44100, 22050, 11025], // MPEG 1
+          [48000, 24000, 12000], // MPEG 2
+          [32000, 16000, 8000],  // MPEG 2.5
+        ];
+
+        const layerIndex = layer === 3 ? 0 : (layer === 2 ? 1 : 2);
+        const bitrate = bitrates[bitrateIndex]?.[layerIndex] || 0;
+        const sampleRate = sampleRates[version]?.[sampleRateIndex] || 44100;
+
+        if (bitrate === 0 || sampleRate === 0) continue;
+
+        // Calculate frame size
+        const frameSize = layer === 3 
+          ? Math.floor((144 * bitrate * 1000) / sampleRate) + padding
+          : Math.floor((144 * bitrate * 1000) / sampleRate) + padding;
+
+        if (frameSize < 4) continue;
+
+        // Estimate duration: (file_size - header) / bitrate
+        // For VBR, this is approximate
+        const estimatedDuration = ((fileSize - offset) * 8) / (bitrate * 1000);
+        
+        if (estimatedDuration > 0 && estimatedDuration < 36000) { // Less than 10 hours
+          return Math.round(estimatedDuration * 1000);
+        }
+        break;
+      }
+    }
+  } catch (error) {
+    console.warn(`[DURATION] MP3 parsing error:`, error);
+  }
+  return 0;
+}
+
+/**
+ * Parse FLAC duration from STREAMINFO block
+ */
+function parseFLACDuration(buffer: Uint8Array): number {
+  try {
+    // FLAC signature: "fLaC" (0x66 0x4C 0x61 0x43)
+    if (buffer.length < 42 || 
+        buffer[0] !== 0x66 || buffer[1] !== 0x4C || 
+        buffer[2] !== 0x61 || buffer[3] !== 0x43) {
+      return 0;
+    }
+
+    // STREAMINFO block starts at offset 4
+    // Block header: 1 byte (type + last block flag)
+    // Block size: 3 bytes (big-endian)
+    // STREAMINFO data starts at offset 8
+    // Sample rate: bytes 18-20 (20 bits, big-endian)
+    // Total samples: bytes 13-16 (36 bits, big-endian, but we need to extract correctly)
+    
+    // Extract total samples (36-bit value from bytes 13-16, but it's split)
+    // Byte 13: bits 0-7 are part of sample rate
+    // Bytes 14-16: 24 bits of total samples (high part)
+    // Byte 13: bits 4-7 are low 4 bits of total samples
+    
+    const totalSamplesHigh = (buffer[14] << 16) | (buffer[15] << 8) | buffer[16];
+    const totalSamplesLow = (buffer[13] & 0x0F);
+    const totalSamples = (totalSamplesHigh << 4) | totalSamplesLow;
+    
+    // Extract sample rate (20-bit value from bytes 18-20)
+    const sampleRate = ((buffer[18] & 0x0F) << 16) | (buffer[19] << 8) | buffer[20];
+    
+    if (totalSamples > 0 && sampleRate > 0) {
+      const durationSeconds = totalSamples / sampleRate;
+      return Math.round(durationSeconds * 1000);
+    }
+  } catch (error) {
+    console.warn(`[DURATION] FLAC parsing error:`, error);
+  }
+  return 0;
+}
+
+/**
  * Extract duration from audio file header using HTTP range request
  * Only downloads first 2MB where duration metadata is stored
+ * Uses manual parsing for MP3/FLAC (compatible with Cloudflare Workers)
  */
 async function extractDurationFromDropboxFile(
   filePath: string,
@@ -479,13 +603,29 @@ async function extractDurationFromDropboxFile(
   }
 
   try {
-    // Download only the first 2MB (headers contain duration for MP3/FLAC)
+    // First, get file size
+    const metadataResponse = await fetch(`https://api.dropboxapi.com/2/files/get_metadata`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ path: filePath }),
+    });
+
+    let fileSize = 0;
+    if (metadataResponse.ok) {
+      const metadata = await metadataResponse.json() as { size?: number };
+      fileSize = metadata.size || 0;
+    }
+
+    // Download only the first 64KB (enough for headers)
     const response = await fetch(`https://content.dropboxapi.com/2/files/download`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
         'Dropbox-API-Arg': JSON.stringify({ path: filePath }),
-        Range: 'bytes=0-2097151', // First 2MB
+        Range: 'bytes=0-65535', // First 64KB
       },
     });
 
@@ -495,12 +635,20 @@ async function extractDurationFromDropboxFile(
     }
 
     const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const buffer = new Uint8Array(arrayBuffer);
 
-    // Parse metadata from buffer
-    const metadata = await parseBuffer(buffer);
-    const durationSeconds = metadata.format.duration || 0;
-    const durationMs = Math.round(durationSeconds * 1000);
+    // Determine file type from extension
+    const ext = filePath.toLowerCase().split('.').pop();
+    let durationMs = 0;
+
+    if (ext === 'mp3') {
+      durationMs = parseMP3Duration(buffer, fileSize);
+    } else if (ext === 'flac') {
+      durationMs = parseFLACDuration(buffer);
+    } else {
+      // For other formats, return 0 (could add WAV, OGG, etc. later)
+      console.log(`[DURATION] Format ${ext} not yet supported for duration extraction`);
+    }
     
     if (durationMs > 0) {
       console.log(`[DURATION] Extracted ${Math.round(durationMs / 1000)}s from ${filePath}`);
