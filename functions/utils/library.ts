@@ -46,20 +46,31 @@ export async function loadLibrarySnapshot(
   env: EnvBindings,
   request?: Request,
 ): Promise<LibrarySnapshot> {
-  // First, try KV cache (fastest, but may be stale)
-  if (env.LIBRARY_KV) {
-    const cached = await env.LIBRARY_KV.get(LIBRARY_CACHE_KEY, 'json');
-    if (cached) {
-      console.log(`[LIBRARY] ✅ Loaded library from KV cache: ${(cached as LibrarySnapshot).albumCount} albums`);
-      return cached as LibrarySnapshot;
-    }
-  }
-
-  // Second, try loading from Function endpoint (library-data.ts)
+  // First, try loading from Function endpoint (library-data.ts) - most up-to-date
+  // This ensures we get the latest library with all durations merged in
   if (request) {
     const functionLibrary = await loadLibraryFromFunction(request);
     if (functionLibrary) {
       return functionLibrary;
+    }
+  }
+
+  // Second, try KV cache (fastest, but may be stale)
+  // Only use if Function endpoint failed
+  if (env.LIBRARY_KV) {
+    const cached = await env.LIBRARY_KV.get(LIBRARY_CACHE_KEY, 'json');
+    if (cached) {
+      const cachedSnapshot = cached as LibrarySnapshot;
+      // Check if cached data has durations (sample library won't have real durations)
+      const hasDurations = cachedSnapshot.albums.some(album => 
+        album.tracks.some(track => track.durationMs > 0)
+      );
+      if (hasDurations) {
+        console.log(`[LIBRARY] ✅ Loaded library from KV cache: ${cachedSnapshot.albumCount} albums (has durations)`);
+        return cachedSnapshot;
+      } else {
+        console.log(`[LIBRARY] ⚠️  KV cache exists but lacks durations, skipping cache`);
+      }
     }
   }
 
