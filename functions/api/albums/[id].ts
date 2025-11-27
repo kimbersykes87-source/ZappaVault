@@ -1130,13 +1130,13 @@ async function attachSignedLinks(
     console.log(`[LINK DEBUG] Using static cover URL: ${coverUrl}`);
   }
 
-  const tracksWithLinks = updatedTracks.filter(t => t.streamingUrl).length;
-  const tracksWithoutLinks = updatedTracks.filter(t => !t.streamingUrl);
-  console.log(`[LINK DEBUG] Album ${album.title}: ${tracksWithLinks}/${updatedTracks.length} tracks have links`);
+  const finalTracksWithLinks = updatedTracks.filter(t => t.streamingUrl).length;
+  const finalTracksWithoutLinks = updatedTracks.filter(t => !t.streamingUrl);
+  console.log(`[LINK DEBUG] Album ${album.title}: ${finalTracksWithLinks}/${updatedTracks.length} tracks have links`);
   
-  if (tracksWithoutLinks.length > 0) {
-    console.error(`[LINK ERROR] Album ${album.title}: ${tracksWithoutLinks.length} tracks failed to get links:`);
-    tracksWithoutLinks.forEach((track, idx) => {
+  if (finalTracksWithoutLinks.length > 0) {
+    console.error(`[LINK ERROR] Album ${album.title}: ${finalTracksWithoutLinks.length} tracks failed to get links:`);
+    finalTracksWithoutLinks.forEach((track, idx) => {
       const result = trackResults.find(r => r.track.id === track.id);
       console.error(`[LINK ERROR]   ${idx + 1}. Track ${track.trackNumber}: "${track.title}"`);
       console.error(`[LINK ERROR]      Path: ${track.filePath}`);
