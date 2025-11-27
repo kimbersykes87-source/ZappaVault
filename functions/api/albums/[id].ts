@@ -860,13 +860,24 @@ async function attachSignedLinks(
       
       // Use allSettled to continue even if some tracks fail
       const linkResults = await Promise.allSettled(linkPromises);
-      linkResults.forEach((result) => {
+      let batchSuccessCount = 0;
+      linkResults.forEach((result, idx) => {
         if (result.status === 'fulfilled') {
           trackResults.push(result.value);
+          batchSuccessCount++;
         } else {
           // This shouldn't happen since we catch errors in the promise, but handle it anyway
-          console.error(`[LINK DEBUG] Promise rejected unexpectedly:`, result.reason);
-          // We can't add a track result here without the track object, so we skip it
+          console.error(`[LINK DEBUG] Promise rejected unexpectedly for batch ${batchNum}, track ${idx + 1}:`, result.reason);
+          // Add the track with no link so we don't lose it
+          const failedTrack = batch[idx];
+          if (failedTrack) {
+            trackResults.push({ 
+              track: failedTrack, 
+              link: undefined, 
+              durationMs: failedTrack.durationMs, 
+              error: `Promise rejected: ${result.reason}` 
+            });
+          }
         }
       });
       
