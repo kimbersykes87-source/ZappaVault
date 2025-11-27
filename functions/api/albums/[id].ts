@@ -819,7 +819,8 @@ async function attachSignedLinks(
   // Duration extraction can happen in parallel but is non-blocking
   // Use larger batch size for albums with many tracks (e.g., The Roxy Performances has 84 tracks)
   // Cloudflare Workers timeout is ~30-50 seconds, so we need to be efficient
-  const CONCURRENT_LINKS = Math.min(10, Math.max(5, Math.ceil(album.tracks.length / 10))); // Scale with album size, max 10
+  // Increase batch size for larger albums to reduce total processing time
+  const CONCURRENT_LINKS = Math.min(15, Math.max(8, Math.ceil(album.tracks.length / 5))); // Scale with album size, max 15
   console.log(`[LINK DEBUG] Processing ${album.tracks.length} tracks in batches of ${CONCURRENT_LINKS}`);
   
   const trackResults: Array<{ track: typeof album.tracks[0]; link: string | undefined; durationMs: number; error?: string }> = [];
@@ -869,14 +870,23 @@ async function attachSignedLinks(
         }
       });
       
-      console.log(`[LINK DEBUG] Completed batch ${batchNum}/${totalBatches} (${linkResults.filter(r => r.status === 'fulfilled').length}/${batch.length} succeeded)`);
+      console.log(`[LINK DEBUG] Completed batch ${batchNum}/${totalBatches} (${batchSuccessCount}/${batch.length} succeeded, ${trackResults.length} total results so far)`);
     } catch (error) {
       console.error(`[LINK DEBUG] Batch ${batchNum} failed completely:`, error);
       // Continue to next batch even if this one fails
     }
   }
   
-  console.log(`[LINK DEBUG] Completed link generation for all ${trackResults.length} tracks`);
+  console.log(`[LINK DEBUG] Completed link generation for all ${trackResults.length} tracks (expected ${album.tracks.length})`);
+  
+  // Verify we processed all tracks
+  if (trackResults.length !== album.tracks.length) {
+    console.error(`[LINK ERROR] Track count mismatch! Expected ${album.tracks.length} but got ${trackResults.length} results`);
+    const missingTrackIds = album.tracks
+      .filter(t => !trackResults.some(r => r.track.id === t.id))
+      .map(t => `${t.trackNumber}. ${t.title}`);
+    console.error(`[LINK ERROR] Missing tracks: ${missingTrackIds.join(', ')}`);
+  }
   
   // Load track durations from database JSON first
   const dbDurations = await loadTrackDurations(request);
