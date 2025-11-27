@@ -127,9 +127,6 @@ def get_permanent_link(token: str, file_path: str, errors: list) -> Optional[str
     # Convert path to Dropbox API format
     dropbox_path = convert_to_dropbox_path(file_path)
     
-    # Debug: print path being used (first 100 chars to avoid secrets)
-    print(f"   [DEBUG] Using Dropbox path: {dropbox_path[:100]}...")
-    
     try:
         # First, try to get existing shared link
         response = requests.post(
@@ -237,6 +234,10 @@ def generate_track_links(library_path: str, output_path: str, batch_size: int = 
             file_path = track.get('filePath', '')
             if not file_path:
                 continue
+            
+            # Debug: show file path (truncated for security)
+            print(f"  Processing: {track.get('trackNumber', '?')}. {track.get('title', 'Unknown')[:50]}")
+            print(f"    File path: {file_path[:80]}...")
             
             link = get_permanent_link(token, file_path, errors)
             if link:
