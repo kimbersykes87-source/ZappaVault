@@ -926,6 +926,7 @@ async function attachSignedLinks(
       });
       // Continue to next batch even if this one fails
     }
+    } // Close for loop
     
     console.log(`[LINK DEBUG] Completed link generation for all ${trackResults.length} tracks (expected ${album.tracks.length})`);
     
