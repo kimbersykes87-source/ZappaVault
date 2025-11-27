@@ -59,25 +59,32 @@ def get_dropbox_token() -> Optional[str]:
         return None
 
 def convert_to_dropbox_path(file_path: str) -> str:
-    """Convert file path to Dropbox API path format"""
-    # Normalize path
+    """Convert file path to Dropbox API path format
+    
+    The library stores paths as /Apps/ZappaVault/ZappaLibrary/...
+    These are already in the correct Dropbox API format and should be used as-is.
+    """
+    # Normalize path separators
     normalized = file_path.replace('\\', '/')
     
-    # Remove Windows drive letters and Dropbox path prefixes
+    # If it's already a Dropbox path (starts with /Apps/), use it as-is
+    if normalized.startswith('/Apps/'):
+        return normalized
+    
+    # Remove Windows drive letters if present
     if normalized.startswith('C:/') or normalized.startswith('c:/'):
         dropbox_idx = normalized.lower().find('/dropbox/')
         if dropbox_idx != -1:
             normalized = normalized[dropbox_idx + len('/dropbox'):]
+        else:
+            # Try to find Apps/ZappaVault/ZappaLibrary
+            zappa_idx = normalized.lower().find('apps/zappavault/zappalibrary')
+            if zappa_idx != -1:
+                normalized = normalized[zappa_idx:]
     
     # Ensure it starts with /
     if not normalized.startswith('/'):
         normalized = '/' + normalized
-    
-    # Remove /Apps/ZappaVault/ZappaLibrary prefix if present
-    if normalized.startswith('/Apps/ZappaVault/ZappaLibrary'):
-        normalized = normalized[len('/Apps/ZappaVault/ZappaLibrary'):]
-        if not normalized.startswith('/'):
-            normalized = '/' + normalized
     
     return normalized
 
@@ -88,16 +95,17 @@ def convert_to_direct_link(shared_url: str, is_audio: bool = True) -> str:
         # For scl/fo and scl/fi links, keep them on www.dropbox.com
         # Use ?raw=1 for images, ?dl=1 for audio files
         try:
-            url = requests.utils.urlparse(shared_url)
-            query_params = requests.utils.parse_qs(url.query)
+            from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+            url = urlparse(shared_url)
+            query_params = parse_qs(url.query)
             # Remove dl parameter if present
             if 'dl' in query_params:
                 del query_params['dl']
             # Add appropriate parameter
             query_params['dl'] = ['1'] if is_audio else ['0']
             # Reconstruct URL
-            new_query = requests.utils.urlencode(query_params, doseq=True)
-            return f"{url.scheme}://{url.netloc}{url.path}?{new_query}"
+            new_query = urlencode(query_params, doseq=True)
+            return urlunparse((url.scheme, url.netloc, url.path, url.params, new_query, url.fragment))
         except Exception:
             # If parsing fails, just append ?dl=1
             return f"{shared_url.rstrip('?&')}{'&' if '?' in shared_url else '?'}dl=1"
@@ -116,7 +124,11 @@ def get_permanent_link(token: str, file_path: str, errors: list) -> Optional[str
         'Content-Type': 'application/json',
     }
     
+    # Convert path to Dropbox API format
     dropbox_path = convert_to_dropbox_path(file_path)
+    
+    # Debug: print path being used (first 100 chars to avoid secrets)
+    print(f"   [DEBUG] Using Dropbox path: {dropbox_path[:100]}...")
     
     try:
         # First, try to get existing shared link
@@ -171,13 +183,17 @@ def get_permanent_link(token: str, file_path: str, errors: list) -> Optional[str
                     direct_link = convert_to_direct_link(shared_url, is_audio)
                     return direct_link
         
-        error_msg = f"Failed to get link for {file_path}: {response.status_code} {response.text[:200]}"
+        # Log the error
+        error_data = response.json() if response.headers.get('content-type', '').startswith('application/json') else {}
+        error_msg = f"Failed to get link for {file_path}: {response.status_code} {json.dumps(error_data)[:200]}"
         errors.append(error_msg)
+        print(f"   ❌ {error_msg}")
         return None
         
     except Exception as e:
         error_msg = f"Exception getting link for {file_path}: {str(e)}"
         errors.append(error_msg)
+        print(f"   ❌ {error_msg}")
         return None
 
 def generate_track_links(library_path: str, output_path: str, batch_size: int = 10):
