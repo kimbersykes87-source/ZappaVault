@@ -128,7 +128,25 @@ def get_permanent_link(token: str, file_path: str, errors: list) -> Optional[str
     dropbox_path = convert_to_dropbox_path(file_path)
     
     try:
-        # First, try to get existing shared link
+        # First, verify the file exists by getting its metadata
+        metadata_response = requests.post(
+            'https://api.dropboxapi.com/2/files/get_metadata',
+            headers=headers,
+            json={'path': dropbox_path},
+            timeout=30
+        )
+        
+        if not metadata_response.ok:
+            # File doesn't exist or path is wrong
+            error_data = metadata_response.json() if metadata_response.headers.get('content-type', '').startswith('application/json') else {}
+            error_tag = error_data.get('error', {}).get('.tag', 'unknown')
+            if error_tag == 'path' and error_data.get('error', {}).get('path', {}).get('.tag') == 'not_found':
+                error_msg = f"File not found at path: {dropbox_path}"
+                errors.append(error_msg)
+                print(f"   ❌ {error_msg}")
+                return None
+        
+        # File exists, now try to get existing shared link
         response = requests.post(
             'https://api.dropboxapi.com/2/sharing/list_shared_links',
             headers=headers,
@@ -143,6 +161,13 @@ def get_permanent_link(token: str, file_path: str, errors: list) -> Optional[str
                 is_audio = not any(ext in file_path.lower() for ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp'])
                 direct_link = convert_to_direct_link(shared_url, is_audio)
                 return direct_link
+        elif response.status_code == 409:
+            # 409 from list_shared_links usually means no link exists yet, try to create one
+            pass
+        else:
+            # Other error from list_shared_links, log but continue to try creating
+            error_data = response.json() if response.headers.get('content-type', '').startswith('application/json') else {}
+            print(f"   ⚠️  list_shared_links returned {response.status_code}: {json.dumps(error_data)[:100]}")
         
         # If no existing link, create a new one
         response = requests.post(
@@ -165,7 +190,7 @@ def get_permanent_link(token: str, file_path: str, errors: list) -> Optional[str
                 direct_link = convert_to_direct_link(shared_url, is_audio)
                 return direct_link
         elif response.status_code == 409:
-            # Link already exists, try to get it again
+            # Link already exists (race condition), try to get it again
             response = requests.post(
                 'https://api.dropboxapi.com/2/sharing/list_shared_links',
                 headers=headers,
