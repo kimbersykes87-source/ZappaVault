@@ -1100,34 +1100,39 @@ async function attachSignedLinks(
   // Generate static cover URL (same logic as library endpoint)
   // Static covers are served from /covers/ directory in Cloudflare Pages
   let coverUrl = album.coverUrl;
-  if (coverUrl && coverUrl.startsWith('http')) {
-    // Already an HTTP URL (Dropbox link), keep it as fallback
-    console.log(`[LINK DEBUG] Cover URL already HTTP: ${coverUrl}`);
-  } else {
-    // Use static URL from /covers/ directory
-    // Extract extension from original coverUrl if it exists
-    let extension = '.jpg'; // default
-    if (coverUrl && coverUrl.startsWith('/')) {
-      // Extract extension from path like "/Apps/.../file.jpg" or "/Apps/.../file.png"
-      const match = coverUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i);
-      if (match) {
-        extension = `.${match[1].toLowerCase()}`;
-        // Normalize .jpeg to .jpg for consistency
-        if (extension === '.jpeg') {
-          extension = '.jpg';
+  if (coverUrl) {
+    if (coverUrl.startsWith('http')) {
+      // Already an HTTP URL (Dropbox link), keep it as fallback
+      console.log(`[LINK DEBUG] Cover URL already HTTP: ${coverUrl}`);
+    } else {
+      // Use static URL from /covers/ directory
+      // Extract extension from original coverUrl if it exists
+      let extension = '.jpg'; // default
+      if (coverUrl.startsWith('/')) {
+        // Extract extension from path like "/Apps/.../file.jpg" or "/Apps/.../file.png"
+        const match = coverUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+        if (match) {
+          extension = `.${match[1].toLowerCase()}`;
+          // Normalize .jpeg to .jpg for consistency
+          if (extension === '.jpeg') {
+            extension = '.jpg';
+          }
         }
       }
+      
+      // Special case: quAUDIOPHILIAc - the copy script used cover.png from Cover folder
+      // but library data says 1 DVD-Front.jpg. Try .png first for this album.
+      if (album.id === 'apps-zappavault-zappalibrary-quaudiophiliac') {
+        extension = '.png';
+      }
+      
+      // Use static URL with the correct extension
+      coverUrl = `/covers/${album.id}${extension}`;
+      console.log(`[LINK DEBUG] Using static cover URL: ${coverUrl}`);
     }
-    
-    // Special case: quAUDIOPHILIAc - the copy script used cover.png from Cover folder
-    // but library data says 1 DVD-Front.jpg. Try .png first for this album.
-    if (album.id === 'apps-zappavault-zappalibrary-quaudiophiliac') {
-      extension = '.png';
-    }
-    
-    // Use static URL with the correct extension
-    coverUrl = `/covers/${album.id}${extension}`;
-    console.log(`[LINK DEBUG] Using static cover URL: ${coverUrl}`);
+  } else {
+    // No cover URL in library, keep it as undefined/null so frontend shows placeholder
+    console.log(`[LINK DEBUG] No cover URL for album: ${album.title}`);
   }
 
   const finalTracksWithLinks = updatedTracks.filter(t => t.streamingUrl).length;
