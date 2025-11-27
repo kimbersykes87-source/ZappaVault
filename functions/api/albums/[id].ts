@@ -926,8 +926,7 @@ async function attachSignedLinks(
       });
       // Continue to next batch even if this one fails
     }
-  }
-  
+    
     console.log(`[LINK DEBUG] Completed link generation for all ${trackResults.length} tracks (expected ${album.tracks.length})`);
     
     // CRITICAL: Verify we processed all tracks - if any are missing, add them with no links
@@ -959,6 +958,7 @@ async function attachSignedLinks(
         durationMs: track.durationMs,
       });
     });
+  }
   
   // Load track durations from database JSON first
   const dbDurations = await loadTrackDurations(request);
