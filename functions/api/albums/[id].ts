@@ -884,6 +884,18 @@ async function attachSignedLinks(
       console.log(`[LINK DEBUG] Completed batch ${batchNum}/${totalBatches} (${batchSuccessCount}/${batch.length} succeeded, ${trackResults.length} total results so far)`);
     } catch (error) {
       console.error(`[LINK DEBUG] Batch ${batchNum} failed completely:`, error);
+      // Add all tracks from this batch with no links so we don't lose them
+      batch.forEach(track => {
+        const existing = trackResults.find(r => r.track.id === track.id);
+        if (!existing) {
+          trackResults.push({ 
+            track, 
+            link: undefined, 
+            durationMs: track.durationMs, 
+            error: `Batch ${batchNum} failed: ${error instanceof Error ? error.message : String(error)}` 
+          });
+        }
+      });
       // Continue to next batch even if this one fails
     }
   }
