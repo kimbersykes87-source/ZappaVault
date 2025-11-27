@@ -424,54 +424,45 @@ export const onRequestGet = async (context: {
   // This is much faster and more reliable than Dropbox API calls
   console.log(`[COVER DEBUG] Generating cover URLs for ${result.results.length} albums`);
   
-  const albumsWithCovers = result.results.map((album) => {
-    // If album already has an HTTP URL (Dropbox link), keep it as fallback
-    if (album.coverUrl?.startsWith('http')) {
-      return {
-        ...album,
-        coverUrl: album.coverUrl,
-      };
-    }
-    
-    // Only generate static URL if coverUrl exists
-    if (album.coverUrl) {
-      // Extract extension from original coverUrl
-      // The copy script preserves the original extension, so we should match it
-      let extension = '.jpg'; // default
-      if (album.coverUrl.startsWith('/')) {
-        // Extract extension from path like "/Apps/.../file.jpg" or "/Apps/.../file.png"
-        const match = album.coverUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i);
-        if (match) {
-          extension = `.${match[1].toLowerCase()}`;
-          // Normalize .jpeg to .jpg for consistency
-          if (extension === '.jpeg') {
-            extension = '.jpg';
-          }
+  // Convert Dropbox cover paths to HTTP URLs for albums that need it
+  // This is done in parallel to avoid blocking
+  const albumsWithCovers = await Promise.all(
+    result.results.map(async (album) => {
+      // If album already has an HTTP URL (Dropbox link), keep it
+      if (album.coverUrl?.startsWith('http')) {
+        return {
+          ...album,
+          coverUrl: album.coverUrl,
+        };
+      }
+      
+      // If coverUrl is a Dropbox path (starts with /), convert it to HTTP URL
+      if (album.coverUrl && album.coverUrl.startsWith('/')) {
+        console.log(`[COVER DEBUG] Converting Dropbox path to HTTP URL for ${album.title}: ${album.coverUrl}`);
+        const coverLink = await getPermanentLink(env, album.coverUrl);
+        if (coverLink) {
+          console.log(`[COVER DEBUG] ✅ Converted cover for ${album.title}`);
+          return {
+            ...album,
+            coverUrl: coverLink,
+          };
+        } else {
+          console.log(`[COVER DEBUG] ⚠️  Failed to convert cover for ${album.title}, keeping path`);
+          // Keep original path - might work or frontend will show placeholder
+          return {
+            ...album,
+            coverUrl: album.coverUrl,
+          };
         }
       }
       
-      // Special case: quAUDIOPHILIAc - the copy script used cover.png from Cover folder
-      // but library data says 1 DVD-Front.jpg. Try .png first for this album.
-      if (album.id === 'apps-zappavault-zappalibrary-quaudiophiliac') {
-        extension = '.png';
-      }
-      
-      // Use static URL with the correct extension
-      const staticCoverUrl = `/covers/${album.id}${extension}`;
-      
+      // No cover URL, keep it as undefined
       return {
         ...album,
-        coverUrl: staticCoverUrl,
+        coverUrl: album.coverUrl, // Could be undefined
       };
-    } else {
-      // No cover URL in library, keep it as undefined so frontend shows placeholder
-      console.log(`[COVER DEBUG] No cover URL for album: ${album.title}`);
-      return {
-        ...album,
-        coverUrl: undefined,
-      };
-    }
-  });
+    })
+  );
   
   const staticCovers = albumsWithCovers.filter(a => a.coverUrl?.startsWith('/')).length;
   const dropboxCovers = albumsWithCovers.filter(a => a.coverUrl?.startsWith('http')).length;

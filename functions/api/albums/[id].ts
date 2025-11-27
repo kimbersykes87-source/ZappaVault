@@ -1097,38 +1097,40 @@ async function attachSignedLinks(
   // Calculate total duration
   const totalDurationMs = updatedTracks.reduce((sum, track) => sum + track.durationMs, 0);
 
-  // Generate static cover URL (same logic as library endpoint)
-  // Static covers are served from /covers/ directory in Cloudflare Pages
+  // Preserve cover URL from library
+  // If it's a Dropbox path, convert it to HTTP URL using Dropbox API
+  // If it's already HTTP, keep it
+  // If it's undefined, keep it undefined
   let coverUrl = album.coverUrl;
+  
   if (coverUrl) {
     if (coverUrl.startsWith('http')) {
-      // Already an HTTP URL (Dropbox link), keep it as fallback
+      // Already an HTTP URL (Dropbox link), keep it
       console.log(`[LINK DEBUG] Cover URL already HTTP: ${coverUrl}`);
-    } else {
-      // Use static URL from /covers/ directory
-      // Extract extension from original coverUrl if it exists
-      let extension = '.jpg'; // default
-      if (coverUrl.startsWith('/')) {
-        // Extract extension from path like "/Apps/.../file.jpg" or "/Apps/.../file.png"
-        const match = coverUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i);
-        if (match) {
-          extension = `.${match[1].toLowerCase()}`;
-          // Normalize .jpeg to .jpg for consistency
-          if (extension === '.jpeg') {
-            extension = '.jpg';
+    } else if (coverUrl.startsWith('/')) {
+      // Dropbox path - convert to HTTP URL
+      console.log(`[LINK DEBUG] Converting Dropbox cover path to HTTP URL: ${coverUrl}`);
+      const token = await getValidDropboxToken(env);
+      if (token) {
+        try {
+          // Use the same getPermanentLink logic but for covers
+          const dropboxPath = convertToDropboxPath(coverUrl);
+          const coverLink = await getPermanentLink(env, dropboxPath, []);
+          if (coverLink) {
+            coverUrl = coverLink;
+            console.log(`[LINK DEBUG] ✅ Converted cover to HTTP URL`);
+          } else {
+            console.log(`[LINK DEBUG] ⚠️  Failed to convert cover path, keeping original`);
+            // Keep original path - frontend might handle it or show placeholder
           }
+        } catch (error) {
+          console.error(`[LINK DEBUG] Error converting cover URL:`, error);
+          // Keep original path on error
         }
+      } else {
+        console.log(`[LINK DEBUG] No Dropbox token available for cover conversion`);
+        // Keep original path
       }
-      
-      // Special case: quAUDIOPHILIAc - the copy script used cover.png from Cover folder
-      // but library data says 1 DVD-Front.jpg. Try .png first for this album.
-      if (album.id === 'apps-zappavault-zappalibrary-quaudiophiliac') {
-        extension = '.png';
-      }
-      
-      // Use static URL with the correct extension
-      coverUrl = `/covers/${album.id}${extension}`;
-      console.log(`[LINK DEBUG] Using static cover URL: ${coverUrl}`);
     }
   } else {
     // No cover URL in library, keep it as undefined/null so frontend shows placeholder
