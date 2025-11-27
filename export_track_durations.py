@@ -50,7 +50,9 @@ def export_durations_to_json(db_path='zappa_tracks.db', output_path='webapp/data
                         zappa_index = normalized_path.lower().find('zappalibrary')
                         if zappa_index != -1:
                             normalized_path = normalized_path[zappa_index:]
-                            normalized_path = f"/Apps/ZappaVault/{normalized_path.replace('\\', '/')}"
+                            # Normalize slashes before using in f-string
+                            normalized_path = normalized_path.replace('\\', '/')
+                            normalized_path = f"/Apps/ZappaVault/{normalized_path}"
                 
                 # Ensure path starts with /
                 if not normalized_path.startswith('/'):
