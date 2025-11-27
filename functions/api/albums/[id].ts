@@ -802,33 +802,61 @@ async function attachSignedLinks(
   env: EnvBindings,
   request: Request,
 ): Promise<Album> {
-  // Check if we have any way to get a token (refresh token credentials)
-  const token = await getValidDropboxToken(env);
-  if (!token) {
-    console.log(`[LINK DEBUG] No Dropbox token available for album: ${album.title}`);
-    console.error(`[ERROR] Refresh token credentials (DROPBOX_REFRESH_TOKEN, DROPBOX_APP_KEY, DROPBOX_APP_SECRET) are missing in environment variables`);
+  console.log(`[LINK DEBUG] Processing album: ${album.title} (${album.tracks.length} tracks)`);
+  
+  // Check if tracks already have links from comprehensive library
+  const tracksWithLinks = album.tracks.filter(t => t.streamingUrl).length;
+  const tracksWithoutLinks = album.tracks.filter(t => !t.streamingUrl);
+  
+  console.log(`[LINK DEBUG] Pre-generated links: ${tracksWithLinks}/${album.tracks.length} tracks already have links`);
+  
+  // If all tracks have links, return early (no need to generate)
+  if (tracksWithLinks === album.tracks.length) {
+    console.log(`[LINK DEBUG] ✅ All tracks already have links from comprehensive library`);
     return album;
   }
+  
+  // Only generate links for tracks that don't have them
+  if (tracksWithoutLinks.length > 0) {
+    console.log(`[LINK DEBUG] Generating links for ${tracksWithoutLinks.length} tracks that are missing links`);
+    
+    // Check if we have any way to get a token (refresh token credentials)
+    const token = await getValidDropboxToken(env);
+    if (!token) {
+      console.log(`[LINK DEBUG] No Dropbox token available - cannot generate missing links`);
+      console.error(`[ERROR] Refresh token credentials (DROPBOX_REFRESH_TOKEN, DROPBOX_APP_KEY, DROPBOX_APP_SECRET) are missing in environment variables`);
+      // Return album with existing links (some tracks may not have links)
+      return album;
+    }
 
-  console.log(`[LINK DEBUG] Processing album: ${album.title} (${album.tracks.length} tracks)`);
-  console.log(`[LINK DEBUG] Token available: ${!!token}, Token length: ${token?.length || 0} chars`);
+    console.log(`[LINK DEBUG] Token available: ${!!token}, Token length: ${token?.length || 0} chars`);
 
-  const errors: string[] = [];
-  
-  // Process streaming links first (critical) - in parallel batches to avoid timeout
-  // Duration extraction can happen in parallel but is non-blocking
-  // Use larger batch size for albums with many tracks (e.g., The Roxy Performances has 84 tracks)
-  // Cloudflare Workers timeout is ~30-50 seconds, so we need to be efficient
-  // Increase batch size for larger albums to reduce total processing time
-  const CONCURRENT_LINKS = Math.min(15, Math.max(8, Math.ceil(album.tracks.length / 5))); // Scale with album size, max 15
-  console.log(`[LINK DEBUG] Processing ${album.tracks.length} tracks in batches of ${CONCURRENT_LINKS}`);
-  
-  const trackResults: Array<{ track: typeof album.tracks[0]; link: string | undefined; durationMs: number; error?: string }> = [];
-  
-  // Process tracks in batches for links (critical path)
-  // Use Promise.allSettled to ensure we continue even if individual tracks fail
-  for (let i = 0; i < album.tracks.length; i += CONCURRENT_LINKS) {
-    const batch = album.tracks.slice(i, i + CONCURRENT_LINKS);
+    const errors: string[] = [];
+    
+    // Process streaming links for missing tracks only - in parallel batches to avoid timeout
+    // Use larger batch size for albums with many tracks (e.g., The Roxy Performances has 84 tracks)
+    // Cloudflare Workers timeout is ~30-50 seconds, so we need to be efficient
+    // Increase batch size for larger albums to reduce total processing time
+    const CONCURRENT_LINKS = Math.min(15, Math.max(8, Math.ceil(tracksWithoutLinks.length / 5))); // Scale with missing tracks, max 15
+    console.log(`[LINK DEBUG] Processing ${tracksWithoutLinks.length} missing tracks in batches of ${CONCURRENT_LINKS}`);
+    
+    const trackResults: Array<{ track: typeof album.tracks[0]; link: string | undefined; durationMs: number; error?: string }> = [];
+    
+    // First, add tracks that already have links
+    album.tracks.forEach(track => {
+      if (track.streamingUrl) {
+        trackResults.push({
+          track,
+          link: track.streamingUrl,
+          durationMs: track.durationMs,
+        });
+      }
+    });
+    
+    // Process tracks without links in batches for links (critical path)
+    // Use Promise.allSettled to ensure we continue even if individual tracks fail
+    for (let i = 0; i < tracksWithoutLinks.length; i += CONCURRENT_LINKS) {
+      const batch = tracksWithoutLinks.slice(i, i + CONCURRENT_LINKS);
     const batchNum = Math.floor(i / CONCURRENT_LINKS) + 1;
     const totalBatches = Math.ceil(album.tracks.length / CONCURRENT_LINKS);
     console.log(`[LINK DEBUG] Processing batch ${batchNum}/${totalBatches} (tracks ${i + 1}-${Math.min(i + CONCURRENT_LINKS, album.tracks.length)})`);
@@ -900,27 +928,37 @@ async function attachSignedLinks(
     }
   }
   
-  console.log(`[LINK DEBUG] Completed link generation for all ${trackResults.length} tracks (expected ${album.tracks.length})`);
-  
-  // CRITICAL: Verify we processed all tracks - if any are missing, add them with no links
-  // This ensures all tracks are returned even if batches fail or timeout
-  if (trackResults.length !== album.tracks.length) {
-    console.error(`[LINK ERROR] Track count mismatch! Expected ${album.tracks.length} but got ${trackResults.length} results`);
-    const missingTracks = album.tracks.filter(t => !trackResults.some(r => r.track.id === t.id));
-    console.error(`[LINK ERROR] Missing ${missingTracks.length} tracks, adding them with no links`);
-    console.error(`[LINK ERROR] Missing track numbers: ${missingTracks.map(t => t.trackNumber).join(', ')}`);
-    missingTracks.forEach(track => {
-      trackResults.push({ 
-        track, 
-        link: undefined, 
-        durationMs: track.durationMs, 
-        error: 'Track was not processed in any batch - likely timeout or batch failure' 
+    console.log(`[LINK DEBUG] Completed link generation for all ${trackResults.length} tracks (expected ${album.tracks.length})`);
+    
+    // CRITICAL: Verify we processed all tracks - if any are missing, add them with no links
+    // This ensures all tracks are returned even if batches fail or timeout
+    if (trackResults.length !== album.tracks.length) {
+      console.error(`[LINK ERROR] Track count mismatch! Expected ${album.tracks.length} but got ${trackResults.length} results`);
+      const missingTracks = album.tracks.filter(t => !trackResults.some(r => r.track.id === t.id));
+      console.error(`[LINK ERROR] Missing ${missingTracks.length} tracks, adding them with no links`);
+      console.error(`[LINK ERROR] Missing track numbers: ${missingTracks.map(t => t.trackNumber).join(', ')}`);
+      missingTracks.forEach(track => {
+        trackResults.push({ 
+          track, 
+          link: track.streamingUrl, // Use existing link if available
+          durationMs: track.durationMs, 
+          error: 'Track was not processed in any batch - likely timeout or batch failure' 
+        });
+      });
+      console.log(`[LINK DEBUG] After recovery: ${trackResults.length} tracks (expected ${album.tracks.length})`);
+    } else {
+      console.log(`[LINK DEBUG] ✅ All ${trackResults.length} tracks were processed`);
+    }
+  } else {
+    // All tracks already have links, create trackResults from existing tracks
+    const trackResults: Array<{ track: typeof album.tracks[0]; link: string | undefined; durationMs: number; error?: string }> = [];
+    album.tracks.forEach(track => {
+      trackResults.push({
+        track,
+        link: track.streamingUrl,
+        durationMs: track.durationMs,
       });
     });
-    console.log(`[LINK DEBUG] After recovery: ${trackResults.length} tracks (expected ${album.tracks.length})`);
-  } else {
-    console.log(`[LINK DEBUG] ✅ All ${trackResults.length} tracks were processed`);
-  }
   
   // Load track durations from database JSON first
   const dbDurations = await loadTrackDurations(request);

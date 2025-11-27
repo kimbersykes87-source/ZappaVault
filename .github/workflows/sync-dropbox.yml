@@ -76,6 +76,16 @@ jobs:
             fi
           fi
 
+      - name: Generate Dropbox permanent links for tracks
+        working-directory: .
+        run: |
+          if [ -f "webapp/data/library.comprehensive.json" ] && [ -n "$DROPBOX_REFRESH_TOKEN" ] && [ -n "$DROPBOX_APP_KEY" ] && [ -n "$DROPBOX_APP_SECRET" ]; then
+            pip install requests
+            python generate_track_links.py webapp/data/library.comprehensive.json webapp/data/library.comprehensive.json 10
+          else
+            echo "⚠️  Skipping link generation (missing comprehensive library or Dropbox credentials)"
+          fi
+
       - name: Upload comprehensive library to Cloudflare KV
         working-directory: .
         run: |
