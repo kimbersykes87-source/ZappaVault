@@ -902,13 +902,24 @@ async function attachSignedLinks(
   
   console.log(`[LINK DEBUG] Completed link generation for all ${trackResults.length} tracks (expected ${album.tracks.length})`);
   
-  // Verify we processed all tracks
+  // CRITICAL: Verify we processed all tracks - if any are missing, add them with no links
+  // This ensures all tracks are returned even if batches fail or timeout
   if (trackResults.length !== album.tracks.length) {
     console.error(`[LINK ERROR] Track count mismatch! Expected ${album.tracks.length} but got ${trackResults.length} results`);
-    const missingTrackIds = album.tracks
-      .filter(t => !trackResults.some(r => r.track.id === t.id))
-      .map(t => `${t.trackNumber}. ${t.title}`);
-    console.error(`[LINK ERROR] Missing tracks: ${missingTrackIds.join(', ')}`);
+    const missingTracks = album.tracks.filter(t => !trackResults.some(r => r.track.id === t.id));
+    console.error(`[LINK ERROR] Missing ${missingTracks.length} tracks, adding them with no links`);
+    console.error(`[LINK ERROR] Missing track numbers: ${missingTracks.map(t => t.trackNumber).join(', ')}`);
+    missingTracks.forEach(track => {
+      trackResults.push({ 
+        track, 
+        link: undefined, 
+        durationMs: track.durationMs, 
+        error: 'Track was not processed in any batch - likely timeout or batch failure' 
+      });
+    });
+    console.log(`[LINK DEBUG] After recovery: ${trackResults.length} tracks (expected ${album.tracks.length})`);
+  } else {
+    console.log(`[LINK DEBUG] ✅ All ${trackResults.length} tracks were processed`);
   }
   
   // Load track durations from database JSON first
