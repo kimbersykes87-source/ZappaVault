@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Generate Dropbox permanent links for all tracks and add them to the comprehensive library.
+Generate Dropbox permanent links for all tracks and album covers, and add them to the comprehensive library.
 
 This script:
 1. Loads the comprehensive library file
 2. For each track, generates a Dropbox permanent link
-3. Updates the comprehensive library with streamingUrl and downloadUrl
-4. Saves the updated library
+3. For each album cover, generates a Dropbox permanent link (if coverUrl is a Dropbox path)
+4. Updates the comprehensive library with streamingUrl, downloadUrl, and coverUrl
+5. Saves the updated library
 
 This eliminates the need to generate links at runtime, solving timeout issues.
 """
@@ -219,7 +220,7 @@ def get_permanent_link(token: str, file_path: str, errors: list) -> Optional[str
         return None
 
 def generate_track_links(library_path: str, output_path: str, batch_size: int = 10):
-    """Generate Dropbox permanent links for all tracks in the library"""
+    """Generate Dropbox permanent links for all tracks and album covers in the library"""
     print(f"Loading library from: {library_path}")
     with open(library_path, 'r', encoding='utf-8') as f:
         library = json.load(f)
@@ -229,7 +230,6 @@ def generate_track_links(library_path: str, output_path: str, batch_size: int = 
         print("❌ Cannot generate links without Dropbox token")
         return False
     
-    print(f"Generating links for all tracks...")
     errors = []
     tracks_processed = 0
     tracks_with_links = 0
@@ -240,6 +240,8 @@ def generate_track_links(library_path: str, output_path: str, batch_size: int = 
     for album in library.get('albums', []):
         for track in album.get('tracks', []):
             all_tracks.append((album, track))
+    
+    print(f"Generating links for all tracks...")
     
     for i in range(0, len(all_tracks), batch_size):
         batch = all_tracks[i:i + batch_size]
@@ -286,15 +288,51 @@ def generate_track_links(library_path: str, output_path: str, batch_size: int = 
         for error in errors[:10]:
             print(f"   {error}")
     
+    # Now generate cover links
+    print(f"\nGenerating links for album covers...")
+    covers_processed = 0
+    covers_with_links = 0
+    total_albums = len(library.get('albums', []))
+    
+    for album in library.get('albums', []):
+        covers_processed += 1
+        cover_url = album.get('coverUrl', '')
+        
+        # Skip if already has HTTP URL
+        if cover_url and cover_url.startswith('http'):
+            covers_with_links += 1
+            continue
+        
+        # Skip if no coverUrl or not a Dropbox path
+        if not cover_url or not cover_url.startswith('/'):
+            continue
+        
+        print(f"  Processing cover for: {album.get('title', 'Unknown')[:50]}")
+        print(f"    Cover path: {cover_url[:80]}...")
+        
+        link = get_permanent_link(token, cover_url, errors)
+        if link:
+            album['coverUrl'] = link
+            covers_with_links += 1
+            print(f"  ✅ Cover link generated for: {album.get('title', 'Unknown')[:50]}")
+        else:
+            print(f"  ❌ Failed to generate cover link for: {album.get('title', 'Unknown')[:50]}")
+        
+        # Rate limiting - small delay between requests
+        time.sleep(0.1)
+    
+    print(f"\n✅ Generated links for {covers_with_links}/{covers_processed} album covers")
+    
     # Update metadata
     library['generatedAt'] = __import__('datetime').datetime.utcnow().isoformat() + 'Z'
     library['hasLinks'] = tracks_with_links > 0
+    library['hasCoverLinks'] = covers_with_links > 0
     
     print(f"\nWriting updated library to: {output_path}")
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(library, f, indent=2, ensure_ascii=False)
     
-    print(f"✅ Successfully updated library with {tracks_with_links} track links")
+    print(f"✅ Successfully updated library with {tracks_with_links} track links and {covers_with_links} cover links")
     return True
 
 if __name__ == '__main__':

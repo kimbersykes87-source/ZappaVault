@@ -1097,31 +1097,30 @@ async function attachSignedLinks(
   // Calculate total duration
   const totalDurationMs = updatedTracks.reduce((sum, track) => sum + track.durationMs, 0);
 
-  // Preserve cover URL from library
-  // If it's a Dropbox path, convert it to HTTP URL using Dropbox API
-  // If it's already HTTP, keep it
-  // If it's undefined, keep it undefined
+  // Use pre-generated cover URL from comprehensive library
+  // If it's already HTTP (pre-generated), use it directly
+  // If it's still a Dropbox path (shouldn't happen), try runtime conversion as fallback
+  // If undefined, keep it undefined for placeholder
   let coverUrl = album.coverUrl;
   
   if (coverUrl) {
     if (coverUrl.startsWith('http')) {
-      // Already an HTTP URL (Dropbox link), keep it
-      console.log(`[LINK DEBUG] Cover URL already HTTP: ${coverUrl}`);
+      // Already an HTTP URL (pre-generated from comprehensive library), use it
+      console.log(`[LINK DEBUG] Cover URL already HTTP (pre-generated): ${coverUrl.substring(0, 50)}...`);
     } else if (coverUrl.startsWith('/')) {
-      // Dropbox path - convert to HTTP URL
-      console.log(`[LINK DEBUG] Converting Dropbox cover path to HTTP URL: ${coverUrl}`);
+      // Dropbox path - should have been converted during build, but try runtime conversion as fallback
+      console.log(`[LINK DEBUG] ⚠️  Cover still has Dropbox path (should be pre-generated), attempting runtime conversion: ${coverUrl}`);
       const token = await getValidDropboxToken(env);
       if (token) {
         try {
-          // Use the same getPermanentLink logic but for covers
           const dropboxPath = convertToDropboxPath(coverUrl);
           const coverLink = await getPermanentLink(env, dropboxPath, []);
           if (coverLink) {
             coverUrl = coverLink;
-            console.log(`[LINK DEBUG] ✅ Converted cover to HTTP URL`);
+            console.log(`[LINK DEBUG] ✅ Converted cover to HTTP URL (runtime fallback)`);
           } else {
             console.log(`[LINK DEBUG] ⚠️  Failed to convert cover path, keeping original`);
-            // Keep original path - frontend might handle it or show placeholder
+            // Keep original path - frontend will show placeholder
           }
         } catch (error) {
           console.error(`[LINK DEBUG] Error converting cover URL:`, error);

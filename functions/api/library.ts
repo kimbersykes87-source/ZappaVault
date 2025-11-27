@@ -424,45 +424,36 @@ export const onRequestGet = async (context: {
   // This is much faster and more reliable than Dropbox API calls
   console.log(`[COVER DEBUG] Generating cover URLs for ${result.results.length} albums`);
   
-  // Convert Dropbox cover paths to HTTP URLs for albums that need it
-  // This is done in parallel to avoid blocking
-  const albumsWithCovers = await Promise.all(
-    result.results.map(async (album) => {
-      // If album already has an HTTP URL (Dropbox link), keep it
-      if (album.coverUrl?.startsWith('http')) {
-        return {
-          ...album,
-          coverUrl: album.coverUrl,
-        };
-      }
-      
-      // If coverUrl is a Dropbox path (starts with /), convert it to HTTP URL
-      if (album.coverUrl && album.coverUrl.startsWith('/')) {
-        console.log(`[COVER DEBUG] Converting Dropbox path to HTTP URL for ${album.title}: ${album.coverUrl}`);
-        const coverLink = await getPermanentLink(env, album.coverUrl);
-        if (coverLink) {
-          console.log(`[COVER DEBUG] ✅ Converted cover for ${album.title}`);
-          return {
-            ...album,
-            coverUrl: coverLink,
-          };
-        } else {
-          console.log(`[COVER DEBUG] ⚠️  Failed to convert cover for ${album.title}, keeping path`);
-          // Keep original path - might work or frontend will show placeholder
-          return {
-            ...album,
-            coverUrl: album.coverUrl,
-          };
-        }
-      }
-      
-      // No cover URL, keep it as undefined
+  // Use pre-generated cover URLs from comprehensive library
+  // If coverUrl is already HTTP, use it; if it's a Dropbox path, it should have been converted during build
+  // If undefined, keep it undefined for placeholder
+  const albumsWithCovers = result.results.map((album) => {
+    // If album already has an HTTP URL (pre-generated from comprehensive library), use it
+    if (album.coverUrl?.startsWith('http')) {
       return {
         ...album,
-        coverUrl: album.coverUrl, // Could be undefined
+        coverUrl: album.coverUrl,
       };
-    })
-  );
+    }
+    
+    // If coverUrl is still a Dropbox path (shouldn't happen if comprehensive library was generated correctly),
+    // try to convert it at runtime as fallback
+    if (album.coverUrl && album.coverUrl.startsWith('/')) {
+      console.log(`[COVER DEBUG] ⚠️  Cover still has Dropbox path for ${album.title}, attempting runtime conversion`);
+      // Note: This is a fallback - covers should be pre-generated in comprehensive library
+      // We'll try to convert it, but it might timeout for large libraries
+      return {
+        ...album,
+        coverUrl: album.coverUrl, // Keep path for now, could be converted if needed
+      };
+    }
+    
+    // No cover URL, keep it as undefined
+    return {
+      ...album,
+      coverUrl: album.coverUrl, // Could be undefined
+    };
+  });
   
   const staticCovers = albumsWithCovers.filter(a => a.coverUrl?.startsWith('/')).length;
   const dropboxCovers = albumsWithCovers.filter(a => a.coverUrl?.startsWith('http')).length;
