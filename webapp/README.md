@@ -21,36 +21,68 @@ Environment variables live in `env.example`; copy it to `.env` (not checked in) 
 
 ## Dropbox sync workflow
 
-1. Configure `DROPBOX_TOKEN` (app token) and `DROPBOX_LIBRARY_PATH` (e.g. `/ZappaLibrary`).
-2. Run `npm run sync:dropbox` to crawl the folder, produce `data/library.generated.json`, and optionally push to Cloudflare KV if `CF_ACCOUNT_ID`, `CF_KV_NAMESPACE_ID`, and `CLOUDFLARE_API_TOKEN` are set.
-3. Deploy or call `POST /api/refresh` with the generated snapshot to update production.
+The sync workflow creates a **comprehensive library file** that serves as the single source of truth for all library data, including pre-generated streaming links.
 
-`scripts/dropboxSync.ts` is TypeScript + `fetch`, so it runs anywhere Node 18+ is available.
+### Manual Sync Process
+
+1. Configure Dropbox credentials (`DROPBOX_REFRESH_TOKEN`, `DROPBOX_APP_KEY`, `DROPBOX_APP_SECRET`) and `DROPBOX_LIBRARY_PATH` (e.g. `/Apps/ZappaVault/ZappaLibrary`).
+2. Run `npm run sync:dropbox` to crawl the folder and produce `data/library.generated.json` (base library with metadata).
+3. Create comprehensive library with durations:
+   ```bash
+   python create_comprehensive_library.py webapp/data/library.generated.json zappa_tracks.db webapp/data/library.comprehensive.json
+   ```
+4. Generate Dropbox permanent links for all tracks:
+   ```bash
+   python generate_track_links.py webapp/data/library.comprehensive.json webapp/data/library.comprehensive.json
+   ```
+5. Upload to Cloudflare KV (if credentials provided):
+   ```bash
+   npm run upload:cloudflare
+   ```
+
+**Note:** The comprehensive library (`library.comprehensive.json`) includes:
+- All album and track metadata from Dropbox
+- Track durations from SQLite database
+- Pre-generated Dropbox permanent links for all tracks (eliminates timeout issues)
 
 ### Automated sync via GitHub Actions
 
 `sync-dropbox.yml` runs every day at 08:00 UTC (and on manual dispatch):
 
-1. Checkout → `npm ci`
-2. `npm run sync:dropbox -- --out data/library.generated.json`
-3. Script writes to the repo and, if the Cloudflare secrets are present, updates KV so Pages Functions instantly serve the new snapshot.
+1. Checkout → Setup Node.js and Python
+2. `npm run sync:dropbox -- --out data/library.generated.json` (generates base library)
+3. Export track durations from SQLite database
+4. Create comprehensive library (merges durations)
+5. **Generate Dropbox permanent links** for all tracks (pre-indexed for fast API responses)
+6. Upload comprehensive library to Cloudflare KV (if credentials provided)
+7. Commit and push updated library files to repository
 
-Add these repository secrets before enabling the workflow:
+**Repository Secrets Required:**
 
 | Secret | Description |
 | --- | --- |
-| `DROPBOX_TOKEN` | Dropbox long-lived token |
-| `DROPBOX_LIBRARY_PATH` | Usually `/ZappaLibrary` |
+| `DROPBOX_REFRESH_TOKEN` | Dropbox OAuth refresh token (recommended) |
+| `DROPBOX_APP_KEY` | Dropbox app key |
+| `DROPBOX_APP_SECRET` | Dropbox app secret |
+| `DROPBOX_TOKEN` | Dropbox access token (optional, expires in 4 hours) |
+| `DROPBOX_LIBRARY_PATH` | Usually `/Apps/ZappaVault/ZappaLibrary` |
 | `CF_ACCOUNT_ID` | Cloudflare account ID |
 | `CF_KV_NAMESPACE_ID` | The Pages KV namespace ID bound as `LIBRARY_KV` |
 | `CLOUDFLARE_API_TOKEN` | Token with KV write access |
 
+`scripts/dropboxSync.ts` is TypeScript + `fetch`, so it runs anywhere Node 18+ is available.
+
 ## API surface
 
-- `GET /api/library` – search, filter, paginate albums
-- `GET /api/albums/:id` – fetch album details; `?links=1` hydrates signed stream/download URLs
+- `GET /api/library` – search, filter, paginate albums (loads from comprehensive library)
+- `GET /api/albums/:id` – fetch album details; `?links=1` includes pre-generated streaming/download URLs from comprehensive library
 - `GET /api/albums/:id/download` – proxies Dropbox `download_zip` for album-level download
 - `POST /api/refresh` – authenticated endpoint to push a new snapshot into KV
+
+**Link Generation:**
+- Links are **pre-generated** during the sync workflow and stored in `library.comprehensive.json`
+- This eliminates timeout issues for large albums and improves API response times
+- If a track is missing a link (e.g., newly added), the API will attempt to generate it at runtime as a fallback
 
 All functions share types defined in `shared/library.ts` to keep the UI, scripts, and API aligned.
 
