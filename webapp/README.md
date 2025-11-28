@@ -44,6 +44,7 @@ The sync workflow creates a **comprehensive library file** that serves as the si
 - All album and track metadata from Dropbox
 - Track durations from SQLite database
 - Pre-generated Dropbox permanent links for all tracks (eliminates timeout issues)
+- Pre-generated cover art URLs with `raw=1` parameter for proper image display
 
 ### Automated sync via GitHub Actions
 
@@ -82,7 +83,9 @@ The sync workflow creates a **comprehensive library file** that serves as the si
 **Link Generation:**
 - Links are **pre-generated** during the sync workflow and stored in `library.comprehensive.json`
 - This eliminates timeout issues for large albums and improves API response times
+- Audio files use `dl=1` parameter, images (cover art) use `raw=1` parameter
 - If a track is missing a link (e.g., newly added), the API will attempt to generate it at runtime as a fallback
+- Cover art URLs are pre-generated with `raw=1` for direct image access
 
 All functions share types defined in `shared/library.ts` to keep the UI, scripts, and API aligned.
 

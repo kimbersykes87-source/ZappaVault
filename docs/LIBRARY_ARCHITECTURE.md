@@ -65,6 +65,7 @@ The ZappaVault uses a **comprehensive library file** (`library.comprehensive.jso
 - All data from `library.generated.json`
 - Track durations (`durationMs` field for each track)
 - Pre-generated Dropbox permanent links (`streamingUrl` and `downloadUrl` for each track)
+- Pre-generated cover art URLs with `raw=1` parameter (`coverUrl` field for each album)
 - **This is the single source of truth used by the API**
 
 ### `zappa_tracks.db`
@@ -183,7 +184,13 @@ Track durations come from the SQLite database (`zappa_tracks.db`), which is crea
 - **Regular links:** `https://dl.dropboxusercontent.com/s/abc123/file.mp3`
 - **New format (scl/fo):** `https://www.dropbox.com/scl/fo/abc123/file.mp3?rlkey=xyz&dl=1`
   - Must stay on `www.dropbox.com` (not converted to `dl.dropboxusercontent.com`)
-  - Uses `?dl=1` for audio files, `?raw=1` for images
+  - Uses `?dl=1` for audio files (streaming/download)
+  - Uses `?raw=1` for images (cover art) - ensures direct image access without download prompt
+
+**Cover Art URLs:**
+- All cover art URLs in the comprehensive library use `raw=1` parameter
+- Format: `https://www.dropbox.com/scl/fi/.../cover.jpg?rlkey=...&raw=1`
+- This ensures images load correctly in browsers and social media previews
 
 ## Troubleshooting
 

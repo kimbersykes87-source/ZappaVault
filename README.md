@@ -258,15 +258,15 @@ openssl rand -base64 48
 
 ## 📊 Library Metadata
 
-The library includes comprehensive metadata for all 98 albums:
+The library includes comprehensive metadata for all 102 albums:
 
-- ✅ **Era:** 100% (98/98) - Mothers Of Invention / Solo classification
-- ✅ **Genre:** 100% (98/98) - Genre classification
-- ✅ **Description:** 100% (98/98) - Album descriptions
-- ✅ **Tags:** 100% (98/98) - Categorization tags
-- ✅ **Cover Art:** 100% (98/98) - Album cover images
-- ✅ **Track Durations:** 100% (1,838/1,838) - All track durations extracted
-- ⚠️ **Year:** 99% (97/98) - Only "Zappa Erie" missing year
+- ✅ **Era:** 100% - Mothers Of Invention / Solo classification
+- ✅ **Genre:** 100% - Genre classification
+- ✅ **Description:** 100% - Album descriptions
+- ✅ **Tags:** 100% - Categorization tags
+- ✅ **Cover Art:** 100% - Album cover images with pre-generated `raw=1` URLs
+- ✅ **Track Durations:** 100% - All track durations extracted
+- ✅ **Permanent Links:** 100% - Pre-generated Dropbox links for all tracks and covers
 
 ## 🔄 Dropbox Sync Workflow
 
@@ -293,6 +293,7 @@ The `.github/workflows/sync-dropbox.yml` workflow runs:
   - All album and track metadata
   - Track durations (from SQLite database)
   - Pre-generated Dropbox permanent links (`streamingUrl` and `downloadUrl`)
+  - Pre-generated cover art URLs with `raw=1` parameter for images
 
 ### Manual Sync
 
@@ -313,7 +314,8 @@ npm run upload:cloudflare
 **Note:** The comprehensive library (`library.comprehensive.json`) is the single source of truth used by the API. It includes:
 - All metadata from Dropbox sync
 - Track durations from the SQLite database
-- Pre-generated Dropbox permanent links for all tracks
+- Pre-generated Dropbox permanent links for all tracks (audio files use `dl=1`, images use `raw=1`)
+- Pre-generated cover art URLs with `raw=1` parameter for proper image display
 
 ## 🧪 Testing
 
@@ -435,13 +437,27 @@ All changes are viewed directly on **Cloudflare Pages** at https://zappavault.pa
 - [React 19 Documentation](https://react.dev/)
 - [Vite Documentation](https://vite.dev/)
 
+## 🌐 Social Sharing
+
+The site includes Open Graph and Twitter Card meta tags for rich link previews:
+
+- **Open Graph tags** for Facebook, WhatsApp, LinkedIn
+- **Twitter Card tags** for Twitter/X
+- **Preview image:** Uses `Zappa-Logo.png` (1200x630px) for optimal social media display
+- **Meta description:** "Explore Frank Zappa's complete discography. Stream albums, browse tracks, and discover rare recordings from the Zappa vault."
+
+**Testing:**
+- [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/)
+- [Twitter Card Validator](https://cards-dev.twitter.com/validator)
+- [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)
+
 ## 📄 License
 
 Private project - Family use only
 
 ---
 
-**Last Updated:** 2025-02-10  
+**Last Updated:** 2025-01-28  
 **Deployment Status:** ✅ Live at https://zappavault.pages.dev  
 **Auto-Deployment:** ✅ Enabled via GitHub Actions
 
