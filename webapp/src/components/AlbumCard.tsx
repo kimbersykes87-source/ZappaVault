@@ -39,7 +39,7 @@ export function AlbumCard({ album, onPlay }: AlbumCardProps) {
         <div className="album-cover">
           {album.coverUrl ? (
             <img 
-              src={album.coverUrl.startsWith('/') ? album.coverUrl : getProxyUrl(album.coverUrl)} 
+              src={getProxyUrl(album.coverUrl)} 
               alt={album.title} 
               loading="lazy"
               onError={(e) => {

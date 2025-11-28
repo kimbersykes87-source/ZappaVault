@@ -201,9 +201,9 @@ export function PlayerBar() {
       {nowPlayingCoverUrl && (
         <div className="player-cover">
           <img 
-            src={nowPlayingCoverUrl.startsWith('/') ? nowPlayingCoverUrl : (nowPlayingCoverUrl.startsWith('http') ? getProxyUrl(nowPlayingCoverUrl) : nowPlayingCoverUrl)} 
+            src={getProxyUrl(nowPlayingCoverUrl)} 
             alt={nowPlayingAlbum ?? 'Album cover'} 
-            crossOrigin={nowPlayingCoverUrl.startsWith('/') ? undefined : "anonymous"}
+            crossOrigin="anonymous"
           />
         </div>
       )}

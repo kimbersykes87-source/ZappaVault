@@ -51,7 +51,7 @@ export function AlbumPage() {
         <div className="album-page-cover">
           {album.coverUrl ? (
             <img 
-              src={album.coverUrl.startsWith('/') ? album.coverUrl : getProxyUrl(album.coverUrl)} 
+              src={getProxyUrl(album.coverUrl)} 
               alt={album.title} 
               loading="eager"
               onError={(e) => {

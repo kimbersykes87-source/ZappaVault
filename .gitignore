@@ -52,10 +52,8 @@ zappa-scanner/
 "Dropbox API Keys.txt"
 desktop.ini
 
-# Python scripts (optional - you may want to keep these)
-# compare_zappa_releases.py
-# extract_and_compare.py
-# find_missing_zappa.py
-# parse_zappa_list.py
-# zappa_comparison.py
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
 

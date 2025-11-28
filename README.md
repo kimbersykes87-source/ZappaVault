@@ -306,8 +306,8 @@ npm run sync:dropbox
 
 # Then run Python scripts to create comprehensive library:
 cd ..
-python create_comprehensive_library.py webapp/data/library.generated.json zappa_tracks.db webapp/data/library.comprehensive.json
-python generate_track_links.py webapp/data/library.comprehensive.json webapp/data/library.comprehensive.json
+python scripts/create_comprehensive_library.py webapp/data/library.generated.json zappa_tracks.db webapp/data/library.comprehensive.json
+python scripts/generate_track_links.py webapp/data/library.comprehensive.json webapp/data/library.comprehensive.json
 
 # Upload to Cloudflare KV
 npm run upload:cloudflare

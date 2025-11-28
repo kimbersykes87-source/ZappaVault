@@ -57,17 +57,17 @@ jobs:
         run: |
           # Check if database exists (might be committed to repo or created locally)
           if [ -f "zappa_tracks.db" ]; then
-            python export_track_durations.py zappa_tracks.db webapp/data/track_durations.json
+            python scripts/export_track_durations.py zappa_tracks.db webapp/data/track_durations.json
           else
             echo "⚠️  Database file not found - skipping export"
-            echo "   Run 'python create_track_database.py ZappaLibrary' locally first"
+            echo "   Run 'python scripts/create_track_database.py ZappaLibrary' locally first"
           fi
 
       - name: Create comprehensive library file
         working-directory: .
         run: |
           if [ -f "webapp/data/library.generated.json" ] && [ -f "zappa_tracks.db" ]; then
-            python create_comprehensive_library.py webapp/data/library.generated.json zappa_tracks.db webapp/data/library.comprehensive.json
+            python scripts/create_comprehensive_library.py webapp/data/library.generated.json zappa_tracks.db webapp/data/library.comprehensive.json
           else
             echo "⚠️  Library or database not found - skipping comprehensive library creation"
             # Fallback: use library.generated.json as-is
@@ -81,10 +81,34 @@ jobs:
         run: |
           if [ -f "webapp/data/library.comprehensive.json" ] && [ -n "$DROPBOX_REFRESH_TOKEN" ] && [ -n "$DROPBOX_APP_KEY" ] && [ -n "$DROPBOX_APP_SECRET" ]; then
             pip install requests
-            python generate_track_links.py webapp/data/library.comprehensive.json webapp/data/library.comprehensive.json 10
+            python scripts/generate_track_links.py webapp/data/library.comprehensive.json webapp/data/library.comprehensive.json 10
           else
             echo "⚠️  Skipping link generation (missing comprehensive library or Dropbox credentials)"
           fi
+
+      - name: Validate cover URLs
+        working-directory: .
+        run: |
+          python -c "
+          import json
+          import sys
+          with open('webapp/data/library.comprehensive.json', 'r') as f:
+              data = json.load(f)
+          invalid = []
+          for album in data.get('albums', []):
+              url = album.get('coverUrl', '')
+              if url and url.startswith('http'):
+                  # Check for image extensions
+                  is_image = any(ext in url.lower() for ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.tif', '.tiff'])
+                  if is_image and ('dl=0' in url or 'dl=1' in url):
+                      invalid.append(album.get('title', 'Unknown'))
+          if invalid:
+              print(f'ERROR: Found {len(invalid)} albums with invalid cover URLs (dl=0 or dl=1):')
+              for title in invalid[:10]:
+                  print(f'  - {title}')
+              sys.exit(1)
+          print('✅ All cover URLs validated successfully (all have raw=1)')
+          "
 
       - name: Upload comprehensive library to Cloudflare KV
         working-directory: .
