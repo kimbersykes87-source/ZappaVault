@@ -37,7 +37,7 @@ function getFolderNameFromPath(path: string): string {
 }
 
 export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
-  const { env, params } = context;
+  const { env, params, request } = context;
   const albumId = params?.id;
 
   if (!albumId) {

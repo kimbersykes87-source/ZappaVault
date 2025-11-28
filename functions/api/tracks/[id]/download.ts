@@ -29,7 +29,7 @@ function getFileNameFromPath(path: string): string {
 }
 
 export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
-  const { env, params } = context;
+  const { env, params, request } = context;
   const trackId = params?.id;
 
   if (!trackId) {
