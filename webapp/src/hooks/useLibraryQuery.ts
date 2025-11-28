@@ -33,7 +33,33 @@ export function useLibraryQuery() {
     void load();
   }, [load]);
 
-  const albums = useMemo<Album[]>(() => data?.results ?? [], [data]);
+  const albums = useMemo<Album[]>(() => {
+    if (!data) {
+      return [];
+    }
+
+    const sortKey = request.sort ?? (data.query?.sort as LibraryRequest['sort']) ?? 'title';
+    const sorted = [...data.results];
+
+    sorted.sort((a, b) => {
+      switch (sortKey) {
+        case 'year':
+          return (b.year ?? 0) - (a.year ?? 0);
+        case 'year-asc':
+          return (a.year ?? 0) - (b.year ?? 0);
+        case 'recent':
+          return (
+            Date.parse(b.lastSyncedAt ?? '1970-01-01') -
+            Date.parse(a.lastSyncedAt ?? '1970-01-01')
+          );
+        case 'title':
+        default:
+          return (a.title ?? '').localeCompare(b.title ?? '');
+      }
+    });
+
+    return sorted;
+  }, [data, request.sort]);
 
   return {
     request,
