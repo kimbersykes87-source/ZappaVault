@@ -1108,13 +1108,20 @@ async function attachSignedLinks(
       // Fix URLs that have dl=0 or dl=1 instead of raw=1 for images
       if (coverUrl.includes('dl=0') || coverUrl.includes('dl=1')) {
         // Convert dl=0 or dl=1 to raw=1 for images
-        coverUrl = coverUrl.replace(/[?&]dl=[01]/, '').replace(/\?/, '?').replace(/\?$/, '') + (coverUrl.includes('?') ? '&' : '?') + 'raw=1';
-        console.log(`[LINK DEBUG] Fixed cover URL (dl=0/1 -> raw=1) for ${album.title}: ${coverUrl.substring(0, 50)}...`);
+        // Remove both dl=0 and dl=1 parameters, then add raw=1
+        let fixedUrl = coverUrl.replace(/[?&]dl=[01]/g, '');
+        // Clean up any double ? or & characters
+        fixedUrl = fixedUrl.replace(/\?&/, '&').replace(/&&+/g, '&');
+        // Ensure we have proper query separator
+        const separator = fixedUrl.includes('?') ? '&' : '?';
+        coverUrl = fixedUrl + separator + 'raw=1';
+        console.log(`[LINK DEBUG] Fixed cover URL (dl=0/1 -> raw=1) for ${album.title}: ${coverUrl.substring(0, 80)}...`);
       } else if (coverUrl.includes('raw=1')) {
         console.log(`[LINK DEBUG] Cover URL already HTTP with raw=1 (pre-generated): ${coverUrl.substring(0, 50)}...`);
       } else {
         // Missing raw=1, add it
-        coverUrl = coverUrl + (coverUrl.includes('?') ? '&' : '?') + 'raw=1';
+        const separator = coverUrl.includes('?') ? '&' : '?';
+        coverUrl = coverUrl + separator + 'raw=1';
         console.log(`[LINK DEBUG] Added raw=1 to cover URL for ${album.title}: ${coverUrl.substring(0, 50)}...`);
       }
     } else if (coverUrl.startsWith('/')) {
@@ -1126,13 +1133,18 @@ async function attachSignedLinks(
       if (link) {
         // Ensure it has raw=1 for images
         if (link.includes('dl=0') || link.includes('dl=1')) {
-          coverUrl = link.replace(/[?&]dl=[01]/, '').replace(/\?/, '?').replace(/\?$/, '') + (link.includes('?') ? '&' : '?') + 'raw=1';
+          // Remove dl=0 or dl=1, then add raw=1
+          let fixedUrl = link.replace(/[?&]dl=[01]/g, '');
+          fixedUrl = fixedUrl.replace(/\?&/, '&').replace(/&&+/g, '&');
+          const separator = fixedUrl.includes('?') ? '&' : '?';
+          coverUrl = fixedUrl + separator + 'raw=1';
         } else if (!link.includes('raw=1')) {
-          coverUrl = link + (link.includes('?') ? '&' : '?') + 'raw=1';
+          const separator = link.includes('?') ? '&' : '?';
+          coverUrl = link + separator + 'raw=1';
         } else {
           coverUrl = link;
         }
-        console.log(`[LINK DEBUG] ✅ Converted cover path to HTTP URL for ${album.title}: ${coverUrl.substring(0, 50)}...`);
+        console.log(`[LINK DEBUG] ✅ Converted cover path to HTTP URL for ${album.title}: ${coverUrl.substring(0, 80)}...`);
       } else {
         console.error(`[LINK ERROR] Failed to convert cover path to HTTP URL for ${album.title}: ${coverUrl}`);
         // Set to undefined so frontend shows placeholder

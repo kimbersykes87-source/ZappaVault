@@ -47,14 +47,21 @@ export const onRequestGet = async (context: {
       let fixedUrl = album.coverUrl;
       if (fixedUrl.includes('dl=0') || fixedUrl.includes('dl=1')) {
         // Convert dl=0 or dl=1 to raw=1 for images
-        fixedUrl = fixedUrl.replace(/[?&]dl=[01]/, '').replace(/\?/, '?').replace(/\?$/, '') + (fixedUrl.includes('?') ? '&' : '?') + 'raw=1';
+        // Remove both dl=0 and dl=1 parameters, then add raw=1
+        fixedUrl = fixedUrl.replace(/[?&]dl=[01]/g, '');
+        // Clean up any double ? or & characters
+        fixedUrl = fixedUrl.replace(/\?&/, '&').replace(/&&+/g, '&');
+        // Ensure we have proper query separator
+        const separator = fixedUrl.includes('?') ? '&' : '?';
+        fixedUrl = fixedUrl + separator + 'raw=1';
         console.warn(`[COVER] Fixed cover URL (dl=0/1 -> raw=1) for ${album.title}: ${fixedUrl.substring(0, 80)}...`);
         return { ...album, coverUrl: fixedUrl };
       } else if (fixedUrl.includes('raw=1')) {
         return { ...album, coverUrl: fixedUrl };
       } else {
         // Missing raw=1, add it
-        fixedUrl = fixedUrl + (fixedUrl.includes('?') ? '&' : '?') + 'raw=1';
+        const separator = fixedUrl.includes('?') ? '&' : '?';
+        fixedUrl = fixedUrl + separator + 'raw=1';
         console.warn(`[COVER] Added raw=1 to cover URL for ${album.title}: ${fixedUrl.substring(0, 80)}...`);
         return { ...album, coverUrl: fixedUrl };
       }
