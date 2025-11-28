@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Link } from 'react-router-dom';
 import './App.css';
 import { LibraryPage } from './pages/LibraryPage.tsx';
 import { AlbumPage } from './pages/AlbumPage.tsx';
@@ -9,10 +9,10 @@ function App() {
     <BrowserRouter>
       <div className="app-shell">
         <header className="app-header">
-          <div className="app-header-brand">
+          <Link to="/" className="app-header-brand" aria-label="Return to the library homepage">
             <img src="/Zappa-Logo.svg" alt="Frank Zappa Vault" className="app-header-logo" />
             <h1>Frank Zappa Vault</h1>
-          </div>
+          </Link>
         </header>
         <main className="app-main">
           <Routes>
