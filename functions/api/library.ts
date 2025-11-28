@@ -2,396 +2,11 @@ import {
   applyLibraryQuery,
   DEFAULT_PAGE_SIZE,
 } from '../shared/library.ts';
-import type { Album, LibraryQuery } from '../shared/library.ts';
+import type { LibraryQuery } from '../shared/library.ts';
 import {
   loadLibrarySnapshot,
 } from '../utils/library.ts';
 import type { EnvBindings } from '../utils/library.ts';
-import { getValidDropboxToken } from '../utils/dropboxToken.ts';
-
-async function getPermanentLink(
-  env: EnvBindings,
-  filePath: string,
-): Promise<string | undefined> {
-  const token = await getValidDropboxToken(env);
-  if (!token) {
-    console.log(`[COVER DEBUG] No Dropbox token available for ${filePath}`);
-    return undefined;
-  }
-
-  try {
-    // First, try to get existing shared link
-    let response = await fetch(
-      'https://api.dropboxapi.com/2/sharing/list_shared_links',
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          path: filePath,
-          direct_only: false 
-        }),
-      },
-    );
-
-    if (response.ok) {
-      const listPayload = (await response.json()) as { 
-        links: Array<{ url: string }> 
-      };
-      if (listPayload.links && listPayload.links.length > 0) {
-        // Convert shared link to direct download link
-        const sharedUrl = listPayload.links[0].url;
-        // This is for cover art, so it's an image
-        const directLink = convertToDirectLink(sharedUrl, true);
-        console.log(`[COVER DEBUG] Found existing link for ${filePath}: ${directLink.substring(0, 80)}...`);
-        return directLink;
-      } else {
-        console.log(`[COVER DEBUG] No existing links found for ${filePath}, will create new one`);
-      }
-    } else {
-      const errorText = await response.text();
-      // 409 (conflict) or 404 (not found) are expected - just log and continue
-      if (response.status === 409 || response.status === 404) {
-        console.log(`[COVER DEBUG] No existing link for ${filePath} (${response.status}), will create new one`);
-      } else {
-        console.log(`[COVER DEBUG] list_shared_links failed for ${filePath}: ${response.status} ${errorText}`);
-        // Log specific error codes for debugging
-        if (response.status === 401) {
-          console.log(`[COVER DEBUG] ❌ 401 Unauthorized - Token is invalid or expired`);
-        } else if (response.status === 403) {
-          console.log(`[COVER DEBUG] ❌ 403 Forbidden - Token lacks 'sharing.read' permission`);
-        }
-      }
-    }
-
-    // If no existing link, create a new permanent shared link using the correct API
-    response = await dropboxRequestWithRefresh(
-      'sharing/create_shared_link_with_settings',
-      { 
-        path: filePath,
-        settings: {
-          requested_visibility: {
-            '.tag': 'public'
-          }
-        }
-      },
-      env,
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.log(`[LINK DEBUG] create_shared_link_with_settings failed for ${filePath}: ${response.status} ${errorText}`);
-      
-      // If it's a 409 conflict, the link might already exist - try to get it
-      if (response.status === 409) {
-        console.log(`[LINK DEBUG] Link already exists for ${filePath}, attempting to retrieve it`);
-        const conflictResponse = await dropboxRequestWithRefresh(
-          'sharing/list_shared_links',
-          { 
-            path: filePath,
-            direct_only: false 
-          },
-          env,
-        );
-        if (conflictResponse.ok) {
-          const conflictPayload = (await conflictResponse.json()) as { 
-            links: Array<{ url: string }> 
-          };
-          if (conflictPayload.links && conflictPayload.links.length > 0) {
-            const sharedUrl = conflictPayload.links[0].url;
-            // This is for cover art, so it's an image
-            const directLink = convertToDirectLink(sharedUrl, true);
-            console.log(`[LINK DEBUG] Retrieved existing link after conflict: ${directLink}`);
-            return directLink;
-          }
-        }
-      }
-      
-      return undefined;
-    }
-
-    const payload = (await response.json()) as { url: string };
-    // Convert shared link to direct download link
-    // This is for cover art, so it's an image
-    const directLink = convertToDirectLink(payload.url, true);
-    console.log(`[COVER DEBUG] Created new link for ${filePath}: ${directLink.substring(0, 80)}...`);
-    return directLink;
-  } catch (error) {
-    console.log(`[COVER DEBUG] getPermanentLink error for ${filePath}:`, error);
-    if (error instanceof Error) {
-      console.log(`[COVER DEBUG] Error message: ${error.message}`);
-      console.log(`[COVER DEBUG] Error stack: ${error.stack}`);
-    }
-    return undefined;
-  }
-}
-
-function convertToDirectLink(sharedUrl: string, isImage = false): string {
-  // Convert Dropbox shared link to direct download link
-  // Handles multiple formats:
-  // 1. Regular links: https://www.dropbox.com/s/abc123/file.jpg?dl=0
-  //    -> https://dl.dropboxusercontent.com/s/abc123/file.jpg
-  // 2. scl/fo or scl/fi links: https://www.dropbox.com/scl/fo/abc123/file.jpg?rlkey=xyz&dl=0
-  //    -> For images: https://www.dropbox.com/scl/fo/abc123/file.jpg?rlkey=xyz&raw=1
-  //    -> For audio: https://www.dropbox.com/scl/fo/abc123/file.jpg?rlkey=xyz&dl=1
-  //    NOTE: scl/fo and scl/fi links MUST stay on www.dropbox.com, NOT converted to dl.dropboxusercontent.com
-  
-  // Check if it's an scl/fo or scl/fi link (newer Dropbox format)
-  if (sharedUrl.includes('scl/fo/') || sharedUrl.includes('scl/fi/')) {
-    // For scl/fo and scl/fi links, MUST keep them on www.dropbox.com
-    // Do NOT convert to dl.dropboxusercontent.com - it won't work!
-    // Preserve the rlkey parameter and use ?raw=1 for images, ?dl=1 for audio files
-    try {
-      const url = new URL(sharedUrl);
-      // Ensure we're using www.dropbox.com, not dl.dropboxusercontent.com
-      if (url.hostname === 'dl.dropboxusercontent.com') {
-        url.hostname = 'www.dropbox.com';
-      }
-      url.searchParams.delete('dl');
-      if (isImage) {
-        url.searchParams.set('raw', '1');
-      } else {
-        url.searchParams.set('dl', '1');
-      }
-      return url.toString();
-    } catch {
-      // If URL parsing fails, try string replacement
-      let baseUrl = sharedUrl.split('?')[0];
-      // Fix if already converted to dl.dropboxusercontent.com
-      baseUrl = baseUrl.replace('dl.dropboxusercontent.com', 'www.dropbox.com');
-      const rlkeyMatch = sharedUrl.match(/[?&]rlkey=([^&]+)/);
-      const rlkey = rlkeyMatch ? rlkeyMatch[1] : '';
-      if (rlkey) {
-        return `${baseUrl}?rlkey=${rlkey}&${isImage ? 'raw=1' : 'dl=1'}`;
-      }
-      return `${baseUrl}?${isImage ? 'raw=1' : 'dl=1'}`;
-    }
-  }
-  
-  // For regular links, convert to direct download link
-  let directUrl = sharedUrl
-    .replace(/^https?:\/\/(www\.)?dropbox\.com/, 'https://dl.dropboxusercontent.com')
-    .replace(/\?dl=[01]/, '')
-    .split('?')[0];
-  
-  // Ensure we have the correct format
-  if (!directUrl.startsWith('https://dl.dropboxusercontent.com')) {
-    // Fallback: try to extract the path and rebuild
-    const match = sharedUrl.match(/dropbox\.com\/([^?]+)/);
-    if (match) {
-      directUrl = `https://dl.dropboxusercontent.com/${match[1]}`;
-    }
-  }
-  
-  return directUrl;
-}
-
-async function listCoverFolder(
-  env: EnvBindings,
-  coverFolderPath: string,
-): Promise<string[]> {
-  const token = await getValidDropboxToken(env);
-  if (!token) {
-    return [];
-  }
-
-  try {
-    const response = await dropboxRequestWithRefresh(
-      'files/list_folder',
-      { path: coverFolderPath },
-      env,
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      // Don't log 409 (path not found) as it's expected when folder doesn't exist
-      if (response.status !== 409) {
-        console.log(`[COVER DEBUG] list_folder failed for ${coverFolderPath}: ${response.status} ${errorText}`);
-      }
-      return [];
-    }
-
-    const payload = (await response.json()) as {
-      entries: Array<{ name: string; '.tag': string }>;
-    };
-
-    return payload.entries
-      .filter((entry) => entry['.tag'] === 'file')
-      .map((entry) => entry.name);
-  } catch (error) {
-    console.log(`[COVER DEBUG] list_folder error for ${coverFolderPath}:`, error);
-    return [];
-  }
-}
-
-function convertToDropboxPath(localPath: string): string {
-  // Convert Windows path to Dropbox path
-  // C:/Users/kimbe/Dropbox/Apps/ZappaVault/ZappaLibrary/... -> /Apps/ZappaVault/ZappaLibrary/...
-  if (localPath.startsWith('C:/') || localPath.startsWith('c:/')) {
-    // Extract the path after Dropbox
-    const dropboxIndex = localPath.toLowerCase().indexOf('/dropbox/');
-    if (dropboxIndex !== -1) {
-      const afterDropbox = localPath.substring(dropboxIndex + '/dropbox'.length);
-      // Ensure it starts with /
-      const dropboxPath = afterDropbox.startsWith('/') ? afterDropbox : `/${afterDropbox}`;
-      console.log(`[COVER DEBUG] Converted path: ${localPath} -> ${dropboxPath}`);
-      return dropboxPath;
-    }
-  }
-  // If already a Dropbox path (starts with /), return as is
-  if (localPath.startsWith('/')) {
-    return localPath;
-  }
-  // Otherwise, assume it's relative and add /
-  return `/${localPath}`;
-}
-
-async function findCoverArt(
-  env: EnvBindings,
-  album: Album,
-): Promise<string | undefined> {
-  const token = await getValidDropboxToken(env);
-  if (!token) {
-    return undefined;
-  }
-
-  // Convert locationPath to Dropbox format
-  const dropboxLocationPath = convertToDropboxPath(album.locationPath);
-  
-  // Try multiple folder names (case-insensitive search)
-  const possibleFolderNames = ['Cover', 'cover', 'Covers', 'covers', 'Artwork', 'artwork', 'Images', 'images'];
-  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp'];
-  
-  // First, try looking in subfolders
-  for (const folderName of possibleFolderNames) {
-    const coverFolderPath = `${dropboxLocationPath}/${folderName}`;
-    const coverFiles = await listCoverFolder(env, coverFolderPath);
-    
-    if (coverFiles.length > 0) {
-      const imageFiles = coverFiles.filter((file) => {
-        const ext = file.toLowerCase().substring(file.lastIndexOf('.'));
-        return imageExtensions.includes(ext);
-      });
-      
-      if (imageFiles.length > 0) {
-        const prioritized = prioritizeCoverFiles(imageFiles);
-        const bestMatch = prioritized[0];
-        const coverPath = `${coverFolderPath}/${bestMatch}`;
-        console.log(`[COVER DEBUG] Album: ${album.title}, Found in ${folderName}: ${bestMatch}`);
-        const link = await getPermanentLink(env, coverPath);
-        if (link) {
-          console.log(`[COVER DEBUG] Successfully got permanent link for ${album.title}`);
-          return link;
-        }
-      }
-    }
-  }
-  
-  // If no cover found in subfolders, try looking in the album root folder
-  const rootFiles = await listCoverFolder(env, dropboxLocationPath);
-  const rootImageFiles = rootFiles.filter((file) => {
-    const ext = file.toLowerCase().substring(file.lastIndexOf('.'));
-    return imageExtensions.includes(ext);
-  });
-  
-  if (rootImageFiles.length > 0) {
-    const prioritized = prioritizeCoverFiles(rootImageFiles);
-    const bestMatch = prioritized[0];
-    const coverPath = `${dropboxLocationPath}/${bestMatch}`;
-    console.log(`[COVER DEBUG] Album: ${album.title}, Found in root: ${bestMatch}`);
-    const link = await getPermanentLink(env, coverPath);
-    if (link) {
-      console.log(`[COVER DEBUG] Successfully got permanent link for ${album.title}`);
-      return link;
-    }
-  }
-  
-  console.log(`[COVER DEBUG] No cover art found for ${album.title} at ${dropboxLocationPath}`);
-  return undefined;
-}
-
-function prioritizeCoverFiles(imageFiles: string[]): string[] {
-  return imageFiles.sort((a, b) => {
-    const aLower = a.toLowerCase();
-    const bLower = b.toLowerCase();
-    
-    // Extract base name (without extension) for exact matching
-    const aBase = aLower.replace(/\.[^.]+$/, '');
-    const bBase = bLower.replace(/\.[^.]+$/, '');
-    
-    const aHas1 = aLower.startsWith('1') || aLower.includes(' 1 ') || aLower.includes('_1_') || aLower.includes('-1-');
-    const bHas1 = bLower.startsWith('1') || bLower.includes(' 1 ') || bLower.includes('_1_') || bLower.includes('-1-');
-    const aHasFront = aLower.includes('front') || aLower.includes('cover') || aLower.includes('folder');
-    const bHasFront = bLower.includes('front') || bLower.includes('cover') || bLower.includes('folder');
-    
-    // Exact match for "folder" has highest priority (as per user's note that some covers are named "folder")
-    const aIsFolder = aBase === 'folder';
-    const bIsFolder = bBase === 'folder';
-    if (aIsFolder && !bIsFolder) return -1;
-    if (!aIsFolder && bIsFolder) return 1;
-    
-    // Files starting with "1" have second priority
-    if (aHas1 && !bHas1) return -1;
-    if (!aHas1 && bHas1) return 1;
-    
-    // Files with "front", "cover", or "folder" have third priority
-    if (aHasFront && !bHasFront) return -1;
-    if (!aHasFront && bHasFront) return 1;
-    
-    return 0;
-  });
-}
-
-async function getCoverUrl(
-  album: Album,
-  env: EnvBindings,
-): Promise<string | undefined> {
-  const token = await getValidDropboxToken(env);
-  if (!token) {
-    console.log(`[COVER DEBUG] No Dropbox token available for ${album.title}`);
-    return undefined;
-  }
-
-  // If coverUrl is already an HTTP URL, return it
-  if (album.coverUrl?.startsWith('http')) {
-    console.log(`[COVER DEBUG] ${album.title}: Cover URL already HTTP`);
-    return album.coverUrl;
-  }
-
-  // If coverUrl is a Dropbox path, convert it to an HTTP URL
-  if (album.coverUrl && album.coverUrl.startsWith('/')) {
-    console.log(`[COVER DEBUG] ${album.title}: Converting Dropbox path to HTTP URL: ${album.coverUrl}`);
-    const coverLink = await getPermanentLink(env, album.coverUrl);
-    if (coverLink) {
-      console.log(`[COVER DEBUG] ${album.title}: ✅ Converted to HTTP URL`);
-      return coverLink;
-    } else {
-      console.log(`[COVER DEBUG] ${album.title}: ❌ Failed to convert, trying fallback search`);
-      // Fallback: Try to find cover art if conversion failed
-      const foundCover = await findCoverArt(env, album);
-      if (foundCover) {
-        console.log(`[COVER DEBUG] ${album.title}: ✅ Found via fallback search`);
-        return foundCover;
-      }
-    }
-  }
-
-  // Fallback: Find cover art in the Cover folder if no coverUrl exists
-  if (!album.coverUrl) {
-    console.log(`[COVER DEBUG] ${album.title}: No coverUrl, searching for cover art`);
-    const foundCover = await findCoverArt(env, album);
-    if (foundCover) {
-      console.log(`[COVER DEBUG] ${album.title}: ✅ Found via search`);
-      return foundCover;
-    } else {
-      console.log(`[COVER DEBUG] ${album.title}: ❌ No cover art found`);
-    }
-  }
-
-  return undefined;
-}
 
 export const onRequestGet = async (context: {
   request: Request;
@@ -419,45 +34,40 @@ export const onRequestGet = async (context: {
 
   const result = applyLibraryQuery(snapshot, query);
 
-  // Generate static cover URLs for albums
-  // Static covers are served from /covers/ directory in Cloudflare Pages
-  // This is much faster and more reliable than Dropbox API calls
-  console.log(`[COVER DEBUG] Generating cover URLs for ${result.results.length} albums`);
+  // Use pre-generated cover URLs from comprehensive library (single source of truth)
+  // All cover URLs should be HTTP URLs with raw=1 parameter, pre-generated during build
+  // No runtime conversion needed - comprehensive library has all URLs ready
+  console.log(`[COVER] Using pre-generated cover URLs from comprehensive library for ${result.results.length} albums`);
   
-  // Use pre-generated cover URLs from comprehensive library
-  // If coverUrl is already HTTP, use it; if it's a Dropbox path, it should have been converted during build
-  // If undefined, keep it undefined for placeholder
   const albumsWithCovers = result.results.map((album) => {
-    // If album already has an HTTP URL (pre-generated from comprehensive library), use it
+    // Use coverUrl directly from comprehensive library
+    // It should be an HTTP URL with raw=1, or undefined for placeholder
     if (album.coverUrl?.startsWith('http')) {
-      return {
-        ...album,
-        coverUrl: album.coverUrl,
-      };
+      // Fix URLs that have dl=0 or dl=1 instead of raw=1 for images
+      let fixedUrl = album.coverUrl;
+      if (fixedUrl.includes('dl=0') || fixedUrl.includes('dl=1')) {
+        // Convert dl=0 or dl=1 to raw=1 for images
+        fixedUrl = fixedUrl.replace(/[?&]dl=[01]/, '').replace(/\?/, '?').replace(/\?$/, '') + (fixedUrl.includes('?') ? '&' : '?') + 'raw=1';
+        console.warn(`[COVER] Fixed cover URL (dl=0/1 -> raw=1) for ${album.title}: ${fixedUrl.substring(0, 80)}...`);
+        return { ...album, coverUrl: fixedUrl };
+      } else if (fixedUrl.includes('raw=1')) {
+        return { ...album, coverUrl: fixedUrl };
+      } else {
+        // Missing raw=1, add it
+        fixedUrl = fixedUrl + (fixedUrl.includes('?') ? '&' : '?') + 'raw=1';
+        console.warn(`[COVER] Added raw=1 to cover URL for ${album.title}: ${fixedUrl.substring(0, 80)}...`);
+        return { ...album, coverUrl: fixedUrl };
+      }
     }
     
-    // If coverUrl is still a Dropbox path (shouldn't happen if comprehensive library was generated correctly),
-    // try to convert it at runtime as fallback
-    if (album.coverUrl && album.coverUrl.startsWith('/')) {
-      console.log(`[COVER DEBUG] ⚠️  Cover still has Dropbox path for ${album.title}, attempting runtime conversion`);
-      // Note: This is a fallback - covers should be pre-generated in comprehensive library
-      // We'll try to convert it, but it might timeout for large libraries
-      return {
-        ...album,
-        coverUrl: album.coverUrl, // Keep path for now, could be converted if needed
-      };
-    }
-    
-    // No cover URL, keep it as undefined
-    return {
-      ...album,
-      coverUrl: album.coverUrl, // Could be undefined
-    };
+    // File path or no cover URL - frontend will show placeholder
+    // Note: Runtime conversion for file paths is handled in the album detail endpoint
+    return { ...album, coverUrl: album.coverUrl };
   });
   
-  const staticCovers = albumsWithCovers.filter(a => a.coverUrl?.startsWith('/')).length;
-  const dropboxCovers = albumsWithCovers.filter(a => a.coverUrl?.startsWith('http')).length;
-  console.log(`[COVER DEBUG] Static covers: ${staticCovers}, Dropbox covers: ${dropboxCovers}`);
+  const httpCovers = albumsWithCovers.filter(a => a.coverUrl?.startsWith('http')).length;
+  const noCovers = albumsWithCovers.filter(a => !a.coverUrl).length;
+  console.log(`[COVER] HTTP covers: ${httpCovers}, No covers (placeholder): ${noCovers}`);
 
   return new Response(
     JSON.stringify({
@@ -474,4 +84,3 @@ export const onRequestGet = async (context: {
     },
   );
 };
-
