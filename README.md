@@ -5,9 +5,11 @@ A Cloudflare Pages application that indexes a Dropbox-hosted Frank Zappa collect
 ## 🎯 Project Status
 
 **Current Status:** ✅ Production Ready
-- **Total Albums:** 98
-- **Total Tracks:** 1,838
+- **Total Albums:** 102
+- **Total Tracks:** 1,897
 - **Metadata Completion:** 100% (era, genre, description, tags, cover art, track durations)
+- **Cover Art:** All URLs pre-generated with `raw=1` for proper image display
+- **Social Sharing:** Open Graph and Twitter Card meta tags configured
 - **Deployment:** Live at https://zappavault.pages.dev
 - **Auto-Deployment:** Configured via GitHub Actions
 
