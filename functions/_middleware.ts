@@ -14,7 +14,7 @@ export const onRequest: PagesFunction<EnvBindings> = async (context) => {
   const { request, env, next } = context;
   const url = new URL(request.url);
   
-  // Allow access to login page and static assets without authentication
+  // Allow access to login page and public static assets without authentication
   const publicPaths = [
     '/login',
     '/favicon.ico',
@@ -24,11 +24,29 @@ export const onRequest: PagesFunction<EnvBindings> = async (context) => {
   // Check if path is public
   const isPublicPath = publicPaths.some(path => url.pathname === path || url.pathname.startsWith('/assets/'));
   
-  // Allow static assets (images, CSS, JS) - these are typically served by Cloudflare Pages
-  const isStaticAsset = url.pathname.match(/\.(jpg|jpeg|png|gif|svg|css|js|woff|woff2|ttf|eot)$/i);
+  // CRITICAL: Block access to data files (library JSON, track durations, links)
+  // These contain sensitive metadata and should only be accessible via authenticated API
+  if (url.pathname.startsWith('/data/')) {
+    // Data files must be accessed through authenticated API endpoints, not directly
+    if (!isAuthenticated(request, env)) {
+      return new Response('Authentication required', { status: 401 });
+    }
+  }
   
-  if (isPublicPath || isStaticAsset) {
-    // Allow access to public paths and static assets
+  // Block access to cover images without authentication (they're part of the collection)
+  if (url.pathname.startsWith('/covers/')) {
+    if (!isAuthenticated(request, env)) {
+      return new Response('Authentication required', { status: 401 });
+    }
+  }
+  
+  // Allow public static assets (only logo, loading SVG, etc. - not data or covers)
+  const isPublicStaticAsset = url.pathname.match(/\.(svg|css|js|woff|woff2|ttf|eot)$/i) && 
+                              !url.pathname.startsWith('/data/') && 
+                              !url.pathname.startsWith('/covers/');
+  
+  if (isPublicPath || isPublicStaticAsset) {
+    // Allow access to public paths and safe static assets
     return next();
   }
   
