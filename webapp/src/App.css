@@ -4,6 +4,8 @@
   margin: 0 auto;
   padding: 0 1.5rem 6rem;
   color: #fdf9ef;
+  display: flex;
+  flex-direction: column;
 }
 
 .app-header {
@@ -62,6 +64,7 @@
 
 .app-main {
   padding: 0 0 4rem;
+  flex: 1;
 }
 
 .library-header {

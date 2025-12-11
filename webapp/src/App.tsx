@@ -3,6 +3,7 @@ import './App.css';
 import { LibraryPage } from './pages/LibraryPage.tsx';
 import { AlbumPage } from './pages/AlbumPage.tsx';
 import { PlayerBar } from './components/PlayerBar.tsx';
+import { Footer } from './components/Footer.tsx';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             <Route path="/album/:albumId" element={<AlbumPage />} />
           </Routes>
         </main>
+        <Footer />
         <PlayerBar />
       </div>
     </BrowserRouter>
