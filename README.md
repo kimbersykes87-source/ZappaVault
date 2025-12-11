@@ -44,6 +44,14 @@ ADMIN_TOKEN=your-admin-token
 
 ```
 ZappaVault/
+├── docs/                   # Documentation
+│   ├── legal/             # Legal documents (Privacy Policy, Terms, DMCA)
+│   ├── security/          # Security documentation and analysis
+│   ├── testing/           # Test reports and verification
+│   ├── ui-ux/             # UI/UX reviews and improvements
+│   ├── CLOUDFLARE_ENV_SETUP.md
+│   ├── DROPBOX_TOKEN_SETUP.md
+│   └── LIBRARY_ARCHITECTURE.md
 ├── functions/              # Cloudflare Pages Functions (API endpoints)
 │   ├── api/
 │   │   ├── library.ts     # GET /api/library
@@ -51,11 +59,15 @@ ZappaVault/
 │   │   └── albums/
 │   ├── shared/            # Shared types and query logic
 │   └── utils/             # Utility functions
+├── scripts/               # Utility scripts (Python & Node.js)
+│   ├── create_comprehensive_library.py
+│   ├── generate_track_links.py
+│   └── upload_library_to_kv.js
 ├── shared/                 # Shared TypeScript types (used by functions)
 ├── webapp/
 │   ├── src/               # React frontend
 │   ├── functions/         # Test files for backend functions
-│   ├── scripts/           # Utility scripts
+│   ├── scripts/           # Frontend utility scripts
 │   ├── data/              # Generated library snapshot
 │   └── dist/              # Build output (deployed to Pages)
 └── .github/workflows/      # GitHub Actions CI/CD
@@ -446,6 +458,29 @@ All changes are viewed directly on **Cloudflare Pages** at https://zappavault.pa
 3. Wait for completion (1-2 minutes)
 4. Check logs for success/errors
 
+## 📚 Documentation
+
+### Project Documentation
+- [`docs/LIBRARY_ARCHITECTURE.md`](docs/LIBRARY_ARCHITECTURE.md) - Library data structure and architecture
+- [`docs/DROPBOX_TOKEN_SETUP.md`](docs/DROPBOX_TOKEN_SETUP.md) - Dropbox authentication setup guide
+- [`docs/CLOUDFLARE_ENV_SETUP.md`](docs/CLOUDFLARE_ENV_SETUP.md) - Cloudflare environment configuration
+
+### Security Documentation
+- [`docs/security/SECURITY_LEGAL_REVIEW.md`](docs/security/SECURITY_LEGAL_REVIEW.md) - Comprehensive security analysis
+- [`docs/security/SECURITY_LEGAL_IMPLEMENTATION.md`](docs/security/SECURITY_LEGAL_IMPLEMENTATION.md) - Security implementation details
+- [`docs/security/EXPOSED_FILES_ANALYSIS.md`](docs/security/EXPOSED_FILES_ANALYSIS.md) - File exposure analysis
+- [`docs/security/ACCESS_CONTROL_OPTIONS.md`](docs/security/ACCESS_CONTROL_OPTIONS.md) - Access control options
+- [`docs/security/PASSWORD_SETUP.md`](docs/security/PASSWORD_SETUP.md) - Password protection setup
+
+### Legal Documents
+- [`docs/legal/PRIVACY_POLICY.md`](docs/legal/PRIVACY_POLICY.md) - Privacy Policy
+- [`docs/legal/TERMS_OF_SERVICE.md`](docs/legal/TERMS_OF_SERVICE.md) - Terms of Service
+- [`docs/legal/DMCA_POLICY.md`](docs/legal/DMCA_POLICY.md) - DMCA Policy
+
+### UI/UX Documentation
+- [`docs/ui-ux/UI_UX_REVIEW.md`](docs/ui-ux/UI_UX_REVIEW.md) - UI/UX design review
+- [`docs/ui-ux/UI_UX_IMPROVEMENTS_IMPLEMENTED.md`](docs/ui-ux/UI_UX_IMPROVEMENTS_IMPLEMENTED.md) - Implemented improvements
+
 ## 📖 Additional Resources
 
 - [Cloudflare Pages Documentation](https://developers.cloudflare.com/pages/)
@@ -483,12 +518,12 @@ The site includes Open Graph and Twitter Card meta tags for rich link previews:
 2. Family members visit the site and enter the password
 3. Session lasts 24 hours (no need to re-enter password)
 
-See `SECURITY_LEGAL_REVIEW.md` for full security analysis and `SECURITY_LEGAL_IMPLEMENTATION.md` for implementation details.
+See [`docs/security/SECURITY_LEGAL_REVIEW.md`](docs/security/SECURITY_LEGAL_REVIEW.md) for full security analysis and [`docs/security/SECURITY_LEGAL_IMPLEMENTATION.md`](docs/security/SECURITY_LEGAL_IMPLEMENTATION.md) for implementation details.
 
 ### Legal Documents
-- [Privacy Policy](PRIVACY_POLICY.md)
-- [Terms of Service](TERMS_OF_SERVICE.md)
-- [DMCA Policy](DMCA_POLICY.md)
+- [Privacy Policy](docs/legal/PRIVACY_POLICY.md)
+- [Terms of Service](docs/legal/TERMS_OF_SERVICE.md)
+- [DMCA Policy](docs/legal/DMCA_POLICY.md)
 
 **Important:** These documents are templates. Review and customize with your information, and consult with legal counsel for specific legal questions.
 
@@ -500,7 +535,7 @@ Private project - Family use only
 
 ---
 
-**Last Updated:** 2025-01-28  
+**Last Updated:** 2025-12-11  
 **Deployment Status:** ✅ Live at https://zappavault.pages.dev  
 **Auto-Deployment:** ✅ Enabled via GitHub Actions
 
