@@ -7,6 +7,7 @@ import {
   loadLibrarySnapshot,
 } from '../utils/library.ts';
 import type { EnvBindings } from '../utils/library.ts';
+import { getSecurityHeaders } from '../utils/security.ts';
 
 export const onRequestGet = async (context: {
   request: Request;
@@ -87,6 +88,7 @@ export const onRequestGet = async (context: {
         'content-type': 'application/json',
         // Permanent links don't expire, so we can cache longer
         'cache-control': 'public, max-age=3600',
+        ...getSecurityHeaders(),
       },
     },
   );

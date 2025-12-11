@@ -3,6 +3,7 @@ import {
 } from '../../../utils/library.ts';
 import type { EnvBindings } from '../../../utils/library.ts';
 import { getValidDropboxToken } from '../../../utils/dropboxToken.ts';
+import { getSecurityHeaders } from '../../../utils/security.ts';
 
 function convertToDropboxPath(localPath: string): string {
   // Convert Windows path to Dropbox path, or return Dropbox path as-is
@@ -132,6 +133,7 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
       'content-disposition': contentDisposition,
       'cache-control': 'no-cache',
       'x-content-type-options': 'nosniff',
+      ...getSecurityHeaders(),
     },
   });
 };

@@ -1,11 +1,70 @@
 import type { EnvBindings } from '../utils/library.ts';
 
+/**
+ * Validate that URL is a legitimate Dropbox URL
+ * Prevents SSRF (Server-Side Request Forgery) attacks
+ */
+function isValidDropboxUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    const hostname = parsed.hostname.toLowerCase();
+    
+    // Whitelist specific Dropbox domains
+    const allowedDomains = [
+      'www.dropbox.com',
+      'dropbox.com',
+      'dl.dropboxusercontent.com',
+      'content.dropboxapi.com',
+    ];
+    
+    if (!allowedDomains.includes(hostname)) {
+      return false;
+    }
+    
+    // Additional validation: ensure it's a valid Dropbox share link format
+    // Dropbox share links typically have format: /s/... or /scl/...
+    const path = parsed.pathname;
+    if (!path.startsWith('/s/') && !path.startsWith('/scl/') && !path.startsWith('/2/')) {
+      // Allow API endpoints (/2/) and share links (/s/, /scl/)
+      return false;
+    }
+    
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Get CORS headers with origin whitelist
+ */
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const ALLOWED_ORIGINS = [
+    'https://zappavault.pages.dev',
+    'https://www.zappavault.pages.dev',
+    // Add custom domain here if you have one
+  ];
+  
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) 
+    ? origin 
+    : 'null';
+    
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Max-Age': '86400', // 24 hours
+  };
+}
+
 export const onRequestGet = async (context: {
   request: Request;
   env: EnvBindings;
 }) => {
   const { request, env } = context;
   const url = new URL(request.url);
+  const origin = request.headers.get('Origin');
+  const corsHeaders = getCorsHeaders(origin);
   
   // Get the target URL from query parameter
   const targetUrl = url.searchParams.get('url');
@@ -13,20 +72,16 @@ export const onRequestGet = async (context: {
   if (!targetUrl) {
     return new Response('Missing url parameter', { 
       status: 400,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: corsHeaders,
     });
   }
 
   // Validate that the URL is from Dropbox (security measure)
-  if (!targetUrl.includes('dropbox.com') && !targetUrl.includes('dropboxusercontent.com')) {
+  if (!isValidDropboxUrl(targetUrl)) {
     console.error(`[PROXY] Invalid URL: ${targetUrl}`);
     return new Response('Invalid URL: must be from Dropbox', {
       status: 400,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: corsHeaders,
     });
   }
 
@@ -67,7 +122,7 @@ export const onRequestGet = async (context: {
         return new Response(`Failed to fetch from Dropbox: ${response.status} ${response.statusText}\n${errorText.substring(0, 200)}`, {
           status: response.status,
           headers: {
-            'Access-Control-Allow-Origin': '*',
+            ...corsHeaders,
             'Content-Type': 'text/plain',
           },
         });
@@ -86,9 +141,7 @@ export const onRequestGet = async (context: {
         status: 200,
         headers: {
           'Content-Type': contentType,
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type',
+          ...corsHeaders,
           'Cache-Control': 'public, max-age=3600',
         },
       });
@@ -99,7 +152,7 @@ export const onRequestGet = async (context: {
         return new Response('Request timeout', {
           status: 504,
           headers: {
-            'Access-Control-Allow-Origin': '*',
+            ...corsHeaders,
             'Content-Type': 'text/plain',
           },
         });
@@ -137,7 +190,7 @@ export const onRequestGet = async (context: {
     return new Response(errorMsg, {
       status: statusCode,
       headers: {
-        'Access-Control-Allow-Origin': '*',
+        ...corsHeaders,
         'Content-Type': 'text/plain',
       },
     });

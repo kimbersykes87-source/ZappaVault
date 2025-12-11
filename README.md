@@ -112,8 +112,9 @@ Fetch album details.
 - `links=1` - Include streaming/download URLs (uses pre-generated links from comprehensive library)
 
 **Behavior:**
-- If `links=1` is provided, the API loads the comprehensive library which contains pre-generated Dropbox permanent links for all tracks
-- Links are pre-generated during the sync workflow, eliminating timeout issues and improving response times
+- If `links=1` is provided, the API loads the library metadata from KV and merges pre-generated links from `library.comprehensive.links.json` (stored in GitHub as static asset)
+- Links are pre-generated during the sync workflow and stored separately to keep KV payload under 25MB limit
+- Links are merged at runtime by Cloudflare Functions, eliminating timeout issues and improving response times
 - If a track is missing a link (e.g., newly added track), the API will attempt to generate it at runtime as a fallback
 
 ### `GET /api/albums/:id/download`
@@ -189,6 +190,9 @@ VITE_API_BASE=https://zappavault.pages.dev
 
 **Required for API:**
 - `ADMIN_TOKEN` - Secret token for `/api/refresh` endpoint
+
+**Required for Site Access (Password Protection):**
+- `SITE_PASSWORD` - Global password for family access (anyone with this password can access the site)
 
 **KV Binding:**
 - `LIBRARY_KV` - KV namespace binding (configured in `wrangler.toml`)
@@ -268,7 +272,7 @@ The library includes comprehensive metadata for all 102 albums:
 - ✅ **Tags:** 100% - Categorization tags
 - ✅ **Cover Art:** 100% - Album cover images with pre-generated `raw=1` URLs
 - ✅ **Track Durations:** 100% - All track durations extracted
-- ✅ **Permanent Links:** 100% - Pre-generated Dropbox links for all tracks and covers
+- ✅ **Permanent Links:** 100% - Pre-generated Dropbox links for all tracks and covers (stored in separate links database)
 
 ## 🔄 Dropbox Sync Workflow
 
@@ -286,16 +290,21 @@ The `.github/workflows/sync-dropbox.yml` workflow runs:
 5. Exports track durations from `zappa_tracks.db` to JSON
 6. Creates `webapp/data/library.comprehensive.json` (merges durations into library)
 7. **Generates Dropbox permanent links** for all tracks (pre-indexed for fast API responses)
-8. Uploads comprehensive library to Cloudflare KV (if credentials provided)
-9. Commits and pushes updated library files to repository
+8. **Extracts links to separate file** (`library.comprehensive.links.json`) to keep KV payload small
+9. Uploads metadata-only library to Cloudflare KV (stays under 25MB limit)
+10. Commits and pushes updated library files to repository (including links file)
 
 **Key Files Generated:**
 - `library.generated.json` - Base library from Dropbox sync (metadata only)
 - `library.comprehensive.json` - **Single source of truth** with:
   - All album and track metadata
   - Track durations (from SQLite database)
-  - Pre-generated Dropbox permanent links (`streamingUrl` and `downloadUrl`)
   - Pre-generated cover art URLs with `raw=1` parameter for images
+  - **Note:** Links are extracted to separate file (see below)
+- `library.comprehensive.links.json` - **Links database** (stored in GitHub as static asset):
+  - Pre-generated Dropbox permanent links for all tracks (`streamingUrl` and `downloadUrl`)
+  - Maps track IDs to their Dropbox links
+  - Served as static asset and merged at runtime by Cloudflare Functions
 
 ### Manual Sync
 
@@ -313,11 +322,17 @@ python scripts/generate_track_links.py webapp/data/library.comprehensive.json we
 npm run upload:cloudflare
 ```
 
-**Note:** The comprehensive library (`library.comprehensive.json`) is the single source of truth used by the API. It includes:
-- All metadata from Dropbox sync
-- Track durations from the SQLite database
-- Pre-generated Dropbox permanent links for all tracks (audio files use `dl=1`, images use `raw=1`)
-- Pre-generated cover art URLs with `raw=1` parameter for proper image display
+**Note:** The comprehensive library (`library.comprehensive.json`) is the single source of truth used by the API. However, to stay within Cloudflare KV's 25MB limit, track links are stored separately:
+
+- **Library metadata** (in KV): Albums, tracks, durations, cover art URLs
+- **Links database** (`library.comprehensive.links.json` in GitHub): Pre-generated Dropbox permanent links for all tracks
+- **Runtime merging**: Cloudflare Functions automatically merge links from the static asset when serving API requests
+
+This architecture ensures:
+- KV payload stays small (metadata only, no links)
+- All pre-generated links are preserved (stored in GitHub, version controlled)
+- Fast access (static asset + KV merge)
+- Automatic updates (workflow commits both files)
 
 ## 🧪 Testing
 
@@ -453,9 +468,35 @@ The site includes Open Graph and Twitter Card meta tags for rich link previews:
 - [Twitter Card Validator](https://cards-dev.twitter.com/validator)
 - [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)
 
+## 🔒 Security & Legal
+
+### Security
+- **Password Protection:** Global password authentication protects the entire site (family members only)
+- Admin authentication uses secure header-based tokens (no query strings)
+- CORS restricted to whitelisted origins
+- Security headers enabled on all API endpoints
+- URL validation prevents SSRF attacks
+- Request size limits prevent DoS attacks
+
+**Password Setup:**
+1. Set `SITE_PASSWORD` environment variable in Cloudflare Pages
+2. Family members visit the site and enter the password
+3. Session lasts 24 hours (no need to re-enter password)
+
+See `SECURITY_LEGAL_REVIEW.md` for full security analysis and `SECURITY_LEGAL_IMPLEMENTATION.md` for implementation details.
+
+### Legal Documents
+- [Privacy Policy](PRIVACY_POLICY.md)
+- [Terms of Service](TERMS_OF_SERVICE.md)
+- [DMCA Policy](DMCA_POLICY.md)
+
+**Important:** These documents are templates. Review and customize with your information, and consult with legal counsel for specific legal questions.
+
 ## 📄 License
 
 Private project - Family use only
+
+**Copyright Notice:** All music content is the property of the Zappa Family Trust. This site is a private family collection and does not grant any rights to use, reproduce, or distribute copyrighted material.
 
 ---
 

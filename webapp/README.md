@@ -43,8 +43,13 @@ The sync workflow creates a **comprehensive library file** that serves as the si
 **Note:** The comprehensive library (`library.comprehensive.json`) includes:
 - All album and track metadata from Dropbox
 - Track durations from SQLite database
-- Pre-generated Dropbox permanent links for all tracks (eliminates timeout issues)
 - Pre-generated cover art URLs with `raw=1` parameter for proper image display
+
+**Links Database:** To keep the KV payload under Cloudflare's 25MB limit, track links are extracted to a separate file:
+- `library.comprehensive.links.json` - Contains all pre-generated Dropbox permanent links
+- Stored in GitHub as a static asset (served at `/data/library.comprehensive.links.json`)
+- Cloudflare Functions automatically merge links at runtime when serving API requests
+- This eliminates timeout issues while keeping KV payload small
 
 ### Automated sync via GitHub Actions
 
@@ -55,8 +60,9 @@ The sync workflow creates a **comprehensive library file** that serves as the si
 3. Export track durations from SQLite database
 4. Create comprehensive library (merges durations)
 5. **Generate Dropbox permanent links** for all tracks (pre-indexed for fast API responses)
-6. Upload comprehensive library to Cloudflare KV (if credentials provided)
-7. Commit and push updated library files to repository
+6. **Extract links to separate file** (`library.comprehensive.links.json`) to keep KV payload small
+7. Upload metadata-only library to Cloudflare KV (stays under 25MB limit)
+8. Commit and push updated library files to repository (including links file)
 
 **Repository Secrets Required:**
 
@@ -81,7 +87,9 @@ The sync workflow creates a **comprehensive library file** that serves as the si
 - `POST /api/refresh` – authenticated endpoint to push a new snapshot into KV
 
 **Link Generation:**
-- Links are **pre-generated** during the sync workflow and stored in `library.comprehensive.json`
+- Links are **pre-generated** during the sync workflow and stored in `library.comprehensive.links.json` (separate from main library)
+- Links are stored in GitHub as a static asset and merged at runtime by Cloudflare Functions
+- This architecture keeps KV payload under 25MB while preserving all pre-generated links
 - This eliminates timeout issues for large albums and improves API response times
 - Audio files use `dl=1` parameter, images (cover art) use `raw=1` parameter
 - If a track is missing a link (e.g., newly added), the API will attempt to generate it at runtime as a fallback

@@ -13,6 +13,76 @@ export interface EnvBindings {
 }
 
 /**
+ * Load track links from separate links file (stored in GitHub as static asset)
+ */
+async function loadTrackLinks(request: Request, libraryPath: string): Promise<Record<string, { streamingUrl?: string; downloadUrl?: string }> | null> {
+  try {
+    const requestUrl = new URL(request.url);
+    // Try comprehensive links first, then generated links
+    const linksPath = libraryPath.includes('comprehensive')
+      ? `${requestUrl.origin}/data/library.comprehensive.links.json`
+      : `${requestUrl.origin}/data/library.generated.links.json`;
+    
+    console.log(`[LINKS] Fetching track links from: ${linksPath}`);
+    const response = await fetch(linksPath, {
+      cache: 'default', // Links don't change often, cache is fine
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+    
+    if (response.ok) {
+      const linksData = await response.json() as { links: Record<string, { streamingUrl?: string; downloadUrl?: string }> };
+      const linkCount = Object.keys(linksData.links || {}).length;
+      console.log(`[LINKS] ✅ Loaded ${linkCount} track links from static asset`);
+      return linksData.links || null;
+    } else {
+      console.log(`[LINKS] Links file not found (${response.status}), will generate links on-demand`);
+      return null;
+    }
+  } catch (error) {
+    console.warn(`[LINKS] ⚠️  Error loading links file:`, error instanceof Error ? error.message : String(error));
+    return null;
+  }
+}
+
+/**
+ * Merge track links into library snapshot
+ */
+function mergeTrackLinks(
+  snapshot: LibrarySnapshot,
+  links: Record<string, { streamingUrl?: string; downloadUrl?: string }> | null
+): LibrarySnapshot {
+  if (!links) {
+    return snapshot;
+  }
+  
+  let linksMerged = 0;
+  for (const album of snapshot.albums) {
+    for (const track of album.tracks) {
+      const trackLinks = links[track.id];
+      if (trackLinks) {
+        if (trackLinks.streamingUrl) {
+          track.streamingUrl = trackLinks.streamingUrl;
+        }
+        if (trackLinks.downloadUrl) {
+          track.downloadUrl = trackLinks.downloadUrl;
+        }
+        if (trackLinks.streamingUrl || trackLinks.downloadUrl) {
+          linksMerged++;
+        }
+      }
+    }
+  }
+  
+  if (linksMerged > 0) {
+    console.log(`[LINKS] ✅ Merged ${linksMerged} track links into library`);
+  }
+  
+  return snapshot;
+}
+
+/**
  * Load library snapshot from static asset URL
  * Falls back to KV cache, then sample library
  */
@@ -25,6 +95,7 @@ async function loadLibraryFromStaticAsset(request?: Request): Promise<LibrarySna
     // Try comprehensive library first (single source of truth with all metadata)
     const requestUrl = new URL(request.url);
     let staticAssetUrl = `${requestUrl.origin}/data/library.comprehensive.json`;
+    let libraryPath = 'library.comprehensive.json';
     console.log(`[LIBRARY] Fetching comprehensive library from: ${staticAssetUrl}`);
     
     let response = await fetch(staticAssetUrl, {
@@ -40,6 +111,7 @@ async function loadLibraryFromStaticAsset(request?: Request): Promise<LibrarySna
     if (!response.ok) {
       console.log(`[LIBRARY] Comprehensive library not found (${response.status}), trying library.generated.json...`);
       staticAssetUrl = `${requestUrl.origin}/data/library.generated.json`;
+      libraryPath = 'library.generated.json';
       console.log(`[LIBRARY] Fetching from static asset: ${staticAssetUrl}`);
     
       response = await fetch(staticAssetUrl, {
@@ -62,8 +134,14 @@ async function loadLibraryFromStaticAsset(request?: Request): Promise<LibrarySna
         return null;
       }
       
-      const snapshot = JSON.parse(text) as LibrarySnapshot;
+      let snapshot = JSON.parse(text) as LibrarySnapshot;
       console.log(`[LIBRARY] ✅ Loaded library from static asset: ${snapshot.albumCount} albums, ${snapshot.trackCount} tracks`);
+      
+      // Load and merge track links from separate file
+      const links = await loadTrackLinks(request, libraryPath);
+      if (links) {
+        snapshot = mergeTrackLinks(snapshot, links);
+      }
       
       // Verify durations - check specific album
       const apostropheAlbum = snapshot.albums.find(a => a.id.includes('apostrophe'));
@@ -125,13 +203,22 @@ export async function loadLibrarySnapshot(
   if (env.LIBRARY_KV) {
     const cached = await env.LIBRARY_KV.get(LIBRARY_CACHE_KEY, 'json');
     if (cached) {
-      const cachedSnapshot = cached as LibrarySnapshot;
+      let cachedSnapshot = cached as LibrarySnapshot;
       // Check if cached data has durations
       const hasDurations = cachedSnapshot.albums.some(album => 
         album.tracks.some(track => track.durationMs > 0)
       );
       if (hasDurations) {
         console.log(`[LIBRARY] Loaded library from KV cache: ${cachedSnapshot.albumCount} albums (has durations)`);
+        
+        // Try to load and merge links from static asset (KV doesn't store links)
+        if (request) {
+          const links = await loadTrackLinks(request, 'library.comprehensive.json');
+          if (links) {
+            cachedSnapshot = mergeTrackLinks(cachedSnapshot, links);
+          }
+        }
+        
         return cachedSnapshot;
       } else {
         console.log(`[LIBRARY] KV cache exists but lacks durations, will use sample library`);
@@ -159,14 +246,36 @@ export async function persistLibrarySnapshot(
   );
 }
 
+/**
+ * Constant-time string comparison to prevent timing attacks
+ */
+function constantTimeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
+
 export function requireAdmin(request: Request, env: EnvBindings): boolean {
-  const headerToken = request.headers.get('x-admin-token');
-  const queryToken = new URL(request.url).searchParams.get('token');
   const expected = env.ADMIN_TOKEN;
+  
+  // Security by default: deny access if token not configured
   if (!expected) {
-    return true;
+    console.error('[AUTH] ADMIN_TOKEN not configured - denying access');
+    return false;
   }
 
-  return headerToken === expected || queryToken === expected;
+  // Only accept token in header, never in query string (query strings are logged/exposed)
+  const headerToken = request.headers.get('x-admin-token');
+  if (!headerToken) {
+    return false;
+  }
+
+  // Use constant-time comparison to prevent timing attacks
+  return constantTimeEqual(headerToken, expected);
 }
 

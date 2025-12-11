@@ -4,6 +4,7 @@ import {
 } from '../../utils/library.ts';
 import type { EnvBindings } from '../../utils/library.ts';
 import { getValidDropboxToken } from '../../utils/dropboxToken.ts';
+import { getSecurityHeaders } from '../../utils/security.ts';
 
 // Cache for track durations loaded from JSON
 let trackDurationsCache: Map<string, number> | null = null;
@@ -1276,6 +1277,7 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
       'cache-control': includeLinks
         ? 'private, max-age=3600'
         : 'public, max-age=300',
+      ...getSecurityHeaders(),
     },
   });
 };

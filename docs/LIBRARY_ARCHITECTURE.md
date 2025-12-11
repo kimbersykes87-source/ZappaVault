@@ -4,7 +4,7 @@ This document describes the library data architecture and how track durations an
 
 ## Overview
 
-The ZappaVault uses a **comprehensive library file** (`library.comprehensive.json`) as the single source of truth for all library metadata, including track durations and pre-generated streaming links.
+The ZappaVault uses a **comprehensive library file** (`library.comprehensive.json`) as the single source of truth for all library metadata, including track durations. To stay within Cloudflare KV's 25MB limit, pre-generated streaming links are stored in a separate **links database** (`library.comprehensive.links.json`) that is hosted in GitHub and served as a static asset.
 
 ## Data Flow
 
@@ -42,10 +42,19 @@ The ZappaVault uses a **comprehensive library file** (`library.comprehensive.jso
                        │
                        ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ 5. Deployment                                                │
-│    - library.comprehensive.json committed to repo           │
-│    - Uploaded to Cloudflare KV                              │
-│    - Served as static asset (/data/library.comprehensive.json)│
+│ 5. Link Extraction (upload_library_to_kv.js)               │
+│    - Extracts links to library.comprehensive.links.json    │
+│    - Removes links from library to reduce KV payload size   │
+│    - Links file stored in GitHub as static asset            │
+└──────────────────────┬──────────────────────────────────────┘
+                       │
+                       ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 6. Deployment                                                │
+│    - library.comprehensive.json (metadata only) → KV        │
+│    - library.comprehensive.links.json → GitHub (static)    │
+│    - Both files committed to repository                     │
+│    - Cloudflare Functions merge links at runtime             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -60,13 +69,26 @@ The ZappaVault uses a **comprehensive library file** (`library.comprehensive.jso
 - **Does NOT contain:** Track durations or streaming links
 
 ### `library.comprehensive.json`
-**Source:** Merged from `library.generated.json` + `zappa_tracks.db` + link generation  
+**Source:** Merged from `library.generated.json` + `zappa_tracks.db`  
 **Contains:**
 - All data from `library.generated.json`
 - Track durations (`durationMs` field for each track)
-- Pre-generated Dropbox permanent links (`streamingUrl` and `downloadUrl` for each track)
 - Pre-generated cover art URLs with `raw=1` parameter (`coverUrl` field for each album)
-- **This is the single source of truth used by the API**
+- **Note:** Links are extracted to separate file (see below) to keep KV payload under 25MB
+- **This is the single source of truth for metadata (links stored separately)**
+
+### `library.comprehensive.links.json`
+**Source:** Extracted from `library.comprehensive.json` during KV upload  
+**Contains:**
+- Pre-generated Dropbox permanent links for all tracks
+- Maps track IDs to their `streamingUrl` and `downloadUrl`
+- Stored in GitHub repository and served as static asset
+- Merged at runtime by Cloudflare Functions when serving API requests
+- **Benefits:**
+  - Keeps KV payload small (metadata only, no links)
+  - All links preserved (version controlled in GitHub)
+  - Fast access (static asset + KV merge)
+  - Automatic updates (workflow commits both files)
 
 ### `zappa_tracks.db`
 **Source:** Local SQLite database created by scanning audio files  
@@ -81,40 +103,51 @@ The ZappaVault uses a **comprehensive library file** (`library.comprehensive.jso
 
 The API endpoint (`functions/api/albums/[id].ts`) loads library data in this priority order:
 
-1. **Static Asset** (`/data/library.comprehensive.json`) - Most up-to-date, includes all links
-2. **KV Cache** (`LIBRARY_KV`) - Fast, but may be stale
+1. **Static Asset** (`/data/library.comprehensive.json`) - Most up-to-date metadata
+2. **KV Cache** (`LIBRARY_KV`) - Fast, but may be stale (metadata only, no links)
 3. **Sample Library** - Fallback for development
+
+**Link Merging:**
+- After loading library metadata, the API fetches links from `/data/library.comprehensive.links.json`
+- Links are merged into tracks at runtime by `mergeTrackLinks()` function
+- If links file is missing, API falls back to on-demand link generation
 
 ### Link Generation
 
 When `?links=1` is requested:
 
-1. **Check for pre-generated links** in comprehensive library
-   - If all tracks have links → Return immediately (fast path)
-   - If some tracks missing links → Generate only missing links (fallback)
-
-2. **Runtime link generation** (fallback only)
+1. **Load library metadata** from KV or static asset
+2. **Load links database** from `/data/library.comprehensive.links.json`
+3. **Merge links** into tracks at runtime
+4. **Fallback to runtime generation** if links file is missing or track has no link
    - Only generates links for tracks that don't have them
    - Processes in batches to avoid timeout
    - Uses Dropbox API to create permanent shared links
 
-## Benefits of Pre-Generated Links
+## Benefits of Separate Links Database
 
-1. **Eliminates Timeout Issues**
+1. **Stays Within KV Limits**
+   - KV has 25MB per value limit
+   - With 1,897 tracks, links add ~400-600KB+ of data
+   - Separating links keeps metadata payload well under limit
+
+2. **Eliminates Timeout Issues**
    - Large albums (30+ tracks) no longer timeout during link generation
    - Links are generated once during sync, not on every API request
 
-2. **Faster API Responses**
+3. **Faster API Responses**
    - No Dropbox API calls needed during user requests
-   - API simply reads pre-generated links from comprehensive library
+   - API merges pre-generated links from static asset (fast)
 
-3. **More Reliable**
+4. **More Reliable**
    - No dependency on Dropbox API availability during user requests
    - Links are generated in controlled environment (GitHub Actions)
+   - Links are version controlled in GitHub
 
-4. **Better Error Handling**
+5. **Better Error Handling**
    - Link generation errors are caught during sync, not during user requests
    - Failed links can be retried in next sync cycle
+   - Graceful fallback to on-demand generation if links file missing
 
 ## Workflow Steps
 
@@ -124,8 +157,9 @@ When `?links=1` is requested:
 2. **Export Durations** → Extract from `zappa_tracks.db`
 3. **Create Comprehensive Library** → Merge durations into library
 4. **Generate Links** → Create Dropbox permanent links for all tracks
-5. **Upload to KV** → Update Cloudflare KV cache
-6. **Commit & Push** → Save updated library to repository
+5. **Extract Links** → Save to `library.comprehensive.links.json` (separate file)
+6. **Upload to KV** → Upload metadata-only library (stays under 25MB)
+7. **Commit & Push** → Save both library and links files to repository
 
 ### Manual Workflow
 
@@ -146,9 +180,9 @@ python generate_track_links.py \
   webapp/data/library.comprehensive.json \
   webapp/data/library.comprehensive.json
 
-# 4. Upload to Cloudflare KV
-cd webapp
-npm run upload:cloudflare
+# 4. Upload to Cloudflare KV (extracts links automatically)
+node upload_library_to_kv.js webapp/data/library.comprehensive.json
+# This creates library.comprehensive.links.json automatically
 ```
 
 ## Track Duration Sources
@@ -208,7 +242,8 @@ Track durations come from the SQLite database (`zappa_tracks.db`), which is crea
 1. Check GitHub Actions workflow logs for errors
 2. Verify Dropbox credentials in GitHub Secrets
 3. Manually trigger sync workflow
-4. Check that `library.comprehensive.json` contains `streamingUrl` fields
+4. Check that `library.comprehensive.links.json` exists and contains links
+5. Verify links file is accessible at `/data/library.comprehensive.links.json`
 
 ### Missing Durations
 
@@ -233,9 +268,10 @@ Track durations come from the SQLite database (`zappa_tracks.db`), which is crea
 2. Too many tracks to process in Cloudflare Workers timeout window
 
 **Solutions:**
-1. Ensure sync workflow completed link generation
-2. Verify `library.comprehensive.json` has links for all tracks
-3. Check API logs to see if it's using pre-generated links or generating at runtime
+1. Ensure sync workflow completed link generation and extraction
+2. Verify `library.comprehensive.links.json` exists and has links for all tracks
+3. Check API logs to see if it's loading links from static asset or generating at runtime
+4. Verify links file is committed to repository and accessible as static asset
 
 ## Future Improvements
 

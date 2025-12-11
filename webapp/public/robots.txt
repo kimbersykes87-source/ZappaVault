@@ -1,0 +1,14 @@
+# robots.txt for ZappaVault
+# If this is a private family site, uncomment the following lines to prevent indexing:
+
+# User-agent: *
+# Disallow: /
+
+# If you want to allow indexing but restrict certain paths:
+User-agent: *
+Disallow: /api/
+Disallow: /functions/
+
+# Allow indexing of main pages
+Allow: /
+
