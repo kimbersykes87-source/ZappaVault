@@ -4,9 +4,10 @@ import { AlbumCard } from './AlbumCard.tsx';
 interface AlbumGridProps {
   albums: Album[];
   onPlay: (albumId: string) => void | Promise<void>;
+  busyAlbum?: string | null;
 }
 
-export function AlbumGrid({ albums, onPlay }: AlbumGridProps) {
+export function AlbumGrid({ albums, onPlay, busyAlbum }: AlbumGridProps) {
   if (albums.length === 0) {
     return <p className="empty-state">No albums match your filters.</p>;
   }
@@ -14,7 +15,12 @@ export function AlbumGrid({ albums, onPlay }: AlbumGridProps) {
   return (
     <div className="album-grid">
       {albums.map((album) => (
-        <AlbumCard key={album.id} album={album} onPlay={onPlay} />
+        <AlbumCard 
+          key={album.id} 
+          album={album} 
+          onPlay={onPlay}
+          isLoading={busyAlbum === album.id}
+        />
       ))}
     </div>
   );

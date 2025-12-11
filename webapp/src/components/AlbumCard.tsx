@@ -6,6 +6,7 @@ import { getAlbumDownloadUrl, getProxyUrl } from '../lib/api.ts';
 interface AlbumCardProps {
   album: Album;
   onPlay: (albumId: string) => void | Promise<void>;
+  isLoading?: boolean;
 }
 
 // Icon-only SVG icons (larger for icon-only buttons)
@@ -28,13 +29,19 @@ const InfoIcon = () => (
   </svg>
 );
 
-export function AlbumCard({ album, onPlay }: AlbumCardProps) {
+export function AlbumCard({ album, onPlay, isLoading = false }: AlbumCardProps) {
   const trackCount = album.tracks.length;
   const fileFormat = album.formats.length > 0 ? album.formats[0] : 'Unknown';
   const fileSize = formatFileSize(album.totalSizeBytes);
 
   return (
     <article className="album-card">
+      {isLoading && (
+        <div className="album-card-loading">
+          <span className="loading-spinner-small">⟳</span>
+          <span>Loading...</span>
+        </div>
+      )}
       <Link to={`/album/${album.id}`} className="album-cover-link">
         <div className="album-cover">
           {album.coverUrl ? (

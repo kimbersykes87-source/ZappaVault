@@ -1,11 +1,15 @@
 import { BrowserRouter, Route, Routes, Link } from 'react-router-dom';
+import { useEffect } from 'react';
 import './App.css';
 import { LibraryPage } from './pages/LibraryPage.tsx';
 import { AlbumPage } from './pages/AlbumPage.tsx';
 import { PlayerBar } from './components/PlayerBar.tsx';
 import { Footer } from './components/Footer.tsx';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts.ts';
 
 function App() {
+  useKeyboardShortcuts();
+
   return (
     <BrowserRouter>
       <div className="app-shell">

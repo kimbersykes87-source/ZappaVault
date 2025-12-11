@@ -16,6 +16,8 @@ export function PlayerBar() {
   const previous = usePlayerStore((state) => state.previous);
   const setLoading = usePlayerStore((state) => state.setLoading);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
 
   // Load audio source when track changes (but don't play yet)
   useEffect(() => {
@@ -141,40 +143,53 @@ export function PlayerBar() {
     };
   }, [next]);
 
-  // Track time remaining for countdown
+  // Track time for progress bar and display
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !currentTrack) {
       return;
     }
 
-    const updateTimeRemaining = () => {
+    const updateTime = () => {
       if (audio.duration && !isNaN(audio.duration)) {
-        const remaining = Math.max(0, (audio.duration * 1000) - (audio.currentTime * 1000));
+        const totalDuration = audio.duration * 1000;
+        const current = audio.currentTime * 1000;
+        const remaining = Math.max(0, totalDuration - current);
+        setDuration(totalDuration);
+        setCurrentTime(current);
         setTimeRemaining(remaining);
       } else {
         // If duration not loaded yet, use track duration
-        setTimeRemaining(currentTrack.durationMs || 0);
+        const trackDuration = currentTrack.durationMs || 0;
+        setDuration(trackDuration);
+        setTimeRemaining(trackDuration);
+        setCurrentTime(0);
       }
     };
 
     const handleTimeUpdate = () => {
-      updateTimeRemaining();
+      updateTime();
     };
 
     const handleLoadedMetadata = () => {
-      updateTimeRemaining();
+      updateTime();
+    };
+
+    const handleDurationChange = () => {
+      updateTime();
     };
 
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('durationchange', handleDurationChange);
     
     // Initial update
-    updateTimeRemaining();
+    updateTime();
 
     return () => {
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('durationchange', handleDurationChange);
     };
   }, [currentTrack]);
 
@@ -195,38 +210,63 @@ export function PlayerBar() {
     }
   };
 
+  const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.currentTime = parseFloat(e.target.value);
+    }
+  };
+
   return (
     <footer className="player-bar">
       <audio ref={audioRef} hidden />
-      {nowPlayingCoverUrl && (
-        <div className="player-cover">
-          <img 
-            src={getProxyUrl(nowPlayingCoverUrl)} 
-            alt={nowPlayingAlbum ?? 'Album cover'} 
-            crossOrigin="anonymous"
-          />
+      <div className="player-bar-content">
+        {nowPlayingCoverUrl && (
+          <div className="player-cover">
+            <img 
+              src={getProxyUrl(nowPlayingCoverUrl)} 
+              alt={nowPlayingAlbum ?? 'Album cover'} 
+              crossOrigin="anonymous"
+            />
+          </div>
+        )}
+        <div className="player-track">
+          <strong>{currentTrack.title}</strong>
+          <span>{nowPlayingAlbum ?? 'Unknown album'}</span>
         </div>
-      )}
-      <div className="player-track">
-        <strong>{currentTrack.title}</strong>
-        <span>{nowPlayingAlbum ?? 'Unknown album'}</span>
+        <div className="player-controls">
+          <button type="button" onClick={previous} title="Previous track" aria-label="Previous track">
+            ⏮
+          </button>
+          <button type="button" onClick={handleToggle} title={isPlaying ? "Pause" : "Play"} disabled={isLoading} aria-label={isPlaying ? "Pause" : "Play"}>
+            {isLoading ? (
+              <span className="loading-spinner-small">⟳</span>
+            ) : isPlaying ? '⏸' : '▶'}
+          </button>
+          <button type="button" onClick={next} title="Next track" aria-label="Next track">
+            ⏭
+          </button>
+        </div>
+        <div className="player-time">
+          <span>{formatDuration(currentTime)}</span>
+          <span className="player-time-separator">/</span>
+          <span>{formatDuration(duration || currentTrack.durationMs || 0)}</span>
+        </div>
+        <div className="player-meta">
+          <span>{currentTrack.format}</span>
+        </div>
       </div>
-      <div className="player-controls">
-        <button type="button" onClick={previous} title="Previous track">
-          ⏮
-        </button>
-        <button type="button" onClick={handleToggle} title="Toggle play" disabled={isLoading}>
-          {isLoading ? (
-            <span className="loading-spinner-small">⟳</span>
-          ) : isPlaying ? '⏸' : '▶'}
-        </button>
-        <button type="button" onClick={next} title="Next track">
-          ⏭
-        </button>
-      </div>
-      <div className="player-meta">
-        <span>{currentTrack.format}</span>
-        <span>-{formatDuration(timeRemaining)}</span>
+      <div className="player-progress">
+        <input
+          type="range"
+          className="player-progress-bar"
+          min="0"
+          max={duration || currentTrack.durationMs || 0}
+          value={currentTime}
+          onChange={handleProgressChange}
+          step="0.1"
+          aria-label="Seek"
+        />
       </div>
     </footer>
   );

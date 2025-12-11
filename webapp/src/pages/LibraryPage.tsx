@@ -6,12 +6,14 @@ import { LoadingState } from '../components/LoadingState.tsx';
 import { ErrorState } from '../components/ErrorState.tsx';
 import { usePlayerStore } from '../store/player.ts';
 import { fetchAlbum } from '../lib/api.ts';
+import { useToastContext } from '../context/ToastContext.tsx';
 
 export function LibraryPage() {
   const { request, setRequest, albums, loading, error, refresh } =
     useLibraryQuery();
   const setQueue = usePlayerStore((state) => state.setQueue);
   const [busyAlbum, setBusyAlbum] = useState<string | null>(null);
+  const { showToast } = useToastContext();
 
   const handleSearch = (value: string) => {
     setRequest((prev) => ({ ...prev, q: value, page: 1 }));
@@ -30,9 +32,9 @@ export function LibraryPage() {
         console.error(`Total tracks: ${album.tracks.length}`);
         // Check if there are any tracks at all
         if (album.tracks.length === 0) {
-          alert('This album has no tracks.');
+          showToast('This album has no tracks.', 'error');
         } else {
-          alert(`Streaming links are not available for this album yet. ${album.tracks.length} tracks found but no streaming URLs generated.`);
+          showToast(`Streaming links are not available for this album yet. ${album.tracks.length} tracks found but no streaming URLs generated.`, 'error');
         }
         setLoading(false);
         return;
@@ -41,7 +43,7 @@ export function LibraryPage() {
       setQueue(playable, album.title, album.coverUrl);
     } catch (err) {
       console.error('Error loading album:', err);
-      alert((err as Error).message);
+      showToast((err as Error).message, 'error');
       setLoading(false);
     } finally {
       setBusyAlbum(null);
@@ -76,7 +78,22 @@ export function LibraryPage() {
               Preparing {albums.find((album) => album.id === busyAlbum)?.title ?? 'album'}…
             </p>
           )}
-          <AlbumGrid albums={albums} onPlay={handlePlay} />
+          {albums.length === 0 ? (
+            <div className="empty-state">
+              <p className="empty-state-message">No albums found</p>
+              {request.q && (
+                <button 
+                  type="button"
+                  className="empty-state-button"
+                  onClick={() => setRequest((prev) => ({ ...prev, q: '' }))}
+                >
+                  Clear search
+                </button>
+              )}
+            </div>
+          ) : (
+            <AlbumGrid albums={albums} onPlay={handlePlay} busyAlbum={busyAlbum} />
+          )}
         </>
       )}
     </div>

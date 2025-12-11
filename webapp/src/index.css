@@ -31,6 +31,10 @@ body {
   background: radial-gradient(circle at top, #1f1f32 0%, #050505 55%);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 a {
   color: inherit;
 }
@@ -40,4 +44,13 @@ input,
 select {
   font: inherit;
   color: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid rgba(235, 64, 52, 0.9);
+  outline-offset: 2px;
+  border-radius: 4px;
 }

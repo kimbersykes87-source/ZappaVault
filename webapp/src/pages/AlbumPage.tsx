@@ -5,12 +5,15 @@ import { ErrorState } from '../components/ErrorState.tsx';
 import { formatDuration, formatFileSize } from '../utils/format.ts';
 import { getAlbumDownloadUrl, getProxyUrl } from '../lib/api.ts';
 import { usePlayerStore } from '../store/player.ts';
+import { useToastContext } from '../context/ToastContext.tsx';
 
 export function AlbumPage() {
   const { albumId } = useParams<{ albumId: string }>();
   const { album, loading, error } = useAlbum(albumId, true);
   const setQueue = usePlayerStore((state) => state.setQueue);
   const playTrackAt = usePlayerStore((state) => state.playTrackAt);
+  const currentTrack = usePlayerStore((state) => state.queue[state.currentIndex]);
+  const { showToast } = useToastContext();
 
   if (loading) {
     return <LoadingState message="Loading album…" />;
@@ -24,7 +27,7 @@ export function AlbumPage() {
 
   const handlePlayAlbum = () => {
     if (playableTracks.length === 0) {
-      alert('No streaming links for this album yet.');
+      showToast('No streaming links for this album yet.', 'error');
       return;
     }
     setQueue(playableTracks, album.title, album.coverUrl);
@@ -32,7 +35,7 @@ export function AlbumPage() {
 
   const handlePlayTrack = (index: number) => {
     if (playableTracks.length === 0) {
-      alert('No streaming links for this album yet.');
+      showToast('No streaming links for this album yet.', 'error');
       return;
     }
     const requested = album.tracks[index];
@@ -47,6 +50,9 @@ export function AlbumPage() {
 
   return (
     <div className="album-page">
+      <Link to="/" className="album-page-back">
+        ← Back to library
+      </Link>
       <header className="album-page-header">
         <div className="album-page-cover">
           {album.coverUrl ? (
@@ -94,11 +100,6 @@ export function AlbumPage() {
             </a>
           </div>
         </div>
-        <div>
-          <Link to="/" className="ghost">
-            ← Back to library
-          </Link>
-        </div>
       </header>
 
       <section className="tracklist">
@@ -107,8 +108,10 @@ export function AlbumPage() {
           <p>{album.tracks.length} total · {formatFileSize(album.totalSizeBytes)}</p>
         </header>
         <ol>
-          {album.tracks.map((track, index) => (
-            <li key={track.id}>
+          {album.tracks.map((track, index) => {
+            const isPlaying = currentTrack?.id === track.id;
+            return (
+            <li key={track.id} className={isPlaying ? 'playing' : ''} onDoubleClick={() => handlePlayTrack(index)}>
               <div className="track-info">
                 <span>{track.trackNumber}.</span>
                 <div>
@@ -127,7 +130,8 @@ export function AlbumPage() {
                 )}
               </div>
             </li>
-          ))}
+            );
+          })}
         </ol>
       </section>
     </div>
