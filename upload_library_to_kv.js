@@ -150,15 +150,35 @@ async function uploadToKV() {
     }
     
     const libraryContent = await readFile(libraryPath, 'utf-8');
-    const library = JSON.parse(libraryContent);
+    let library;
+    try {
+      library = JSON.parse(libraryContent);
+    } catch (error) {
+      throw new Error(`Invalid JSON in library file: ${error.message}`);
+    }
+    
+    // Validate library structure
+    if (!library || typeof library !== 'object') {
+      throw new Error('Library file is not a valid JSON object');
+    }
+    if (!Array.isArray(library.albums)) {
+      throw new Error('Library file missing or invalid albums array');
+    }
     
     // Extract links to separate file (stored in GitHub as static asset)
     // This keeps KV payload small while preserving all pre-generated links
     const linksMap = {};
     let linksExtracted = 0;
     
+    // Safely iterate through albums and tracks
     for (const album of library.albums || []) {
-      for (const track of album.tracks || []) {
+      if (!album || !Array.isArray(album.tracks)) {
+        continue; // Skip invalid albums
+      }
+      for (const track of album.tracks) {
+        if (!track || !track.id) {
+          continue; // Skip invalid tracks
+        }
         if (track.streamingUrl || track.downloadUrl) {
           linksMap[track.id] = {
             streamingUrl: track.streamingUrl || null,
@@ -175,18 +195,24 @@ async function uploadToKV() {
     
     // Write links to separate JSON file (will be committed to repo)
     if (linksExtracted > 0) {
-      const linksFilePath = libraryPath.replace(/\.json$/, '.links.json');
-      const linksData = {
-        generatedAt: library.generatedAt || new Date().toISOString(),
-        trackCount: linksExtracted,
-        links: linksMap,
-      };
-      
-      await writeFile(linksFilePath, JSON.stringify(linksData, null, 2), 'utf-8');
-      const linksFileSize = (await stat(linksFilePath)).size;
-      console.log(`   Extracted ${linksExtracted} track links to: ${linksFilePath}`);
-      console.log(`   Links file size: ${formatBytes(linksFileSize)}`);
-      console.log(`   (Links will be served as static asset and merged at runtime)`);
+      try {
+        const linksFilePath = libraryPath.replace(/\.json$/, '.links.json');
+        const linksData = {
+          generatedAt: library.generatedAt || new Date().toISOString(),
+          trackCount: linksExtracted,
+          links: linksMap,
+        };
+        
+        await writeFile(linksFilePath, JSON.stringify(linksData, null, 2), 'utf-8');
+        const linksFileSize = (await stat(linksFilePath)).size;
+        console.log(`   Extracted ${linksExtracted} track links to: ${linksFilePath}`);
+        console.log(`   Links file size: ${formatBytes(linksFileSize)}`);
+        console.log(`   (Links will be served as static asset and merged at runtime)`);
+      } catch (error) {
+        // Links file write failure is non-critical - log but continue
+        console.warn(`⚠️  Could not write links file: ${error.message}`);
+        console.warn(`   Continuing with upload (links can be regenerated)`);
+      }
     }
     
     // Minify JSON to reduce payload size
@@ -213,26 +239,55 @@ async function uploadToKV() {
     
     if (!forceUpload) {
       try {
-        const hashResponse = await fetch(
-          `https://api.cloudflare.com/client/v4/accounts/${accountId}/storage/kv/namespaces/${namespaceId}/values/library-snapshot-hash`,
-          {
-            headers: {
-              'Authorization': `Bearer ${apiToken}`,
+        // Use retry logic for hash check to handle rate limiting
+        const hashResponse = await retryWithBackoff(async () => {
+          const response = await fetch(
+            `https://api.cloudflare.com/client/v4/accounts/${accountId}/storage/kv/namespaces/${namespaceId}/values/library-snapshot-hash`,
+            {
+              headers: {
+                'Authorization': `Bearer ${apiToken}`,
+              },
             },
-          },
-        );
+          );
+          
+          if (!response.ok && response.status !== 404) {
+            // Retry on rate limiting or server errors
+            if (response.status === 429 || (response.status >= 500 && response.status < 600)) {
+              const error = new Error(`Hash check failed: ${response.status}`);
+              error.status = response.status;
+              const retryAfter = response.headers.get('Retry-After');
+              if (retryAfter) {
+                error.retryAfter = parseInt(retryAfter, 10);
+              }
+              throw error;
+            }
+          }
+          
+          return response;
+        }, {
+          maxRetries: 3, // Fewer retries for hash check (it's just a read)
+          baseDelay: 1000,
+          maxDelay: 30000,
+        });
         
         if (hashResponse.ok) {
-          const existingHash = await hashResponse.text();
-          if (existingHash === contentHash) {
-            console.log(`✅ Library content unchanged (hash matches)`);
-            console.log(`   Skipping upload to avoid rate limiting`);
-            console.log(`   (Use --force or FORCE_UPLOAD=1 to upload anyway)`);
-            needsUpload = false;
+          const existingHash = (await hashResponse.text()).trim();
+          
+          // Validate hash format (should be 64 hex characters for SHA-256)
+          if (existingHash && /^[a-f0-9]{64}$/i.test(existingHash)) {
+            if (existingHash === contentHash) {
+              console.log(`✅ Library content unchanged (hash matches)`);
+              console.log(`   Skipping upload to avoid rate limiting`);
+              console.log(`   (Use --force or FORCE_UPLOAD=1 to upload anyway)`);
+              needsUpload = false;
+            } else {
+              console.log(`📝 Library content changed`);
+              console.log(`   Previous hash: ${existingHash.substring(0, 16)}...`);
+              console.log(`   New hash:      ${contentHash.substring(0, 16)}...`);
+            }
           } else {
-            console.log(`📝 Library content changed`);
-            console.log(`   Previous hash: ${existingHash.substring(0, 16)}...`);
-            console.log(`   New hash:      ${contentHash.substring(0, 16)}...`);
+            console.log(`⚠️  Invalid hash format in KV, will upload to refresh`);
+            console.log(`   (Hash should be 64 hex characters, got: ${existingHash.length} chars)`);
           }
         } else if (hashResponse.status === 404) {
           console.log(`📝 No existing library found in KV (first upload)`);
@@ -240,8 +295,15 @@ async function uploadToKV() {
           console.log(`⚠️  Could not check existing hash (${hashResponse.status}), will upload anyway`);
         }
       } catch (error) {
-        console.log(`⚠️  Error checking existing hash: ${error.message}`);
-        console.log(`   Will upload anyway to ensure KV is up to date`);
+        // If hash check fails after retries, log but continue with upload
+        // This ensures we don't skip uploads due to transient API issues
+        if (error.status === 429) {
+          console.log(`⚠️  Rate limited while checking hash, will upload anyway`);
+          console.log(`   (This ensures library stays up to date even if hash check fails)`);
+        } else {
+          console.log(`⚠️  Error checking existing hash: ${error.message}`);
+          console.log(`   Will upload anyway to ensure KV is up to date`);
+        }
       }
     } else {
       console.log(`🔄 Force upload requested (--force flag)`);
@@ -250,28 +312,55 @@ async function uploadToKV() {
     if (!needsUpload) {
       // Still update the hash to track this version
       // (This is a small write, much less likely to hit rate limits)
+      // Use retry logic but don't fail if it doesn't work (non-critical)
       try {
-        await fetch(
-          `https://api.cloudflare.com/client/v4/accounts/${accountId}/storage/kv/namespaces/${namespaceId}/bulk`,
-          {
-            method: 'PUT',
-            headers: {
-              'Authorization': `Bearer ${apiToken}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify([
-              {
-                key: 'library-snapshot-hash',
-                value: contentHash,
+        await retryWithBackoff(async () => {
+          const response = await fetch(
+            `https://api.cloudflare.com/client/v4/accounts/${accountId}/storage/kv/namespaces/${namespaceId}/bulk`,
+            {
+              method: 'PUT',
+              headers: {
+                'Authorization': `Bearer ${apiToken}`,
+                'Content-Type': 'application/json',
               },
-            ]),
-          },
-        );
+              body: JSON.stringify([
+                {
+                  key: 'library-snapshot-hash',
+                  value: contentHash,
+                },
+              ]),
+            },
+          );
+          
+          if (!response.ok) {
+            const error = new Error(`Hash update failed: ${response.status}`);
+            error.status = response.status;
+            const retryAfter = response.headers.get('Retry-After');
+            if (retryAfter) {
+              error.retryAfter = parseInt(retryAfter, 10);
+            }
+            // Only retry on rate limiting or server errors
+            if (response.status === 429 || (response.status >= 500 && response.status < 600)) {
+              throw error;
+            }
+            // For other errors, just log and continue
+            throw error;
+          }
+          
+          return await response.json();
+        }, {
+          maxRetries: 2, // Fewer retries for hash update (non-critical)
+          baseDelay: 1000,
+          maxDelay: 10000,
+        });
         console.log(`✅ Updated hash in KV`);
       } catch (error) {
+        // Hash update is non-critical - if it fails, we'll just check again next time
         console.log(`⚠️  Could not update hash (non-critical): ${error.message}`);
+        console.log(`   Library content is unchanged, so this is safe to ignore`);
       }
-      return; // Exit early, no upload needed
+      // Exit successfully even if hash update failed (library didn't change)
+      return;
     }
     
     console.log(`📤 Uploading library snapshot to Cloudflare KV...`);
