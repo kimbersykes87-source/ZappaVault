@@ -21,8 +21,16 @@ export const onRequest: PagesFunction<EnvBindings> = async (context) => {
     '/robots.txt',
   ];
   
+  // Allow logo files to be accessed without authentication (needed for login page)
+  const publicLogoFiles = [
+    '/Zappa-Logo.png',
+    '/Zappa-Logo.svg',
+    '/Zappa-Loading.svg',
+  ];
+  
   // Check if path is public
-  const isPublicPath = publicPaths.some(path => url.pathname === path || url.pathname.startsWith('/assets/'));
+  const isPublicPath = publicPaths.some(path => url.pathname === path || url.pathname.startsWith('/assets/')) ||
+                       publicLogoFiles.includes(url.pathname);
   
   // CRITICAL: Block access to data files (library JSON, track durations, links)
   // These contain sensitive metadata and should only be accessible via authenticated API
