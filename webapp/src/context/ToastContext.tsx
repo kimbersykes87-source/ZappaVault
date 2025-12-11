@@ -1,4 +1,5 @@
-import { createContext, useContext, ReactNode, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
+import type { ReactNode } from 'react';
 import type { ToastType } from '../hooks/useToast.ts';
 
 interface ToastState {

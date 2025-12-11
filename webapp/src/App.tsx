@@ -1,5 +1,4 @@
 import { BrowserRouter, Route, Routes, Link } from 'react-router-dom';
-import { useEffect } from 'react';
 import './App.css';
 import { LibraryPage } from './pages/LibraryPage.tsx';
 import { AlbumPage } from './pages/AlbumPage.tsx';

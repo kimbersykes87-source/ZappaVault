@@ -15,7 +15,6 @@ export function PlayerBar() {
   const next = usePlayerStore((state) => state.next);
   const previous = usePlayerStore((state) => state.previous);
   const setLoading = usePlayerStore((state) => state.setLoading);
-  const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
 
@@ -154,15 +153,12 @@ export function PlayerBar() {
       if (audio.duration && !isNaN(audio.duration)) {
         const totalDuration = audio.duration * 1000;
         const current = audio.currentTime * 1000;
-        const remaining = Math.max(0, totalDuration - current);
         setDuration(totalDuration);
         setCurrentTime(current);
-        setTimeRemaining(remaining);
       } else {
         // If duration not loaded yet, use track duration
         const trackDuration = currentTrack.durationMs || 0;
         setDuration(trackDuration);
-        setTimeRemaining(trackDuration);
         setCurrentTime(0);
       }
     };
