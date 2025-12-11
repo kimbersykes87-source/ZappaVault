@@ -4,6 +4,7 @@
  * This script is used after durations are merged into the library file
  */
 import { readFile, stat, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import process from 'node:process';
 
 const accountId = process.env.CF_ACCOUNT_ID;
@@ -30,6 +31,13 @@ function formatBytes(bytes) {
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+}
+
+/**
+ * Compute SHA-256 hash of content
+ */
+function computeHash(content) {
+  return createHash('sha256').update(content).digest('hex');
 }
 
 /**
@@ -185,7 +193,11 @@ async function uploadToKV() {
     const minifiedContent = JSON.stringify(library);
     const minifiedSize = Buffer.byteLength(minifiedContent, 'utf8');
     
-    console.log(`📤 Uploading library snapshot to Cloudflare KV...`);
+    // Compute hash of the content to detect changes
+    const contentHash = computeHash(minifiedContent);
+    console.log(`   Content hash: ${contentHash.substring(0, 16)}...`);
+    
+    console.log(`📤 Checking if library has changed...`);
     console.log(`   Albums: ${library.albumCount}, Tracks: ${library.trackCount}`);
     
     // Count tracks with durations
@@ -195,11 +207,84 @@ async function uploadToKV() {
     console.log(`   Tracks with durations: ${tracksWithDurations}/${library.trackCount}`);
     console.log(`   Payload size: ${formatBytes(minifiedSize)}`);
     
-    // Build request payload
+    // Check if content has changed by comparing hash with what's in KV
+    const forceUpload = process.env.FORCE_UPLOAD === '1' || process.argv.includes('--force');
+    let needsUpload = true;
+    
+    if (!forceUpload) {
+      try {
+        const hashResponse = await fetch(
+          `https://api.cloudflare.com/client/v4/accounts/${accountId}/storage/kv/namespaces/${namespaceId}/values/library-snapshot-hash`,
+          {
+            headers: {
+              'Authorization': `Bearer ${apiToken}`,
+            },
+          },
+        );
+        
+        if (hashResponse.ok) {
+          const existingHash = await hashResponse.text();
+          if (existingHash === contentHash) {
+            console.log(`✅ Library content unchanged (hash matches)`);
+            console.log(`   Skipping upload to avoid rate limiting`);
+            console.log(`   (Use --force or FORCE_UPLOAD=1 to upload anyway)`);
+            needsUpload = false;
+          } else {
+            console.log(`📝 Library content changed`);
+            console.log(`   Previous hash: ${existingHash.substring(0, 16)}...`);
+            console.log(`   New hash:      ${contentHash.substring(0, 16)}...`);
+          }
+        } else if (hashResponse.status === 404) {
+          console.log(`📝 No existing library found in KV (first upload)`);
+        } else {
+          console.log(`⚠️  Could not check existing hash (${hashResponse.status}), will upload anyway`);
+        }
+      } catch (error) {
+        console.log(`⚠️  Error checking existing hash: ${error.message}`);
+        console.log(`   Will upload anyway to ensure KV is up to date`);
+      }
+    } else {
+      console.log(`🔄 Force upload requested (--force flag)`);
+    }
+    
+    if (!needsUpload) {
+      // Still update the hash to track this version
+      // (This is a small write, much less likely to hit rate limits)
+      try {
+        await fetch(
+          `https://api.cloudflare.com/client/v4/accounts/${accountId}/storage/kv/namespaces/${namespaceId}/bulk`,
+          {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${apiToken}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify([
+              {
+                key: 'library-snapshot-hash',
+                value: contentHash,
+              },
+            ]),
+          },
+        );
+        console.log(`✅ Updated hash in KV`);
+      } catch (error) {
+        console.log(`⚠️  Could not update hash (non-critical): ${error.message}`);
+      }
+      return; // Exit early, no upload needed
+    }
+    
+    console.log(`📤 Uploading library snapshot to Cloudflare KV...`);
+    
+    // Build request payload (include both library and hash)
     const requestBody = JSON.stringify([
       {
         key: 'library-snapshot',
         value: minifiedContent,
+      },
+      {
+        key: 'library-snapshot-hash',
+        value: contentHash,
       },
     ]);
     
