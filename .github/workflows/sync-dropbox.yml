@@ -114,7 +114,7 @@ jobs:
         working-directory: .
         run: |
           if [ -f "webapp/data/library.comprehensive.json" ] && [ -n "$CF_ACCOUNT_ID" ] && [ -n "$CF_KV_NAMESPACE_ID" ] && [ -n "$CLOUDFLARE_API_TOKEN" ]; then
-            node upload_library_to_kv.js webapp/data/library.comprehensive.json
+            node scripts/upload_library_to_kv.js webapp/data/library.comprehensive.json
           else
             echo "⚠️  Skipping KV upload (missing comprehensive library file or credentials)"
           fi

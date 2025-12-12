@@ -215,12 +215,13 @@ async function uploadToKV() {
       }
     }
     
-    // Minify JSON to reduce payload size
+    // Compute hash of the content to detect changes
+    // Exclude generatedAt timestamp since it changes every run but doesn't indicate content changes
+    const libraryForHash = { ...library };
+    delete libraryForHash.generatedAt;
     const minifiedContent = JSON.stringify(library);
     const minifiedSize = Buffer.byteLength(minifiedContent, 'utf8');
-    
-    // Compute hash of the content to detect changes
-    const contentHash = computeHash(minifiedContent);
+    const contentHash = computeHash(JSON.stringify(libraryForHash));
     console.log(`   Content hash: ${contentHash.substring(0, 16)}...`);
     
     console.log(`📤 Checking if library has changed...`);
