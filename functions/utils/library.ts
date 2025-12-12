@@ -142,16 +142,28 @@ async function loadLibraryFromStaticAsset(request?: Request): Promise<LibrarySna
         sum + album.tracks.filter(t => t.streamingUrl).length, 0
       );
       
+      console.log(`[LIBRARY] Static asset library has ${tracksWithLinks} tracks with streaming links out of ${snapshot.trackCount} total tracks`);
+      
+      // Sample a few tracks to verify links are present
       if (tracksWithLinks > 0) {
-        console.log(`[LIBRARY] Library already has ${tracksWithLinks} tracks with streaming links - no need to merge from links file`);
+        const sampleTrack = snapshot.albums.flatMap(a => a.tracks).find(t => t.streamingUrl);
+        if (sampleTrack) {
+          console.log(`[LIBRARY] Sample streaming URL: ${sampleTrack.streamingUrl?.substring(0, 80)}...`);
+        }
+        console.log(`[LIBRARY] ✅ Using links from comprehensive library file - no merge needed`);
       } else {
         // Only merge links from separate file if library doesn't have them (e.g., loaded from KV)
-        console.log(`[LIBRARY] No streaming links found in library - attempting to merge from links file`);
+        console.log(`[LIBRARY] ⚠️  No streaming links found in library - attempting to merge from links file`);
         const links = await loadTrackLinks(request, libraryPath);
         if (links) {
           snapshot = mergeTrackLinks(snapshot, links);
+          const mergedLinks = snapshot.albums.reduce((sum, album) => 
+            sum + album.tracks.filter(t => t.streamingUrl).length, 0
+          );
+          console.log(`[LIBRARY] After merge: ${mergedLinks} tracks now have streaming links`);
         } else {
-          console.warn(`[LIBRARY] ⚠️  Links file not found and library has no streaming links - tracks may not be playable`);
+          console.error(`[LIBRARY] ❌ Links file not found and library has no streaming links - tracks will not be playable`);
+          console.error(`[LIBRARY] This suggests the comprehensive library file is missing links or was loaded from KV`);
         }
       }
       
