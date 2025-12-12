@@ -124,9 +124,11 @@ Fetch album details.
 - `links=1` - Include streaming/download URLs (uses pre-generated links from comprehensive library)
 
 **Behavior:**
-- If `links=1` is provided, the API loads the library metadata from KV and merges pre-generated links from `library.comprehensive.links.json` (stored in GitHub as static asset)
-- Links are pre-generated during the sync workflow and stored separately to keep KV payload under 25MB limit
-- Links are merged at runtime by Cloudflare Functions, eliminating timeout issues and improving response times
+- If `links=1` is provided, the API loads the comprehensive library from the static asset (`/data/library.comprehensive.json`)
+- The comprehensive library contains all streaming links directly in the track objects (pre-generated during sync workflow)
+- Cloudflare Functions fetch the static asset with forwarded authentication cookies to bypass middleware protection
+- KV cache is used as a fallback if static asset fetch fails (contains metadata only, links stripped to stay under 25MB)
+- Links are pre-generated during the sync workflow and stored in the comprehensive library file (single source of truth)
 - If a track is missing a link (e.g., newly added track), the API will attempt to generate it at runtime as a fallback
 
 ### `GET /api/albums/:id/download`
@@ -312,11 +314,12 @@ The `.github/workflows/sync-dropbox.yml` workflow runs:
   - All album and track metadata
   - Track durations (from SQLite database)
   - Pre-generated cover art URLs with `raw=1` parameter for images
-  - **Note:** Links are extracted to separate file (see below)
-- `library.comprehensive.links.json` - **Links database** (stored in GitHub as static asset):
-  - Pre-generated Dropbox permanent links for all tracks (`streamingUrl` and `downloadUrl`)
-  - Maps track IDs to their Dropbox links
-  - Served as static asset and merged at runtime by Cloudflare Functions
+  - **Pre-generated streaming and download links** (`streamingUrl` and `downloadUrl` for all tracks)
+  - Deployed as static asset at `/data/library.comprehensive.json`
+  - Loaded by Cloudflare Functions with forwarded authentication cookies
+- `library.comprehensive.links.json` - **Links backup** (extracted during KV upload):
+  - Extracted links stored separately (backup/fallback, also in GitHub)
+  - Used only if comprehensive library cannot be loaded from static asset
 
 ### Manual Sync
 
@@ -334,17 +337,23 @@ python scripts/generate_track_links.py webapp/data/library.comprehensive.json we
 npm run upload:cloudflare
 ```
 
-**Note:** The comprehensive library (`library.comprehensive.json`) is the single source of truth used by the API. However, to stay within Cloudflare KV's 25MB limit, track links are stored separately:
+**Note:** The comprehensive library (`library.comprehensive.json`) is the single source of truth used by the API. It contains all metadata including streaming links. The architecture works as follows:
 
-- **Library metadata** (in KV): Albums, tracks, durations, cover art URLs
-- **Links database** (`library.comprehensive.links.json` in GitHub): Pre-generated Dropbox permanent links for all tracks
-- **Runtime merging**: Cloudflare Functions automatically merge links from the static asset when serving API requests
+- **Comprehensive library** (`library.comprehensive.json` in GitHub): Contains all metadata including streaming links
+  - Deployed as static asset at `/data/library.comprehensive.json`
+  - Loaded by Cloudflare Functions via authenticated fetch (cookies forwarded)
+  - Protected by middleware (requires authentication)
+- **KV cache** (metadata only): Links stripped to stay under 25MB limit
+  - Used as fast fallback if static asset fetch fails
+  - Contains albums, tracks, durations, cover art URLs (no links)
+- **Links backup** (`library.comprehensive.links.json`): Extracted during KV upload as backup
 
 This architecture ensures:
-- KV payload stays small (metadata only, no links)
-- All pre-generated links are preserved (stored in GitHub, version controlled)
-- Fast access (static asset + KV merge)
-- Automatic updates (workflow commits both files)
+- Comprehensive library (with links) is always the primary source (loaded from static asset)
+- KV payload stays small (metadata only, used as fallback)
+- All pre-generated links are preserved (stored in comprehensive library, version controlled)
+- Fast access (static asset with forwarded authentication)
+- Automatic updates (workflow commits comprehensive library file)
 
 ## 🧪 Testing
 
@@ -395,10 +404,16 @@ All changes are viewed directly on **Cloudflare Pages** at https://zappavault.pa
 **"Streaming links are not available" or "No stream"**
 - **Most common cause:** Links haven't been pre-generated yet. Run the GitHub Actions sync workflow to generate links for all tracks
 - Check that `library.comprehensive.json` exists and contains `streamingUrl` fields for tracks
-- Verify the sync workflow completed successfully (check GitHub Actions logs)
+- Verify the sync workflow completed successfully and committed `library.comprehensive.json` to GitHub
+- Ensure the comprehensive library file is deployed as static asset (check Cloudflare Pages build logs for file copy)
+- Verify Cloudflare Functions can access the static asset (check Functions logs for authentication/access errors)
+- The library loader forwards authentication cookies when fetching static assets - verify middleware allows authenticated access
 - Check Cloudflare Pages environment variables are set for **Production** environment
 - Trigger a new deployment after adding variables (Deployments → Retry deployment)
-- Check Cloudflare Functions logs for token refresh errors
+- Check Cloudflare Functions logs for:
+  - `[LIBRARY] ✅ Loaded library from static asset` (successful load)
+  - `[LIBRARY] Loaded library from KV cache` (fallback to KV, may indicate static asset fetch failed)
+  - `[LINK DEBUG] Pre-generated links: X/Y tracks already have links` (shows how many tracks have links)
 - Test API directly: `https://zappavault.pages.dev/api/albums/[album-id]?links=1`
 - **For large albums (30+ tracks):** Links are pre-generated to avoid timeout issues. If you see "No stream" for tracks 9+, the sync workflow may have failed or not completed link generation
 

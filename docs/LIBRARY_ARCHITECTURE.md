@@ -4,7 +4,7 @@ This document describes the library data architecture and how track durations an
 
 ## Overview
 
-The ZappaVault uses a **comprehensive library file** (`library.comprehensive.json`) as the single source of truth for all library metadata, including track durations. To stay within Cloudflare KV's 25MB limit, pre-generated streaming links are stored in a separate **links database** (`library.comprehensive.links.json`) that is hosted in GitHub and served as a static asset.
+The ZappaVault uses a **comprehensive library file** (`library.comprehensive.json`) as the single source of truth for all library metadata, including track durations and streaming links. The comprehensive library file is deployed as a static asset and loaded directly by Cloudflare Functions. To stay within Cloudflare KV's 25MB limit, links are extracted to a separate backup file (`library.comprehensive.links.json`) when uploading to KV, but the comprehensive library file (with all links) remains the primary source.
 
 ## Data Flow
 
@@ -43,18 +43,20 @@ The ZappaVault uses a **comprehensive library file** (`library.comprehensive.jso
                        ▼
 ┌─────────────────────────────────────────────────────────────┐
 │ 5. Link Extraction (upload_library_to_kv.js)               │
+│    - Creates deep copy of library for KV (links stripped)   │
 │    - Extracts links to library.comprehensive.links.json    │
-│    - Removes links from library to reduce KV payload size   │
-│    - Links file stored in GitHub as static asset            │
+│    - Original library.comprehensive.json keeps all links    │
+│    - Both files stored in GitHub (both deployed as static) │
 └──────────────────────┬──────────────────────────────────────┘
                        │
                        ▼
 ┌─────────────────────────────────────────────────────────────┐
 │ 6. Deployment                                                │
-│    - library.comprehensive.json (metadata only) → KV        │
-│    - library.comprehensive.links.json → GitHub (static)    │
-│    - Both files committed to repository                     │
-│    - Cloudflare Functions merge links at runtime             │
+│    - library.comprehensive.json (with links) → Static Asset │
+│    - library.comprehensive.links.json → Static Asset (backup)│
+│    - library.comprehensive.json (no links) → KV (fallback)  │
+│    - Cloudflare Functions load from static asset (primary)   │
+│    - Functions forward auth cookies for protected /data/     │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -69,25 +71,30 @@ The ZappaVault uses a **comprehensive library file** (`library.comprehensive.jso
 - **Does NOT contain:** Track durations or streaming links
 
 ### `library.comprehensive.json`
-**Source:** Merged from `library.generated.json` + `zappa_tracks.db`  
+**Source:** Merged from `library.generated.json` + `zappa_tracks.db` + link generation  
 **Contains:**
 - All data from `library.generated.json`
 - Track durations (`durationMs` field for each track)
 - Pre-generated cover art URLs with `raw=1` parameter (`coverUrl` field for each album)
-- **Note:** Links are extracted to separate file (see below) to keep KV payload under 25MB
-- **This is the single source of truth for metadata (links stored separately)**
+- **Pre-generated streaming and download links** (`streamingUrl` and `downloadUrl` for all tracks)
+- **This is the single source of truth for all metadata including links**
+- Deployed as static asset at `/data/library.comprehensive.json`
+- Protected by middleware (requires authentication)
+- Loaded by Cloudflare Functions with forwarded authentication cookies
 
 ### `library.comprehensive.links.json`
-**Source:** Extracted from `library.comprehensive.json` during KV upload  
+**Source:** Extracted from `library.comprehensive.json` during KV upload (backup only)  
 **Contains:**
 - Pre-generated Dropbox permanent links for all tracks
 - Maps track IDs to their `streamingUrl` and `downloadUrl`
 - Stored in GitHub repository and served as static asset
-- Merged at runtime by Cloudflare Functions when serving API requests
+- **Used as fallback only** if comprehensive library cannot be loaded
+- **Note:** The comprehensive library file contains all links, so this file is primarily a backup
 - **Benefits:**
-  - Keeps KV payload small (metadata only, no links)
+  - Backup/fallback if comprehensive library file cannot be accessed
+  - Keeps KV payload small (links stripped when uploading to KV)
   - All links preserved (version controlled in GitHub)
-  - Fast access (static asset + KV merge)
+  - Fast access (static asset)
   - Automatic updates (workflow commits both files)
 
 ### `zappa_tracks.db`
@@ -103,23 +110,34 @@ The ZappaVault uses a **comprehensive library file** (`library.comprehensive.jso
 
 The API endpoint (`functions/api/albums/[id].ts`) loads library data in this priority order:
 
-1. **Static Asset** (`/data/library.comprehensive.json`) - Most up-to-date metadata
-2. **KV Cache** (`LIBRARY_KV`) - Fast, but may be stale (metadata only, no links)
+1. **Static Asset** (`/data/library.comprehensive.json`) - **Primary source** with all metadata including streaming links
+   - Functions fetch the static asset with forwarded authentication cookies (to bypass middleware protection)
+   - If comprehensive library already contains streaming links, they are used directly (no merge needed)
+   - This is the preferred source as it contains all data including links
+2. **KV Cache** (`LIBRARY_KV`) - Fast fallback, but metadata only (links stripped)
+   - Used only if static asset fetch fails
+   - If loaded from KV, API attempts to merge links from `library.comprehensive.links.json` (backup)
+   - If links file is also missing, API falls back to on-demand link generation
 3. **Sample Library** - Fallback for development
 
-**Link Merging:**
-- After loading library metadata, the API fetches links from `/data/library.comprehensive.links.json`
-- Links are merged into tracks at runtime by `mergeTrackLinks()` function
-- If links file is missing, API falls back to on-demand link generation
+**Authentication:**
+- The `/data/` path is protected by middleware (requires authentication)
+- When Functions make internal `fetch()` calls to load the library, they forward the `Cookie` header from the original request
+- This allows authenticated access to the static asset while maintaining security
+- The library loader prioritizes static asset if it has streaming links or durations
 
-### Link Generation
+### Link Loading and Generation
 
 When `?links=1` is requested:
 
-1. **Load library metadata** from KV or static asset
-2. **Load links database** from `/data/library.comprehensive.links.json`
-3. **Merge links** into tracks at runtime
-4. **Fallback to runtime generation** if links file is missing or track has no link
+1. **Load comprehensive library** from static asset (`/data/library.comprehensive.json`)
+   - Functions forward authentication cookies to access protected static asset
+   - Comprehensive library already contains all streaming links in track objects
+   - If library has links, they are used directly (no merge needed)
+2. **Fallback: Load from KV** if static asset fetch fails
+   - KV contains metadata only (links stripped)
+   - API attempts to merge links from `library.comprehensive.links.json` (backup)
+3. **Fallback: Runtime link generation** if links are missing
    - Only generates links for tracks that don't have them
    - Processes in batches to avoid timeout
    - Uses Dropbox API to create permanent shared links
@@ -228,22 +246,39 @@ Track durations come from the SQLite database (`zappa_tracks.db`), which is crea
 
 ## Troubleshooting
 
-### Links Not Generated
+### Links Not Loading / "No stream" Error
 
 **Symptoms:** Tracks show "No stream" in UI
 
 **Causes:**
-1. Sync workflow didn't complete link generation step
-2. Dropbox credentials missing or invalid
-3. Link generation script failed (check GitHub Actions logs)
-4. New tracks added but sync hasn't run yet
+1. Comprehensive library file not deployed as static asset
+2. Functions cannot access static asset (authentication issue)
+3. Sync workflow didn't complete link generation step
+4. Dropbox credentials missing or invalid
+5. Link generation script failed (check GitHub Actions logs)
+6. New tracks added but sync hasn't run yet
 
 **Solutions:**
-1. Check GitHub Actions workflow logs for errors
-2. Verify Dropbox credentials in GitHub Secrets
-3. Manually trigger sync workflow
-4. Check that `library.comprehensive.links.json` exists and contains links
-5. Verify links file is accessible at `/data/library.comprehensive.links.json`
+1. **Verify comprehensive library has links:**
+   - Check that `webapp/data/library.comprehensive.json` exists in repo
+   - Verify it contains `streamingUrl` fields for tracks
+   - Check build logs to ensure file is copied to `dist/data/`
+2. **Verify static asset is accessible:**
+   - Check Cloudflare Functions logs for `[LIBRARY] ✅ Loaded library from static asset`
+   - Look for authentication errors (should forward cookies)
+   - Verify middleware allows authenticated access to `/data/` paths
+3. **Check sync workflow:**
+   - Review GitHub Actions workflow logs for link generation errors
+   - Verify Dropbox credentials in GitHub Secrets
+   - Manually trigger sync workflow if needed
+4. **Check deployment:**
+   - Ensure comprehensive library file is in `webapp/dist/data/` after build
+   - Verify Cloudflare Pages deployment includes the file
+   - Trigger new deployment if file is missing
+5. **Debug via logs:**
+   - Check Functions logs for `[LINK DEBUG]` messages
+   - Look for `Pre-generated links: X/Y tracks already have links`
+   - If showing 0/X, static asset is not loading correctly
 
 ### Missing Durations
 

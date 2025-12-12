@@ -45,11 +45,12 @@ The sync workflow creates a **comprehensive library file** that serves as the si
 - Track durations from SQLite database
 - Pre-generated cover art URLs with `raw=1` parameter for proper image display
 
-**Links Database:** To keep the KV payload under Cloudflare's 25MB limit, track links are extracted to a separate file:
-- `library.comprehensive.links.json` - Contains all pre-generated Dropbox permanent links
-- Stored in GitHub as a static asset (served at `/data/library.comprehensive.links.json`)
-- Cloudflare Functions automatically merge links at runtime when serving API requests
-- This eliminates timeout issues while keeping KV payload small
+**Links Database:** The comprehensive library file (`library.comprehensive.json`) contains all streaming and download links directly in the track objects. However, to keep the KV payload under Cloudflare's 25MB limit, links are extracted to a separate file when uploading to KV:
+- `library.comprehensive.json` - **Source of truth** with all metadata including streaming links (stored in GitHub, deployed as static asset)
+- `library.comprehensive.links.json` - Extracted links file (backup/fallback, also stored in GitHub)
+- When Cloudflare Functions load the library, they fetch `library.comprehensive.json` from the static asset (authenticated via forwarded cookies)
+- Links are preserved in the comprehensive library file, so streaming works immediately after deployment
+- KV cache contains metadata only (links stripped) for fast fallback access
 
 ### Automated sync via GitHub Actions
 
@@ -86,14 +87,20 @@ The sync workflow creates a **comprehensive library file** that serves as the si
 - `GET /api/albums/:id/download` – proxies Dropbox `download_zip` for album-level download
 - `POST /api/refresh` – authenticated endpoint to push a new snapshot into KV
 
-**Link Generation:**
-- Links are **pre-generated** during the sync workflow and stored in `library.comprehensive.links.json` (separate from main library)
-- Links are stored in GitHub as a static asset and merged at runtime by Cloudflare Functions
-- This architecture keeps KV payload under 25MB while preserving all pre-generated links
-- This eliminates timeout issues for large albums and improves API response times
+**Link Generation & Loading:**
+- Links are **pre-generated** during the sync workflow and stored directly in `library.comprehensive.json`
+- The comprehensive library file is deployed as a static asset at `/data/library.comprehensive.json`
+- Cloudflare Functions load the library by fetching the static asset, forwarding authentication cookies to bypass middleware protection
+- This ensures the comprehensive library (with all streaming links) is always the primary source
+- KV cache contains metadata only (links stripped) and is used as a fast fallback if static asset fetch fails
 - Audio files use `dl=1` parameter, images (cover art) use `raw=1` parameter
 - If a track is missing a link (e.g., newly added), the API will attempt to generate it at runtime as a fallback
 - Cover art URLs are pre-generated with `raw=1` for direct image access
+
+**Authentication for Static Assets:**
+- The `/data/` path is protected by middleware (requires authentication)
+- When Functions fetch static assets internally, they forward the `Cookie` header from the original request
+- This allows authenticated access to the comprehensive library file while maintaining security
 
 All functions share types defined in `shared/library.ts` to keep the UI, scripts, and API aligned.
 
