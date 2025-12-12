@@ -167,11 +167,13 @@ async function uploadToKV() {
     
     // Extract links to separate file (stored in GitHub as static asset)
     // This keeps KV payload small while preserving all pre-generated links
+    // IMPORTANT: Create a deep copy for KV upload (don't modify original library object)
+    const libraryForKV = JSON.parse(JSON.stringify(library));
     const linksMap = {};
     let linksExtracted = 0;
     
-    // Safely iterate through albums and tracks
-    for (const album of library.albums || []) {
+    // Safely iterate through albums and tracks in the copy (not the original)
+    for (const album of libraryForKV.albums || []) {
       if (!album || !Array.isArray(album.tracks)) {
         continue; // Skip invalid albums
       }
@@ -186,7 +188,8 @@ async function uploadToKV() {
           };
           linksExtracted++;
           
-          // Remove from library to reduce KV payload size
+          // Remove from library copy to reduce KV payload size
+          // Original library file on disk is NOT modified - it keeps all links
           delete track.streamingUrl;
           delete track.downloadUrl;
         }
@@ -208,6 +211,7 @@ async function uploadToKV() {
         console.log(`   Extracted ${linksExtracted} track links to: ${linksFilePath}`);
         console.log(`   Links file size: ${formatBytes(linksFileSize)}`);
         console.log(`   (Links will be served as static asset and merged at runtime)`);
+        console.log(`   Note: Original library file keeps all links - only KV upload uses stripped version`);
       } catch (error) {
         // Links file write failure is non-critical - log but continue
         console.warn(`⚠️  Could not write links file: ${error.message}`);
@@ -215,7 +219,11 @@ async function uploadToKV() {
       }
     }
     
-    // Compute hash of the content to detect changes
+    // Use the copy (without links) for KV upload
+    // Original library file on disk remains unchanged with all links intact
+    library = libraryForKV;
+    
+    // Compute hash of the content to detect changes (use library without links for hash)
     // Exclude generatedAt timestamp since it changes every run but doesn't indicate content changes
     const libraryForHash = { ...library };
     delete libraryForHash.generatedAt;

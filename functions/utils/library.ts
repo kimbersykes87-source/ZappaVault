@@ -137,10 +137,22 @@ async function loadLibraryFromStaticAsset(request?: Request): Promise<LibrarySna
       let snapshot = JSON.parse(text) as LibrarySnapshot;
       console.log(`[LIBRARY] ✅ Loaded library from static asset: ${snapshot.albumCount} albums, ${snapshot.trackCount} tracks`);
       
-      // Load and merge track links from separate file
-      const links = await loadTrackLinks(request, libraryPath);
-      if (links) {
-        snapshot = mergeTrackLinks(snapshot, links);
+      // Check if library already has streaming links (comprehensive library should have them)
+      const tracksWithLinks = snapshot.albums.reduce((sum, album) => 
+        sum + album.tracks.filter(t => t.streamingUrl).length, 0
+      );
+      
+      if (tracksWithLinks > 0) {
+        console.log(`[LIBRARY] Library already has ${tracksWithLinks} tracks with streaming links - no need to merge from links file`);
+      } else {
+        // Only merge links from separate file if library doesn't have them (e.g., loaded from KV)
+        console.log(`[LIBRARY] No streaming links found in library - attempting to merge from links file`);
+        const links = await loadTrackLinks(request, libraryPath);
+        if (links) {
+          snapshot = mergeTrackLinks(snapshot, links);
+        } else {
+          console.warn(`[LIBRARY] ⚠️  Links file not found and library has no streaming links - tracks may not be playable`);
+        }
       }
       
       // Verify durations - check specific album
