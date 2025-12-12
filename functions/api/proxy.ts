@@ -1,10 +1,19 @@
 import type { EnvBindings } from '../utils/library.ts';
+import { getValidDropboxToken } from '../utils/dropboxToken.ts';
 
 /**
- * Validate that URL is a legitimate Dropbox URL
+ * Validate that URL is a legitimate Dropbox URL or file path
  * Prevents SSRF (Server-Side Request Forgery) attacks
  */
 function isValidDropboxUrl(url: string): boolean {
+  // If it's a file path (starts with /), validate it's a Dropbox path
+  if (url.startsWith('/')) {
+    // Validate it starts with expected Dropbox path prefix
+    // Allow paths like /Apps/ZappaVault/ZappaLibrary/...
+    return url.startsWith('/Apps/') || url.startsWith('/ZappaLibrary/');
+  }
+  
+  // Otherwise, validate it's a Dropbox HTTP URL
   try {
     const parsed = new URL(url);
     const hostname = parsed.hostname.toLowerCase();
@@ -33,6 +42,33 @@ function isValidDropboxUrl(url: string): boolean {
   } catch {
     return false;
   }
+}
+
+/**
+ * Convert a Dropbox file path to a temporary HTTP URL
+ */
+async function getTemporaryLink(filePath: string, env: EnvBindings): Promise<string> {
+  const token = await getValidDropboxToken(env);
+  if (!token) {
+    throw new Error('Dropbox token not configured');
+  }
+  
+  const response = await fetch('https://api.dropboxapi.com/2/files/get_temporary_link', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ path: filePath }),
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => 'Unknown error');
+    throw new Error(`Failed to get temporary link: ${response.status} ${errorText}`);
+  }
+  
+  const data = await response.json() as { link: string };
+  return data.link;
 }
 
 /**
@@ -85,15 +121,35 @@ export const onRequestGet = async (context: {
     });
   }
 
+  // If it's a file path (starts with /), convert it to a temporary HTTP URL
+  let fetchUrl = targetUrl;
+  if (targetUrl.startsWith('/')) {
+    try {
+      console.log(`[PROXY] Converting file path to temporary link: ${targetUrl}`);
+      fetchUrl = await getTemporaryLink(targetUrl, env);
+      console.log(`[PROXY] Got temporary link: ${fetchUrl.substring(0, 80)}...`);
+    } catch (error) {
+      console.error(`[PROXY] Failed to get temporary link for ${targetUrl}:`, error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return new Response(`Failed to get Dropbox temporary link: ${errorMessage}`, {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'text/plain',
+        },
+      });
+    }
+  }
+
   try {
-    console.log(`[PROXY] Fetching: ${targetUrl}`);
+    console.log(`[PROXY] Fetching: ${fetchUrl}`);
     
     // Fetch the content from Dropbox with timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
     
     try {
-      const response = await fetch(targetUrl, {
+      const response = await fetch(fetchUrl, {
         method: 'GET',
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -114,7 +170,7 @@ export const onRequestGet = async (context: {
           console.error(`[PROXY] Could not read error response body:`, e);
         }
         
-        console.error(`[PROXY] Fetch failed: ${response.status} ${response.statusText} for ${targetUrl}`);
+        console.error(`[PROXY] Fetch failed: ${response.status} ${response.statusText} for ${fetchUrl}`);
         console.error(`[PROXY] Error details: ${errorText.substring(0, 500)}`);
         console.error(`[PROXY] Response headers:`, Object.fromEntries(response.headers.entries()));
         
