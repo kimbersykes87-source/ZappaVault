@@ -811,9 +811,28 @@ async function attachSignedLinks(
   
   console.log(`[LINK DEBUG] Pre-generated links: ${tracksWithLinks}/${album.tracks.length} tracks already have links`);
   
+  // Log sample of tracks to see what we have
+  if (tracksWithLinks > 0) {
+    const sampleTrack = album.tracks.find(t => t.streamingUrl);
+    console.log(`[LINK DEBUG] Sample track with link: ${sampleTrack?.title} - ${sampleTrack?.streamingUrl?.substring(0, 80)}...`);
+  } else {
+    console.log(`[LINK DEBUG] ⚠️  NO tracks have links - checking first few tracks:`);
+    album.tracks.slice(0, 3).forEach((t, i) => {
+      console.log(`[LINK DEBUG]   Track ${i + 1}: "${t.title}" - streamingUrl: ${t.streamingUrl || 'MISSING'}`);
+    });
+  }
+  
   // If all tracks have links, return early (no need to generate)
   if (tracksWithLinks === album.tracks.length) {
-    console.log(`[LINK DEBUG] ✅ All tracks already have links from comprehensive library`);
+    console.log(`[LINK DEBUG] ✅ All tracks already have links from comprehensive library - returning album as-is`);
+    return album;
+  }
+  
+  // If some tracks have links but not all, still return early - use what we have
+  // (The comprehensive library should have all links, so if some are missing, that's the data we have)
+  if (tracksWithLinks > 0) {
+    console.log(`[LINK DEBUG] ⚠️  ${tracksWithLinks}/${album.tracks.length} tracks have links - using existing links, not generating new ones`);
+    console.log(`[LINK DEBUG] This suggests the comprehensive library has partial link data`);
     return album;
   }
   
