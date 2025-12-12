@@ -24,11 +24,19 @@ async function loadTrackLinks(request: Request, libraryPath: string): Promise<Re
       : `${requestUrl.origin}/data/library.generated.links.json`;
     
     console.log(`[LINKS] Fetching track links from: ${linksPath}`);
+    
+    // Forward auth cookie from original request so middleware allows access
+    const authCookie = request.headers.get('Cookie');
+    const fetchHeaders: HeadersInit = {
+      'Accept': 'application/json',
+    };
+    if (authCookie) {
+      fetchHeaders['Cookie'] = authCookie;
+    }
+    
     const response = await fetch(linksPath, {
       cache: 'default', // Links don't change often, cache is fine
-      headers: {
-        'Accept': 'application/json',
-      },
+      headers: fetchHeaders,
     });
     
     if (response.ok) {
@@ -98,11 +106,18 @@ async function loadLibraryFromStaticAsset(request?: Request): Promise<LibrarySna
     let libraryPath = 'library.comprehensive.json';
     console.log(`[LIBRARY] Fetching comprehensive library from: ${staticAssetUrl}`);
     
+    // Forward auth cookie from original request so middleware allows access
+    const authCookie = request.headers.get('Cookie');
+    const fetchHeaders: HeadersInit = {
+      'Accept': 'application/json',
+    };
+    if (authCookie) {
+      fetchHeaders['Cookie'] = authCookie;
+    }
+    
     let response = await fetch(staticAssetUrl, {
       cache: 'no-store', // Don't use cache - always fetch fresh comprehensive library
-      headers: {
-        'Accept': 'application/json',
-      },
+      headers: fetchHeaders,
     });
     
     console.log(`[LIBRARY] Comprehensive library fetch: ${response.status} ${response.statusText}`);
@@ -116,9 +131,7 @@ async function loadLibraryFromStaticAsset(request?: Request): Promise<LibrarySna
     
       response = await fetch(staticAssetUrl, {
         cache: 'no-store', // Don't use cache
-        headers: {
-          'Accept': 'application/json',
-        },
+        headers: fetchHeaders,
       });
       console.log(`[LIBRARY] Fallback fetch: ${response.status} ${response.statusText}`);
     }
