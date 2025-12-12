@@ -1233,6 +1233,10 @@ export const onRequestGet: PagesFunction<EnvBindings> = async (context) => {
   const url = new URL(request.url);
   const includeLinks = url.searchParams.get('links') === '1';
   console.log(`[API DEBUG] includeLinks: ${includeLinks}`);
+  
+  // Debug: Check if album already has links from library
+  const tracksWithLinksInLibrary = album.tracks.filter(t => t.streamingUrl).length;
+  console.log(`[API DEBUG] Album ${album.title}: ${tracksWithLinksInLibrary}/${album.tracks.length} tracks already have streaming links in library snapshot`);
 
   let payload: Album;
   if (includeLinks) {
