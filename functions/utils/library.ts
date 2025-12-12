@@ -202,20 +202,31 @@ export async function loadLibrarySnapshot(
   env: EnvBindings,
   request?: Request,
 ): Promise<LibrarySnapshot> {
-  // ALWAYS try loading from static asset first - comprehensive library has all durations
-  // This is the single source of truth with all metadata including durations
+  // ALWAYS try loading from static asset first - comprehensive library has all data
+  // This is the single source of truth with all metadata including durations and links
   if (request) {
     const staticLibrary = await loadLibraryFromStaticAsset(request);
     if (staticLibrary) {
-      // Verify it has durations before using it
+      // Check if it has streaming links (most important - comprehensive library should have them)
+      const hasLinks = staticLibrary.albums.some(album => 
+        album.tracks.some(track => track.streamingUrl)
+      );
+      
+      // Also check for durations
       const hasDurations = staticLibrary.albums.some(album => 
         album.tracks.some(track => track.durationMs > 0)
       );
-      if (hasDurations) {
-        console.log(`[LIBRARY] Using comprehensive library from static asset (has durations)`);
+      
+      // Prioritize static asset if it has links OR durations (comprehensive library should have both)
+      if (hasLinks || hasDurations) {
+        if (hasLinks) {
+          console.log(`[LIBRARY] ✅ Using comprehensive library from static asset (has streaming links)`);
+        } else {
+          console.log(`[LIBRARY] ⚠️  Using comprehensive library from static asset (has durations but no links)`);
+        }
         return staticLibrary;
       } else {
-        console.warn(`[LIBRARY] Static asset loaded but lacks durations, will try KV cache`);
+        console.warn(`[LIBRARY] Static asset loaded but lacks both durations and links, will try KV cache`);
       }
     } else {
       console.warn(`[LIBRARY] Failed to load from static asset, will try KV cache`);
@@ -232,17 +243,24 @@ export async function loadLibrarySnapshot(
       const hasDurations = cachedSnapshot.albums.some(album => 
         album.tracks.some(track => track.durationMs > 0)
       );
+      
+      // KV doesn't store links (they're stripped to keep payload small)
+      // Always try to merge links from static asset links file
+      if (request) {
+        const links = await loadTrackLinks(request, 'library.comprehensive.json');
+        if (links) {
+          cachedSnapshot = mergeTrackLinks(cachedSnapshot, links);
+          const tracksWithLinksAfterMerge = cachedSnapshot.albums.reduce((sum, album) => 
+            sum + album.tracks.filter(t => t.streamingUrl).length, 0
+          );
+          console.log(`[LIBRARY] Loaded library from KV cache and merged ${tracksWithLinksAfterMerge} track links`);
+        } else {
+          console.warn(`[LIBRARY] ⚠️  KV cache loaded but links file not found - tracks will not have streaming links`);
+        }
+      }
+      
       if (hasDurations) {
         console.log(`[LIBRARY] Loaded library from KV cache: ${cachedSnapshot.albumCount} albums (has durations)`);
-        
-        // Try to load and merge links from static asset (KV doesn't store links)
-        if (request) {
-          const links = await loadTrackLinks(request, 'library.comprehensive.json');
-          if (links) {
-            cachedSnapshot = mergeTrackLinks(cachedSnapshot, links);
-          }
-        }
-        
         return cachedSnapshot;
       } else {
         console.log(`[LIBRARY] KV cache exists but lacks durations, will use sample library`);
