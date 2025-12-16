@@ -224,9 +224,17 @@ async function uploadToKV() {
     library = libraryForKV;
     
     // Compute hash of the content to detect changes (use library without links for hash)
-    // Exclude generatedAt and lastSyncedAt timestamps since they change every run but don't indicate content changes
+    // Exclude metadata fields that change every run but don't indicate actual content changes:
+    // - generatedAt: root-level timestamp updated on every run
+    // - lastSyncedAt: album-level timestamp updated on every sync
+    // - hasDurations: metadata flag that can flip based on whether NEW durations were added (not whether durations exist)
+    // - hasLinks: metadata flag indicating if links exist (can change if links are regenerated even if content unchanged)
+    // - hasCoverLinks: metadata flag indicating if cover links exist (same as hasLinks)
     const libraryForHash = JSON.parse(JSON.stringify(library)); // Deep copy to avoid modifying original
     delete libraryForHash.generatedAt;
+    delete libraryForHash.hasDurations; // Exclude metadata flag
+    delete libraryForHash.hasLinks; // Exclude metadata flag
+    delete libraryForHash.hasCoverLinks; // Exclude metadata flag
     // Remove lastSyncedAt from all albums (it's updated on every sync even if content hasn't changed)
     if (libraryForHash.albums) {
       for (const album of libraryForHash.albums) {
