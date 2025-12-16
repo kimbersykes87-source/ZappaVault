@@ -224,9 +224,17 @@ async function uploadToKV() {
     library = libraryForKV;
     
     // Compute hash of the content to detect changes (use library without links for hash)
-    // Exclude generatedAt timestamp since it changes every run but doesn't indicate content changes
-    const libraryForHash = { ...library };
+    // Exclude generatedAt and lastSyncedAt timestamps since they change every run but don't indicate content changes
+    const libraryForHash = JSON.parse(JSON.stringify(library)); // Deep copy to avoid modifying original
     delete libraryForHash.generatedAt;
+    // Remove lastSyncedAt from all albums (it's updated on every sync even if content hasn't changed)
+    if (libraryForHash.albums) {
+      for (const album of libraryForHash.albums) {
+        if (album && typeof album === 'object') {
+          delete album.lastSyncedAt;
+        }
+      }
+    }
     const minifiedContent = JSON.stringify(library);
     const minifiedSize = Buffer.byteLength(minifiedContent, 'utf8');
     const contentHash = computeHash(JSON.stringify(libraryForHash));
