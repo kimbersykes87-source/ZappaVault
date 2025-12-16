@@ -10,6 +10,7 @@ A Cloudflare Pages application that indexes a Dropbox-hosted Frank Zappa collect
 - **Metadata Completion:** 100% (era, genre, description, tags, cover art, track durations)
 - **Cover Art:** All URLs pre-generated with `raw=1` for proper image display
 - **Social Sharing:** Open Graph and Twitter Card meta tags configured
+- **Analytics:** Free privacy-focused analytics tracking (city, device, dwell time)
 - **Deployment:** Live at https://zappavault.pages.dev
 - **Auto-Deployment:** Configured via GitHub Actions
 
@@ -49,6 +50,8 @@ ZappaVault/
 │   ├── security/          # Security documentation and analysis
 │   ├── testing/           # Test reports and verification
 │   ├── ui-ux/             # UI/UX reviews and improvements
+│   ├── ANALYTICS.md       # Analytics implementation documentation
+│   ├── ANALYTICS_VIEWING_GUIDE.md  # How to view analytics data
 │   ├── CLOUDFLARE_ENV_SETUP.md
 │   ├── DROPBOX_TOKEN_SETUP.md
 │   └── LIBRARY_ARCHITECTURE.md
@@ -56,6 +59,8 @@ ZappaVault/
 │   ├── api/
 │   │   ├── library.ts     # GET /api/library
 │   │   ├── refresh.ts     # POST /api/refresh
+│   │   ├── analytics.ts   # POST /api/analytics, GET /api/analytics
+│   │   ├── analytics-viewer.ts  # GET /api/analytics-viewer
 │   │   └── albums/
 │   ├── shared/            # Shared types and query logic
 │   └── utils/             # Utility functions
@@ -152,6 +157,38 @@ Upload a new library snapshot to Cloudflare KV.
   }
 }
 ```
+
+### `POST /api/analytics`
+Record an analytics event (automatically called by frontend).
+
+**Body:**
+```json
+{
+  "path": "/album/123",
+  "timestamp": 1704067200000,
+  "dwellTime": 45000,
+  "referrer": "https://example.com"
+}
+```
+
+### `GET /api/analytics`
+Retrieve raw analytics data for the last N days.
+
+**Query Parameters:**
+- `days` (optional) - Number of days to retrieve (default: 7)
+
+### `GET /api/analytics-viewer`
+Get formatted analytics summary with top cities, devices, browsers, and OS.
+
+**Query Parameters:**
+- `days` (optional) - Number of days to analyze (default: 30)
+
+**Response includes:**
+- Summary statistics (total page views, sessions, average dwell time)
+- Top cities, devices, browsers, and operating systems
+- Daily breakdown table
+
+**View Analytics:** Visit `/analytics` on your site for a visual dashboard.
 
 ## 🔧 Scripts
 
@@ -479,6 +516,8 @@ All changes are viewed directly on **Cloudflare Pages** at https://zappavault.pa
 - [`docs/LIBRARY_ARCHITECTURE.md`](docs/LIBRARY_ARCHITECTURE.md) - Library data structure and architecture
 - [`docs/DROPBOX_TOKEN_SETUP.md`](docs/DROPBOX_TOKEN_SETUP.md) - Dropbox authentication setup guide
 - [`docs/CLOUDFLARE_ENV_SETUP.md`](docs/CLOUDFLARE_ENV_SETUP.md) - Cloudflare environment configuration
+- [`docs/ANALYTICS.md`](docs/ANALYTICS.md) - Analytics implementation and API documentation
+- [`docs/ANALYTICS_VIEWING_GUIDE.md`](docs/ANALYTICS_VIEWING_GUIDE.md) - Complete guide to viewing analytics data
 
 ### Security Documentation
 - [`docs/security/SECURITY_LEGAL_REVIEW.md`](docs/security/SECURITY_LEGAL_REVIEW.md) - Comprehensive security analysis
@@ -550,7 +589,8 @@ Private project - Family use only
 
 ---
 
-**Last Updated:** 2025-12-11  
+**Last Updated:** 2025-12-16  
 **Deployment Status:** ✅ Live at https://zappavault.pages.dev  
-**Auto-Deployment:** ✅ Enabled via GitHub Actions
+**Auto-Deployment:** ✅ Enabled via GitHub Actions  
+**Analytics:** ✅ Free privacy-focused analytics with dashboard at `/analytics`
 
