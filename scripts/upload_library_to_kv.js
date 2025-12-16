@@ -243,11 +243,9 @@ async function uploadToKV() {
         }
       }
     }
-    // Use libraryForHash (without metadata) for both hash computation AND upload content
-    // This ensures consistency: we hash what we upload, so hash comparisons work correctly
-    const minifiedContent = JSON.stringify(libraryForHash);
+    const minifiedContent = JSON.stringify(library);
     const minifiedSize = Buffer.byteLength(minifiedContent, 'utf8');
-    const contentHash = computeHash(minifiedContent);
+    const contentHash = computeHash(JSON.stringify(libraryForHash));
     console.log(`   Content hash: ${contentHash.substring(0, 16)}...`);
     
     console.log(`📤 Checking if library has changed...`);
@@ -492,4 +490,3 @@ uploadToKV().catch((error) => {
   console.error('❌ Cloudflare KV update failed:', error);
   process.exit(1);
 });
-

@@ -5,9 +5,11 @@ import { AlbumPage } from './pages/AlbumPage.tsx';
 import { PlayerBar } from './components/PlayerBar.tsx';
 import { Footer } from './components/Footer.tsx';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts.ts';
+import { useAnalytics } from './hooks/useAnalytics.ts';
 
 function App() {
   useKeyboardShortcuts();
+  useAnalytics();
 
   return (
     <BrowserRouter>
