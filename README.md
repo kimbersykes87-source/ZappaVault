@@ -113,14 +113,16 @@ Search, filter, and paginate albums.
 - `formats` - Filter by audio format (comma-separated: `FLAC,MP3`)
 - `era` - Filter by era (`Mothers Of Invention` or `Solo`)
 - `year` - Filter by release year
-- `sort` - Sort order: `title`, `year`, or `recent`
+- `sort` - Sort order: `title` (A-Z), `year` (Newest to Oldest), `year-asc` (Oldest to Newest, **default**), or `recent`
 - `page` - Page number (default: 1)
 - `pageSize` - Results per page (default: 24)
 
 **Example:**
 ```
-GET /api/library?q=hot&formats=FLAC&era=Solo&sort=year&page=1
+GET /api/library?q=hot&formats=FLAC&era=Solo&sort=year-asc&page=1
 ```
+
+**Note:** The default sort is `year-asc` (Oldest to Newest), displaying albums chronologically from earliest to latest release year.
 
 ### `GET /api/albums/:id`
 Fetch album details.
@@ -589,8 +591,9 @@ Private project - Family use only
 
 ---
 
-**Last Updated:** 2025-12-16  
+**Last Updated:** 2026-01-26  
 **Deployment Status:** ✅ Live at https://zappavault.pages.dev  
 **Auto-Deployment:** ✅ Enabled via GitHub Actions  
-**Analytics:** ✅ Free privacy-focused analytics with dashboard at `/analytics`
+**Analytics:** ✅ Free privacy-focused analytics with dashboard at `/analytics`  
+**Default Sort:** ✅ Oldest to Newest (chronological by release year)
 
