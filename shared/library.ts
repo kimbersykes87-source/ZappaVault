@@ -69,7 +69,7 @@ export function applyLibraryQuery(
     formats,
     era,
     year,
-    sort = 'title',
+    sort = 'year-asc',
     page = 1,
     pageSize = DEFAULT_PAGE_SIZE,
   } = query;

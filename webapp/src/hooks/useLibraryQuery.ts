@@ -5,7 +5,7 @@ import type { LibraryRequest, LibraryResponse } from '../lib/api.ts';
 
 const defaultRequest: LibraryRequest = {
   q: '',
-  sort: 'title',
+  sort: 'year-asc',
   page: 1,
   pageSize: 200, // Show all albums on homepage
 };
@@ -38,7 +38,7 @@ export function useLibraryQuery() {
       return [];
     }
 
-    const sortKey = request.sort ?? (data.query?.sort as LibraryRequest['sort']) ?? 'title';
+    const sortKey = request.sort ?? (data.query?.sort as LibraryRequest['sort']) ?? 'year-asc';
     const sorted = [...data.results];
 
     sorted.sort((a, b) => {

@@ -24,7 +24,7 @@ export const onRequestGet = async (context: {
     year: url.searchParams.get('year')
       ? Number(url.searchParams.get('year'))
       : undefined,
-    sort: (url.searchParams.get('sort') as LibraryQuery['sort']) ?? 'title',
+    sort: (url.searchParams.get('sort') as LibraryQuery['sort']) ?? 'year-asc',
     page: url.searchParams.get('page')
       ? Number(url.searchParams.get('page'))
       : 1,

@@ -56,7 +56,7 @@ export function LibraryPage() {
         <SearchBar value={request.q ?? ''} onSearch={handleSearch} />
         <select
           className="sort-dropdown"
-          value={request.sort ?? 'title'}
+          value={request.sort ?? 'year-asc'}
           onChange={(e) => {
             const sortValue = e.target.value as 'title' | 'year' | 'year-asc';
             setRequest((prev) => ({ ...prev, sort: sortValue, page: 1 }));
